@@ -17,19 +17,33 @@
           text-color="black">
           <q-badge color="green" class="absolute-bottom-right badge-position" rounded />
         </q-btn>
-        <div class="text-weight-bold">User Name</div>
+        <div class="text-subtitle2 text-weight-bolder">User Name</div>
         <q-separator class="absolute-bottom"></q-separator>
       </div>
 
       <q-scroll-area style="height: calc(100% - 50px); margin-top: 50px;">
         <q-list dense>
-          <template v-for="(menuItem, index) in menuList" :key="index">
-            <q-item clickable :active="menuItem.label === 'Outbox'" v-ripple>
-              <q-item-section>
-                # {{ menuItem.label }}
-              </q-item-section>
-            </q-item>
-          </template>
+          <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
+            class="text-subtitle2">
+            <template v-for="(menuItem, index) in menuList" :key="index">
+              <q-item dense clickable :active="menuItem.label === 'Outbox'" v-ripple>
+                <q-item-section class="text-subtitle2">
+                  # {{ menuItem.label }}
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-expansion-item>
+          <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
+            class="text-subtitle2">
+            <template v-for=" (menuItem, index) in menuList" :key="index">
+              <q-item dense clickable :active="menuItem.label === 'Outbox'" v-ripple>
+                <q-item-section class="text-subtitle2">
+                  # {{ menuItem.label }}
+                </q-item-section>
+              </q-item>
+            </template>
+          </q-expansion-item>
+
         </q-list>
       </q-scroll-area>
 
@@ -64,24 +78,6 @@ const menuList = [
   },
   {
     label: 'Channel 4',
-  },
-  {
-    label: 'Channel 5',
-  },
-  {
-    label: 'Channel 6',
-  },
-  {
-    label: 'Channel 7',
-  },
-  {
-    label: 'Channel 5',
-  },
-  {
-    label: 'Channel 6',
-  },
-  {
-    label: 'Channel 7',
   },
   {
     label: 'Channel 5',
