@@ -39,9 +39,10 @@
       <router-view />
     </q-page-container>
 
-    <q-footer class="bg-grey-8 text-white">
-      <div class=" bg-amber">
-        textbox will be here
+    <q-footer style="background-color:transparent" class="row">
+      <div class="text-box">
+        <textarea placeholder="Message"></textarea>
+        <q-btn flat icon="send" color="teal" padding="xs" />
       </div>
     </q-footer>
 
@@ -104,10 +105,12 @@ export default defineComponent({
   name: 'MainLayout',
   setup() {
     const drawer = ref(false)
+    const text = ref('')
 
     return {
       drawer,
-      menuList
+      menuList,
+      text
     }
   }
 });
@@ -116,5 +119,26 @@ export default defineComponent({
 <style scoped>
 .badge-position {
   margin: 0px -2px -2px 0px
+}
+
+.text-box {
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.text-box textarea {
+  resize: none !important;
+  height: 150px;
+  width: 100%;
+  padding: 14px 38px 14px 14px;
+  border-radius: 8px;
+  border: solid 2px grey;
+  outline-color: teal;
+  margin: 14px 10px 14px 14px;
+}
+
+.text-box button {
+  margin: 0px 14px 14px 0px;
 }
 </style>
