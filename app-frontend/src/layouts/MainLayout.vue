@@ -4,13 +4,20 @@
     <q-header class="bg-dark text-white">
       <q-toolbar>
         <q-btn dense flat round icon="menu" @click="drawer = !drawer" />
-        <q-toolbar-title>
-          <div class="text-h6">Channel 1</div>
+        <q-toolbar-title class="row">
+          <q-btn flat dense no-caps color="white" size="16px" padding="2px 6px">
+            <div class="text-weight-bold"># Channel 1</div>
+            <q-icon name="expand_more" size="18px" />
+          </q-btn>
         </q-toolbar-title>
+        <q-btn dense flat>
+          <q-icon name="group" class="q-mr-xs" />
+          <div class="text-subtile2">26</div>
+        </q-btn>
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="drawer" side="left" :width="200" :breakpoint="500" class="bg-grey-3">
+    <q-drawer show-if-above v-model="drawer" side="left" :width="225" :breakpoint="600" class="bg-grey-3">
 
       <div class="absolute-top row items-center" style="height:50px;">
         <q-btn unelevated color="primary" padding="none" style="height:32px; width:32px" label="M" class="q-ma-sm"
@@ -23,6 +30,15 @@
 
       <q-scroll-area style="height: calc(100% - 50px); margin-top: 50px;">
         <q-list dense>
+          <q-item dense clickable v-ripple>
+            <q-item-section class="text-subtitle2">
+              Add Channel
+            </q-item-section>
+            <q-item-section side>
+              <q-icon name="add" size="20px" style="margin-right: 2px;" />
+            </q-item-section>
+          </q-item>
+
           <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
             class="text-subtitle2">
             <template v-for="(menuItem, index) in menuList" :key="index">
@@ -43,7 +59,6 @@
               </q-item>
             </template>
           </q-expansion-item>
-
         </q-list>
       </q-scroll-area>
 
