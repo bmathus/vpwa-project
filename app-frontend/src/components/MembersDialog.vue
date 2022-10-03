@@ -11,13 +11,17 @@
         <q-list>
           <q-item dense v-for="member in channelMembersList" :key="member.name">
             <q-item-section avatar>
-              <q-avatar rounded :color="member.avatarColor" text-color="dark" class="q-my-xs">
+              <q-avatar rounded :color="member.avatarColor" text-color="dark" class="q-my-xs"
+                style="height:38px; width:38px">
                 <div>{{member.name[0].toUpperCase()}}</div>
-                <q-badge :color="getMemberStatus(member)" class="absolute-bottom-right badge-style" rounded>
-                </q-badge>
+                <activity-badge :status="member.status" />
               </q-avatar>
             </q-item-section>
-            <q-item-section>{{member.name}}</q-item-section>
+
+            <q-item-section>
+              {{member.name}}
+            </q-item-section>
+
           </q-item>
         </q-list>
       </q-scroll-area>
@@ -28,6 +32,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import ActivityBadge from './ActivityBadge.vue'
 
 type Member = {
   name: string,
@@ -66,20 +71,12 @@ const channelMembersList: Member[] = [
 
 export default defineComponent({
   name: 'MembersDialog',
+  components: {
+    ActivityBadge
+  },
   setup() {
-    function getMemberStatus(member: Member): string {
-      if (member.status === 'online') {
-        return 'green';
-      } else if (member.status === 'dnd') {
-        return 'grey';
-      } else {
-        return 'red';
-      }
-    }
-
     return {
       channelMembersList,
-      getMemberStatus
     }
   }
 });
