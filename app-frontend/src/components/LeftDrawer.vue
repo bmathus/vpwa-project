@@ -14,12 +14,19 @@
 
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
           <template v-for="(item, index) in invitationsList" :key="index">
-            <q-item dense clickable :active="item.label === 'Outbox'" v-ripple>
+            <q-item dense :active="item.label === 'Outbox'">
               <q-item-section class="text-subtitle2">
                 # {{ item.label }}
               </q-item-section>
               <q-item-section side>
-                <q-badge outline color="teal" label="new" />
+                <div class="row items-center justify-center">
+                  <q-badge outline color="teal">
+                    <q-icon name="check" color="teal" />
+                  </q-badge>
+                  <q-badge outline color="red" class="q-ml-xs">
+                    <q-icon name="close" color="red" />
+                  </q-badge>
+                </div>
               </q-item-section>
             </q-item>
           </template>
@@ -51,7 +58,7 @@
     </q-scroll-area>
 
     <div class="absolute-bottom bg-grey-3">
-      <q-separator></q-separator>
+      <q-separator />
       <q-item dense clickable v-ripple>
         <q-item-section class="text-subtitle2">
           Add Channel
