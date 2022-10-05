@@ -6,7 +6,9 @@
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
+
       <q-separator />
+
       <q-scroll-area class="area">
         <q-list>
           <q-item dense v-for="member in channelMembersList" :key="member.name">
