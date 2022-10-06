@@ -34,10 +34,10 @@
 
         <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
           class="text-subtitle2">
-          <template v-for="(menuItem, index) in menuList" :key="index">
-            <q-item dense clickable :active="menuItem.label === 'Outbox'" v-ripple>
+          <template v-for="channel in store.getPrivateChannels" :key="channel.id">
+            <q-item dense clickable v-ripple>
               <q-item-section class="text-subtitle2">
-                # {{ menuItem.label }}
+                # {{ channel.name }}
               </q-item-section>
             </q-item>
           </template>
@@ -45,10 +45,10 @@
 
         <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
           class="text-subtitle2">
-          <template v-for=" (menuItem, index) in menuList" :key="index">
-            <q-item dense clickable :active="menuItem.label === 'Outbox'" v-ripple>
+          <template v-for=" channel in store.getPublicChannels" :key="channel.id">
+            <q-item dense clickable v-ripple>
               <q-item-section class="text-subtitle2">
-                # {{ menuItem.label }}
+                # {{ channel.name }}
               </q-item-section>
             </q-item>
           </template>
@@ -68,7 +68,7 @@
         </q-item-section>
       </q-item>
     </div>
-    <create-channel-dialog v-model="openDialog" />
+    <create-channel-dialog v-model="openDialog" @showDialog="toggleDialog" />
   </q-drawer>
 
 </template>
@@ -77,36 +77,8 @@
 import { defineComponent, ref } from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
+import { useChannelStore } from 'src/stores/channelstore';
 
-const menuList = [
-  {
-    label: 'Channel 1',
-  },
-  {
-    label: 'Channel 2',
-  },
-  {
-    label: 'Channel 3',
-  },
-  {
-    label: 'Channel 4',
-  },
-  {
-    label: 'Channel 5',
-  },
-  {
-    label: 'Channel 6',
-  },
-  {
-    label: 'Channel 7',
-  },
-  {
-    label: 'Channel 5',
-  },
-  {
-    label: 'Channel 6',
-  },
-]
 
 const invitationsList = [
   {
@@ -121,19 +93,20 @@ export default defineComponent({
   name: 'LeftDrawer',
   components: {
     ActivityBadge,
-    CreateChannelDialog
+    CreateChannelDialog,
   },
   setup() {
+    const store = useChannelStore()
     const openDialog = ref(false)
 
     function toggleDialog(): void {
       openDialog.value = !openDialog.value;
     }
     return {
-      menuList,
       invitationsList,
       toggleDialog,
-      openDialog
+      openDialog,
+      store
     }
   }
 

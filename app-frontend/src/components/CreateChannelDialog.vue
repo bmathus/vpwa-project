@@ -11,8 +11,8 @@
 
       <q-card-section s>
         <q-form @submit.prevent="onSubmit" class="column justify-center area">
-          <q-input filled dense v-model="name" label="Name" hint="Enter unique channel name" lazy-rules
-            :rules="[(val:any)  => val && val.length > 0 || 'Please type something']" />
+          <q-input filled dense v-model="name" label="Channel name" hint="Enter unique channel name" lazy-rules
+            :rules="[(val:any)  => val && val.length > 0 || 'Name must be at least 1 character']" />
 
           <q-toggle v-model="isPublic" color="steal" keep-color :label="isPublic ? 'Public' :'Private' " />
 
@@ -29,20 +29,23 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useChannelStore } from 'src/stores/channelstore';
 
 export default defineComponent({
   name: 'CreateChannelDialog',
-  setup() {
-
+  emits: ['showDialog'],
+  setup(props, ctx) {
+    const store = useChannelStore()
     const name = ref('');
     const isPublic = ref(false);
 
     function onSubmit(): void {
-
-      console.log(name.value)
+      store.createNewChannel(name.value, isPublic.value);
+      ctx.emit('showDialog');
+      name.value = '';
     }
     return {
-      name, onSubmit, isPublic
+      name, onSubmit, isPublic, store
     }
   }
 });
