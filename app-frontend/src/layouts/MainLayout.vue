@@ -8,7 +8,7 @@
     <left-drawer v-model="drawerVisible" />
 
     <q-page-container>
-      <router-view />
+      <component :is="activeComponent"></component>
     </q-page-container>
 
     <q-footer style="background-color:transparent" class="row">
@@ -23,10 +23,13 @@
 
 <script lang="ts">
 
-import { ref, defineComponent } from 'vue'
+import { ref, defineComponent, computed } from 'vue'
 
 import ToolbarHeader from '../components/ToolbarHeader.vue';
 import LeftDrawer from '../components/LeftDrawer.vue';
+import { useChannelStore } from '../stores/channelstore'
+import ChannelPage from '../pages/ChannelPage.vue';
+import NoChannelPage from '../pages/NoChannelPage.vue'
 
 export default defineComponent({
   name: 'MainLayout',
@@ -35,12 +38,24 @@ export default defineComponent({
     LeftDrawer
   },
   setup() {
+    const store = useChannelStore()
+
+    store.fetchChannels()
+
     const drawerVisible = ref(false)
     const text = ref('')
+    const activeComponent = computed(() => {
+      if (store.channelsAreEmpty) {
+        return NoChannelPage
+      } else {
+        return ChannelPage
+      }
+    })
 
     return {
       drawerVisible,
       text,
+      activeComponent
     }
   }
 });

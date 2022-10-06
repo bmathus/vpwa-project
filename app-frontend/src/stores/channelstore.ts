@@ -49,8 +49,9 @@ const dummyChannels: Channel[] = [
 
 export const useChannelStore = defineStore('channelstore', {
   state: () => ({
-    channels:dummyChannels as Channel[],
-    channels_messages: null as ChannelsMessages | null
+    channels:[] as Channel[],
+    channels_messages: null as ChannelsMessages | null,
+    active_channel: null as Channel | null
   }),
 
   getters: {
@@ -59,17 +60,41 @@ export const useChannelStore = defineStore('channelstore', {
     },
     getPrivateChannels() :Channel[] {
       return this.channels.filter((channel) => channel.is_public === false);
+    },
+    getActiveChannel(): Channel | null {
+      return this.active_channel
+    }, 
+    channelsAreEmpty(): boolean {
+      if(this.channels.length === 0) {
+        return true
+      } else {
+        return false
+      }
     }
+    
   },
 
   actions: {
+    fetchChannels() {
+      this.channels = dummyChannels;
+      if(this.channels.length !== 0) {
+        this.active_channel = this.channels[0];
+      }
+    },
     createNewChannel(channel_name: string,is_public: boolean): void {
-      this.channels.push({
+      const new_channel: Channel = {
         id:Date.now(),
         name:channel_name,
         members:[], // treba pridat neviem či seba alebo ako to vymysliet - zatial prazdny list
         is_public:is_public
-      })
+      };
+
+      this.channels.push(new_channel)
+      this.active_channel = new_channel;
+    },
+
+    setActiveChannel(channel :Channel): void {
+      this.active_channel = channel;
     }
     
   }

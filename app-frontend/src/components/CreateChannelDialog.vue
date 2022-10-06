@@ -33,7 +33,7 @@ import { useChannelStore } from 'src/stores/channelstore';
 
 export default defineComponent({
   name: 'CreateChannelDialog',
-  emits: ['showDialog'],
+  emits: ['dialogVisibility'],
   setup(props, ctx) {
     const store = useChannelStore()
     const name = ref('');
@@ -41,7 +41,7 @@ export default defineComponent({
 
     function onSubmit(): void {
       store.createNewChannel(name.value, isPublic.value);
-      ctx.emit('showDialog');
+      ctx.emit('dialogVisibility');
       name.value = '';
     }
     return {

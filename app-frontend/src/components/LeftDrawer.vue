@@ -14,7 +14,7 @@
 
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
           <template v-for="(item, index) in invitationsList" :key="index">
-            <q-item dense :active="item.label === 'Outbox'">
+            <q-item dense>
               <q-item-section class="text-subtitle2">
                 # {{ item.label }}
               </q-item-section>
@@ -35,7 +35,7 @@
         <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
           class="text-subtitle2">
           <template v-for="channel in store.getPrivateChannels" :key="channel.id">
-            <q-item dense clickable v-ripple>
+            <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 # {{ channel.name }}
               </q-item-section>
@@ -46,7 +46,7 @@
         <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
           class="text-subtitle2">
           <template v-for=" channel in store.getPublicChannels" :key="channel.id">
-            <q-item dense clickable v-ripple>
+            <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 # {{ channel.name }}
               </q-item-section>
@@ -68,7 +68,7 @@
         </q-item-section>
       </q-item>
     </div>
-    <create-channel-dialog v-model="openDialog" @showDialog="toggleDialog" />
+    <create-channel-dialog v-model="openDialog" @dialogVisibility="toggleDialog" />
   </q-drawer>
 
 </template>
