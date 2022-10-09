@@ -1,13 +1,13 @@
 <template>
   <q-dialog>
     <q-card>
-      <q-card-section class="row items-center q-pa-sm">
+      <q-card-section class="q-pa-sm row items-center">
         <div class="text-subtitle1 text-weight-bold q-ml-sm">Create channel</div>
         <q-space />
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-separator />
+      <q-separator class="q-mx-md" />
 
       <q-card-section s>
         <q-form @submit.prevent="onSubmit" class="column justify-center area">
@@ -15,8 +15,8 @@
             :rules="[(val:any)  => val && val.length > 0 || 'Name must be at least 1 character']" />
 
           <q-toggle v-model="isPublic" color="steal" keep-color :label="isPublic ? 'Public' :'Private' " />
-
-          <div class="row justify-end items-center">
+          <q-separator />
+          <div class="row justify-end items-center q-mt-sm">
             <q-btn flat label="Create" type="submit" color="teal" style="display:block" />
           </div>
 

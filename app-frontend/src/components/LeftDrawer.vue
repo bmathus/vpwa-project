@@ -1,9 +1,11 @@
 <template>
+
   <q-drawer show-if-above side="left" :width="225" :breakpoint="600" class="bg-grey-3">
     <div class="absolute-top row items-center" style="height:50px;">
       <q-btn unelevated color="primary" padding="none" style="height:32px; width:32px" label="M" class="q-ma-sm"
         text-color="black">
         <activity-badge status="online" />
+        <user-settings></user-settings>
       </q-btn>
       <div class="text-subtitle2 text-weight-bolder">User Name</div>
       <q-separator class="absolute-bottom"></q-separator>
@@ -78,6 +80,7 @@ import { defineComponent, ref } from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
+import UserSettings from './UserSettings.vue'
 
 
 const invitationsList = [
@@ -94,6 +97,7 @@ export default defineComponent({
   components: {
     ActivityBadge,
     CreateChannelDialog,
+    UserSettings
   },
   setup() {
     const store = useChannelStore()
@@ -112,3 +116,4 @@ export default defineComponent({
 
 });
 </script>
+

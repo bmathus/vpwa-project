@@ -7,7 +7,7 @@
         <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
-      <q-separator />
+      <q-separator class="q-mx-md" />
 
       <q-scroll-area class="area">
         <q-list>
