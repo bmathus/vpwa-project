@@ -11,7 +11,7 @@
       <component :is="activeComponent"></component>
     </q-page-container>
 
-    <q-footer style="background-color:transparent" class="row">
+    <q-footer style="background-color:white" class="row">
       <div class="text-box">
         <textarea placeholder="Message"></textarea>
         <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" />
@@ -76,7 +76,7 @@ export default defineComponent({
   border-radius: 8px;
   border: solid 2px grey;
   outline-color: teal;
-  margin: 14px 10px 14px 14px;
+  margin: -6px 16px 16px 16px;
 }
 
 .text-box button {
