@@ -9,14 +9,14 @@
           </div>
         </template>
 
-        <q-chat-message :text="[message.message]" :sent="index % 2 == 0 ? true : false"
-          v-for="(message, index) in messages" :key="index" :bg-color="index % 2 == 0 ? '' : 'teal-3'">
-          <template v-slot:name>Name</template>
-          <template v-slot:stamp>9:30 10.02.2022</template>
+        <q-chat-message :text="[message.message]" :sent="message.id % 2 == 0 ? true : false"
+          v-for="message in store.getMessages" :key="message.id" :bg-color="message.id % 2 == 0 ? '' : 'teal-3'">
+          <template v-slot:name>{{message.sender_name}}</template>
+          <template v-slot:stamp>{{message.send_at}}</template>
           <template v-slot:avatar>
-            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(index % 2 == 0 ? true : false)"
-              style="height:35px; width:35px">
-              <div class="text-body1 text-weight-medium">{{"Matus"[0].toUpperCase()}}</div>
+            <q-avatar rounded color="primary" text-color="dark"
+              :class="messageClass(message.id % 2 == 0 ? true : false)" style="height:35px; width:35px">
+              <div class="text-body1 text-weight-medium">{{message.sender_name[0].toUpperCase()}}</div>
             </q-avatar>
           </template>
         </q-chat-message>
@@ -28,60 +28,24 @@
 
 </template>
 
-
-  
 <script lang="ts">
 import { reactive } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 
-const messagesToAdd = [
-  {
-    name: 'Jane',
-    message: 'cauko',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'me',
-    message: 'hey, how are you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'Jane',
-    message: 'doing fine, how r you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'me',
-    message: 'hey, how are you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'Jane',
-    message: 'doing fine, how r you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'me',
-    message: 'hey, how are you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'Jane',
-    message: 'doing fine, how r you?',
-    time: '10.2.2022 9:32'
-  },
-  {
-    name: 'me',
-    message: 'hey, how are you?',
-    time: '10.2.2022 9:32'
-  },
-]
 
 export default {
 
   setup() {
-    const messages = reactive(messagesToAdd);
     const store = useChannelStore()
+
+    store.fetchMessages()
+
+    function onLoad(index: unknown, done: () => void) {
+      setTimeout(() => {
+        store.fetchMessages()
+        done()
+      }, 2000)
+    }
 
     function messageClass(isSent: boolean): object {
       return reactive({
@@ -90,20 +54,10 @@ export default {
         'q-message-avatar--received': !isSent
       })
     }
-
     return {
       store,
-      messages,
       messageClass,
-      onLoad(index: unknown, done: () => void) {
-        setTimeout(() => {
-          messages.splice(0, 0, ...messagesToAdd)
-          done()
-        }, 2000)
-
-      }
-
-
+      onLoad,
     }
   }
 }

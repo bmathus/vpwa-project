@@ -11,11 +11,8 @@
       <component :is="activeComponent"></component>
     </q-page-container>
 
-    <q-footer style="background-color:white" class="row">
-      <div class="text-box">
-        <textarea placeholder="Message"></textarea>
-        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" />
-      </div>
+    <q-footer style="background-color:white">
+      <message-field />
     </q-footer>
 
   </q-layout>
@@ -29,13 +26,15 @@ import ToolbarHeader from '../components/ToolbarHeader.vue';
 import LeftDrawer from '../components/LeftDrawer.vue';
 import { useChannelStore } from '../stores/channelstore'
 import ChannelPage from '../pages/ChannelPage.vue';
-import NoChannelPage from '../pages/NoChannelPage.vue'
+import NoChannelPage from '../pages/NoChannelPage.vue';
+import MessageField from '../components/MessageField.vue'
 
 export default defineComponent({
   name: 'MainLayout',
   components: {
     ToolbarHeader,
-    LeftDrawer
+    LeftDrawer,
+    MessageField
   },
   setup() {
     const store = useChannelStore()
@@ -62,30 +61,5 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.text-box {
-  width: 100%;
-  display: flex;
-  align-items: flex-end;
-}
 
-.text-box textarea {
-  resize: none !important;
-  height: 150px;
-  width: 100%;
-  padding: 14px 38px 14px 14px;
-  border-radius: 8px;
-  border: solid 2px grey;
-  outline-color: teal;
-  margin: -6px 16px 16px 16px;
-}
-
-.text-box button {
-  margin: 0px 14px 14px 0px;
-}
-
-.send-btn {
-  position: absolute;
-  bottom: 5px;
-  right: 4px;
-}
 </style>

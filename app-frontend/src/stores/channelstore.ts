@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { Channel, ChannelsMessages, Message } from './interfaces';
 
-const dummyMessages: Message[] = [
+const dummyMessages: Array<Message> = [
   {
     id: 1,
     message: 'Ahoj',
@@ -30,7 +30,7 @@ const dummyMessages: Message[] = [
     id: 5,
     message: 'Ahoj',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Matus',
+    sender_name: 'Lucia',
   },
 ];
 
@@ -82,11 +82,14 @@ const dummyChannels: Channel[] = [
 export const useChannelStore = defineStore('channelstore', {
   state: () => ({
     channels: [] as Channel[],
-    channels_messages: {} as ChannelsMessages | null,
-    active_channel: null as Channel | null,
+    channels_messages: {} as ChannelsMessages,
+    active_channel: {} as Channel,
   }),
 
   getters: {
+    getMessages(): Message[] {
+      return this.channels_messages[this.active_channel.id.toString()].messages;
+    },
     getPublicChannels(): Channel[] {
       return this.channels.filter((channel) => channel.is_public === true);
     },
@@ -106,15 +109,27 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
-    // fetchMessages(channel_id: number): void {
-    //   this.channels_messages[channel_id.toString()] =
-    // },
+    pushMessage(message: string) {
+      const date = new Date();
+      this.channels_messages[this.active_channel.id.toString()].messages.push({
+        id: Date.now(),
+        message: message,
+        send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
+        sender_name: 'Matus',
+      });
+    },
+    fetchMessages(): void {
+      this.channels_messages[this.active_channel.id.toString()].messages.push(
+        ...dummyMessages
+      );
+    },
     fetchChannels(): void {
       this.channels = dummyChannels;
       if (this.channels.length !== 0) {
-        this.active_channel = this.channels[0];
+        this.setActiveChannel(this.channels[0]);
       }
     },
+
     createNewChannel(channel_name: string, is_public: boolean): void {
       const new_channel: Channel = {
         id: Date.now(),
@@ -124,11 +139,16 @@ export const useChannelStore = defineStore('channelstore', {
       };
 
       this.channels.push(new_channel);
-      this.active_channel = new_channel;
+      this.setActiveChannel(new_channel);
     },
 
     setActiveChannel(channel: Channel): void {
       this.active_channel = channel;
+      if (!(channel.id.toString() in this.channels_messages)) {
+        this.channels_messages[channel.id.toString()] = {
+          messages: [],
+        };
+      }
     },
   },
 });
