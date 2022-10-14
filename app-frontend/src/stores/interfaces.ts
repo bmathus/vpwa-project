@@ -1,22 +1,22 @@
 export interface Channel {
-    id:number,
-    name:string,
-    members:[]
-    is_public: boolean
+  id: number;
+  name: string;
+  members: [];
+  is_public: boolean;
 }
 
 export interface Message {
-    id:number,
-    body:string
+  id: number;
+  message: string;
+  send_at: string;
+  sender_name: string;
 }
 export interface Member {
-    id:number,
-    
+  id: number;
 }
 
 export interface ChannelsMessages {
-    [channel:string]: {
-      messages: Message[]
-    }
-  }
-  
+  [channel: string]: {
+    messages: Message[];
+  };
+}

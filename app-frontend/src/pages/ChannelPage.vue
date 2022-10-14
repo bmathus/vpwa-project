@@ -9,8 +9,16 @@
           </div>
         </template>
 
-        <q-chat-message name="me" avatar="https://cdn.quasar.dev/img/avatar4.jpg" :text="['hey, how are you?']"
-          :sent="index % 2 == 0 ? true : false" stamp="7 minutes ago" v-for="(message, index) in messages" :key="index">
+        <q-chat-message :text="[message.message]" :sent="index % 2 == 0 ? true : false"
+          v-for="(message, index) in messages" :key="index" :bg-color="index % 2 == 0 ? '' : 'teal-3'">
+          <template v-slot:name>Name</template>
+          <template v-slot:stamp>9:30 10.02.2022</template>
+          <template v-slot:avatar>
+            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(index % 2 == 0 ? true : false)"
+              style="height:35px; width:35px">
+              <div class="text-body1 text-weight-medium">{{"Matus"[0].toUpperCase()}}</div>
+            </q-avatar>
+          </template>
         </q-chat-message>
 
       </q-infinite-scroll>
@@ -22,14 +30,14 @@
 
 
   
-<script>
+<script lang="ts">
 import { reactive } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 
 const messagesToAdd = [
   {
     name: 'Jane',
-    message: 'doing fine, how r you?',
+    message: 'cauko',
     time: '10.2.2022 9:32'
   },
   {
@@ -75,10 +83,19 @@ export default {
     const messages = reactive(messagesToAdd);
     const store = useChannelStore()
 
+    function messageClass(isSent: boolean): object {
+      return reactive({
+        'q-mb-xs': true,
+        'q-message-avatar--sent': isSent,
+        'q-message-avatar--received': !isSent
+      })
+    }
+
     return {
       store,
       messages,
-      onLoad(index, done) {
+      messageClass,
+      onLoad(index: unknown, done: () => void) {
         setTimeout(() => {
           messages.splice(0, 0, ...messagesToAdd)
           done()

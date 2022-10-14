@@ -1,19 +1,15 @@
 import { defineStore } from 'pinia';
 
-export const useCounterStore = defineStore('counter', {
+export const useUserStore = defineStore('userstore', {
   state: () => ({
-    counter: 0
+    status: 'online' as string | null,
   }),
 
   getters: {
-    doubleCount (state) {
-      return state.counter * 2;
-    }
+    getStatus(state) {
+      return state.status;
+    },
   },
 
-  actions: {
-    increment () {
-      this.counter++;
-    }
-  }
+  actions: {},
 });
