@@ -1,7 +1,7 @@
 <template>
   <div class="text-box">
     <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage($event)" />
-    <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" />
+    <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage($event)" />
   </div>
 </template>
 
@@ -18,7 +18,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function sendMessage(event: any): void {
       if (!event.shiftKey && messageText.value.trim() !== '') {
-        store.pushMessage(messageText.value.trim())
+        store.pushMessage(messageText.value)
         messageText.value = ''
       }
     }
