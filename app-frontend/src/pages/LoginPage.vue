@@ -1,21 +1,32 @@
 <template>
-    <div class="q-gutter-md, fixed-center, container" style="max-width: 400px">
-        <h3 class="text-center">Login </h3>
-        <q-form @submit="onSubmit" @reset="onReset" class="form_backg">
-            <q-input filled v-model="email" label="Enter email *" lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
-            <q-input filled type="any" v-model="password" label="Password *" lazy-rules :rules="[
-              val => val && val !== '' || 'Type your password'
-            ]" />
+    <div class="row">
 
-            <div>
+        <q-card class="fixed-center container">
+
+            <q-form class="column q-pa-md" @submit="onSubmit">
+
+                <h4 class="text-center">Login </h4>
+
+                <q-input filled v-model="email" label="Enter email *" lazy-rules
+                    :rules="[ val => val && val.length > 0 || 'Please type something']" />
+
+
+                <q-input filled type="any" v-model="password" label="Password *" lazy-rules
+                    :rules="[val => val && val !== '' || 'Type your password']" />
+
                 <q-btn label="Submit" type="submit" color="primary" />
-                <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
-            </div>
-        </q-form>
+
+                <router-link class=" q-pa-md text-center" to='/register'> Forgot password? </router-link>
+
+
+
+            </q-form>
+
+        </q-card>
 
     </div>
+
 </template>
 
 <script>
@@ -56,12 +67,23 @@ export default {
 
 <style scoped>
 .container {
-    max-width: 500px;
-    margin: 30px auto;
+    max-width: 400px;
+    margin: 20px auto;
     overflow: auto;
     min-height: 300px;
     border: 1px solid steelblue;
-    padding: 30px;
+    padding: 20px;
     border-radius: 5px;
+
+}
+
+.bg-image {
+    background-image: url(https://img.freepik.com/free-vector/white-gold-geometric-pattern-background-vector_53876-140726.jpg?w=2000&t=st=1665859939~exp=1665860539~hmac=1964884ac792b7ddad1f0345d8ed5fa6d8f58be8905230f6fcd65c45353c81d3);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.button_botton {
+    margin-bottom: 10px;
 }
 </style>

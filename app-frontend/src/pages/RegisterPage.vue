@@ -1,29 +1,35 @@
 <template>
-    <div class="q-gutter-md, fixed-center, container" style="max-width: 400px">
-        <h3 class="text-center">Registration </h3>
-        <q-form @submit="onSubmit" @reset="onReset" class="form_backg">
-            <q-input filled v-model="name" label="Enter name *" hint="Name" lazy-rules
+    <div>
+
+        <q-form class="fixed-center container" @submit="onSubmit">
+
+            <h4 class="text-center">Registration </h4>
+
+            <q-input filled v-model="name" label="Enter name *" lazy-rules
                 :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
-            <q-input filled v-model="surname" label="Enter surname *" hint="Surname" lazy-rules
+            <q-input filled v-model="surname" label="Enter surname *" lazy-rules
                 :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
-            <q-input filled v-model="nickname" label="Enter nickname *" hint="Name which other users will see"
-                lazy-rules :rules="[ val => val && val.length > 0 || 'Please type something']" />
+            <q-input filled v-model="nickname" label="Enter nickname *" lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
-            <q-input filled v-model="email" label="Enter email *" hint="Email" lazy-rules
+            <q-input filled v-model="email" label="Enter email *" lazy-rules
                 :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
             <q-input filled type="any" v-model="password" label="Password *" lazy-rules :rules="[
               val => val && val !== '' || 'Type your password'
             ]" />
 
+
             <q-toggle v-model="accept" label="I accept the license and terms" />
 
-            <div>
+            <div lass="fixed-center">
                 <q-btn label="Submit" type="submit" color="primary" />
-                <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
+
             </div>
+
+
         </q-form>
 
     </div>
@@ -71,12 +77,6 @@ export default {
                     })
                 }
             },
-
-            onReset() {
-                name.value = null
-                age.value = null
-                accept.value = false
-            }
         }
     }
 }
@@ -91,5 +91,9 @@ export default {
     border: 1px solid steelblue;
     padding: 30px;
     border-radius: 5px;
+}
+
+.q-input {
+    margin: 10px auto;
 }
 </style>
