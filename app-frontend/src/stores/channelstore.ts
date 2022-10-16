@@ -150,5 +150,13 @@ export const useChannelStore = defineStore('channelstore', {
         };
       }
     },
+
+    deleteTargetChannel(id: number | undefined): void{
+     
+
+      this.channels =  this.channels.filter((obj) => {
+        return obj.id !== id
+      })
+    }
   },
 });

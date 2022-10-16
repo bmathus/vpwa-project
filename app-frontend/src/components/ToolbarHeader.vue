@@ -7,6 +7,11 @@
                 <div class="text-weight-bold">{{store.getActiveChannel?.name}}</div>
                 <q-icon name="expand_more" size="18px" />
             </q-btn>
+            <q-btn flat dense no-caps color="white" size="16px" padding="2px 6px"
+                v-else>
+                <div class="text-weight-bold">No channels</div>
+                <q-icon name="expand_more" size="18px" />
+            </q-btn>
         </q-toolbar-title>
         <q-btn dense flat @click="toggleDialog">
             <q-icon name="group" class="q-mr-xs" />

@@ -12,7 +12,7 @@
                     :rules="[ val => val && val.length > 0 || 'Please type something']" />
 
 
-                <q-input filled type="any" v-model="password" label="Password *" lazy-rules
+                <q-input filled type="password" v-model="password" label="Password *" lazy-rules
                     :rules="[val => val && val !== '' || 'Type your password']" />
 
                 <q-btn label="Submit" type="submit" color="primary" />
@@ -29,7 +29,7 @@
 
 </template>
 
-<script>
+<script lang="ts">
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
 
@@ -40,7 +40,6 @@ export default {
 
         const email = ref(null)
         const password = ref(null)
-        const accept = ref(false)
 
         return {
             email,
@@ -55,11 +54,7 @@ export default {
                 })
             },
 
-            onReset() {
-                name.value = null
-                age.value = null
-                accept.value = false
-            }
+           
         }
     }
 }
