@@ -79,11 +79,17 @@ const dummyChannels: Channel[] = [
   },
 ];
 
+interface InfiniteScroll {
+  stopOnLoad: () => void;
+  resumeOnLoad: () => void;
+}
+
 export const useChannelStore = defineStore('channelstore', {
   state: () => ({
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: {} as Channel,
+    infiniteScroll: {} as InfiniteScroll,
   }),
 
   getters: {
@@ -151,12 +157,17 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    deleteTargetChannel(id: number | undefined): void{
-     
-
-      this.channels =  this.channels.filter((obj) => {
-        return obj.id !== id
-      })
-    }
+    deleteTargetChannel(id: number | undefined): void {
+      this.channels = this.channels.filter((obj) => {
+        return obj.id !== id;
+      });
+    },
+    //infinite scroll control - kvoli members dialogu
+    stopMessagesLoading(): void {
+      this.infiniteScroll.stopOnLoad();
+    },
+    resumeMessagesLoading(): void {
+      this.infiniteScroll.resumeOnLoad();
+    },
   },
 });

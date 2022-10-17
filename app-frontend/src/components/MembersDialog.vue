@@ -4,7 +4,7 @@
       <q-card-section class="row items-center q-pa-sm">
         <div class="text-subtitle1 text-weight-bold q-ml-sm">Channel Members</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn icon="close" flat round dense v-close-popup @click="resumeMessagesLoading" />
       </q-card-section>
 
       <q-separator class="q-mx-md" />
@@ -35,6 +35,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import ActivityBadge from './ActivityBadge.vue'
+import { useChannelStore } from '../stores/channelstore';
 
 type Member = {
   name: string,
@@ -77,8 +78,13 @@ export default defineComponent({
     ActivityBadge
   },
   setup() {
+    const store = useChannelStore()
+    function resumeMessagesLoading() {
+      store.resumeMessagesLoading()
+    }
     return {
       channelMembersList,
+      resumeMessagesLoading
     }
   }
 });

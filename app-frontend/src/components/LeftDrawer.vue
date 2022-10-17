@@ -40,9 +40,8 @@
             <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 # {{ channel.name }}
-               
               </q-item-section>
-              <channel-menu :name = "channel.name" :id = "channel.id"/>
+
             </q-item>
           </template>
         </q-expansion-item>
@@ -54,7 +53,7 @@
               <q-item-section class="text-subtitle2">
                 # {{ channel.name }}
               </q-item-section>
-              <channel-menu :name = "channel.name" :id = "channel.id"/>
+
             </q-item>
           </template>
         </q-expansion-item>
@@ -84,7 +83,6 @@ import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
 import UserSettings from './UserSettings.vue';
-import ChannelMenu from './ChannelMenu.vue';
 
 
 const invitationsList = [
@@ -102,7 +100,6 @@ export default defineComponent({
     ActivityBadge,
     CreateChannelDialog,
     UserSettings,
-    ChannelMenu,
   },
   setup() {
     const store = useChannelStore()

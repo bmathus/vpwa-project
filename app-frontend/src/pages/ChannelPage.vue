@@ -2,7 +2,7 @@
 <template>
   <q-page class="row justify-center">
     <div class="q-pa-md messages-box">
-      <q-infinite-scroll @load="onLoad" reverse :offset="50">
+      <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll">
         <template v-slot:loading>
           <div class="row justify-center q-my-md">
             <q-spinner color="primary" name="dots" size="40px" />
@@ -29,16 +29,24 @@
 </template>
 
 <script lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 
 
 export default {
 
   setup() {
+    const infiniteScroll = ref()
     const store = useChannelStore()
 
-    store.fetchMessages()
+    onMounted(() => {
+      store.$state.infiniteScroll = {
+        stopOnLoad: infiniteScroll.value.stop,
+        resumeOnLoad: infiniteScroll.value.resume
+      }
+    }),
+
+      store.fetchMessages()
 
     function onLoad(index: unknown, done: () => void) {
       setTimeout(() => {
@@ -55,6 +63,7 @@ export default {
       })
     }
     return {
+      infiniteScroll,
       store,
       messageClass,
       onLoad,
