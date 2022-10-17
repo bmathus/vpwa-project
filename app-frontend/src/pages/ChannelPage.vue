@@ -8,7 +8,6 @@
             <q-spinner color="primary" name="dots" size="40px" />
           </div>
         </template>
-
         <q-chat-message :text="[message.message]" :sent="message.id % 2 == 0 ? true : false"
           v-for="message in store.getMessages" :key="message.id" :bg-color="message.id % 2 == 0 ? '' : 'teal-3'">
           <template v-slot:name>{{message.sender_name}}</template>
@@ -20,7 +19,6 @@
             </q-avatar>
           </template>
         </q-chat-message>
-
       </q-infinite-scroll>
 
     </div>
