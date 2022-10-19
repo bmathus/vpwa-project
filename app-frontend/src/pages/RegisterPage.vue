@@ -6,16 +6,16 @@
             <h4 class="text-center">Registration </h4>
 
             <q-input filled v-model="name" label="Enter name *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
 
             <q-input filled v-model="surname" label="Enter surname *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
 
             <q-input filled v-model="nickname" label="Enter nickname *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
 
             <q-input filled type="email" v-model="email" label="Enter email *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 320 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 320 || 'Too many characters']" />
 
             <q-input filled type="password" v-model="password" label="Password *" lazy-rules :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 256 || 'Too many characters']" />
 

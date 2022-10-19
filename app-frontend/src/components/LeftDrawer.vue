@@ -25,9 +25,10 @@
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
           <template v-for="invite in userstore.getInvitations" :key="invite.id">
             <q-item dense clickable>
-              <q-item-section class="text-subtitle2">
+              <q-item-section :channel_id ="invite.id" class="text-subtitle2">
+                  
                 # {{ invite.channel_name }}
-              </q-item-section>
+              </q-item-section >
               <accept-invitation></accept-invitation>
             </q-item>
           </template>

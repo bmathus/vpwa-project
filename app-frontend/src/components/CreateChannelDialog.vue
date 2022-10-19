@@ -12,7 +12,7 @@
       <q-card-section s>
         <q-form @submit.prevent="onSubmit" class="column justify-center area">
           <q-input filled dense v-model="name" label="Channel name" hint="Enter unique channel name" lazy-rules
-            :rules="[(val:any)  => val && val.length > 0 || 'Name must be at least 1 character']" />
+            :rules="[(val:any)  => val && val.length > 0 || 'Name must be at least 1 character',(val:any) => val && val.length <= 20  || 'Name is too long']" />
 
           <q-toggle v-model="isPublic" color="teal" keep-color :label="isPublic ? 'Public' :'Private' " />
           <q-separator />

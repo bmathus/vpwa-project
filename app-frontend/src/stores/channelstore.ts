@@ -124,6 +124,7 @@ export const useChannelStore = defineStore('channelstore', {
         sender_name: 'Matus',
       });
     },
+    
     fetchMessages(): void {
       this.channels_messages[this.active_channel.id.toString()].messages.push(
         ...dummyMessages

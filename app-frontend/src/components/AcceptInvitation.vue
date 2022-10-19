@@ -15,15 +15,23 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { useUserStore } from '../stores/userstore';
+
 export default defineComponent({
   name: 'AcceptInvitation',
-  setup() {
+  props: {
+    channel_id : Number},
+  setup(props) {
+
+    const userstore = useUserStore()
+
     function acceptInvitation(): void {
       console.log('accepted');
     }
 
     function declineInvitation(): void {
-      console.log('declined')
+      console.log(props.channel_id)
+      userstore.declineInvitation(props.channel_id)
     }
     return {
       acceptInvitation,

@@ -49,10 +49,16 @@ export const useUserStore = defineStore('userstore', {
     acceptInvitation(invitation_id: number): void {
       //todo
       console.log('accepting invitation' + invitation_id);
+      
     },
-    declineInvitation(invitation_id: number): void {
+    declineInvitation(invitation_id: number | undefined): void {
       //todo
       console.log('desclining invitation' + invitation_id);
+
+      this.invitations =  this.invitations.filter((obj) => {
+        return obj.id !== invitation_id
+      })
+    
     },
   },
 });
