@@ -39,10 +39,11 @@ export default {
 
     onMounted(() => {
       store.$state.infiniteScroll = {
-        stopOnLoad: infiniteScroll.value.stop,
-        resumeOnLoad: infiniteScroll.value.resume
+        stopOnLoad: () => infiniteScroll.value.stop(),
+        resumeOnLoad: () => infiniteScroll.value.resume()
       }
     }),
+
 
       store.fetchMessages()
 

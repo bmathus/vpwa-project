@@ -15,21 +15,12 @@
       <q-list dense>
 
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
-          <template v-for="(item, index) in invitationsList" :key="index">
-            <q-item dense>
+          <template v-for="invite in userstore.getInvitations" :key="invite.id">
+            <q-item dense clickable>
               <q-item-section class="text-subtitle2">
-                # {{ item.label }}
+                # {{ invite.channel_name }}
               </q-item-section>
-              <q-item-section side>
-                <div class="row items-center justify-center">
-                  <q-badge outline color="teal">
-                    <q-icon name="check" color="teal" />
-                  </q-badge>
-                  <q-badge outline color="red" class="q-ml-xs">
-                    <q-icon name="close" color="red" />
-                  </q-badge>
-                </div>
-              </q-item-section>
+              <accept-invitation></accept-invitation>
             </q-item>
           </template>
         </q-expansion-item>
@@ -82,17 +73,10 @@ import { defineComponent, ref } from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
+import { useUserStore } from '../stores/userstore';
 import UserSettings from './UserSettings.vue';
+import AcceptInvitation from './AcceptInvitation.vue';
 
-
-const invitationsList = [
-  {
-    label: 'DBS channel'
-  },
-  {
-    label: 'IAU 2022/23'
-  }
-]
 
 export default defineComponent({
   name: 'LeftDrawer',
@@ -100,19 +84,21 @@ export default defineComponent({
     ActivityBadge,
     CreateChannelDialog,
     UserSettings,
+    AcceptInvitation
   },
   setup() {
-    const store = useChannelStore()
-    const openDialog = ref(false)
+    const store = useChannelStore();
+    const userstore = useUserStore();
+    const openDialog = ref(false);
 
     function toggleDialog(): void {
       openDialog.value = !openDialog.value;
     }
     return {
-      invitationsList,
       toggleDialog,
       openDialog,
-      store
+      store,
+      userstore
     }
   }
 

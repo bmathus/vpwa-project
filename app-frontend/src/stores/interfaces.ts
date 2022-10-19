@@ -15,6 +15,12 @@ export interface Member {
   id: number;
 }
 
+export interface Invitation {
+  id: number;
+  channel_id: number;
+  channel_name: string;
+}
+
 export interface ChannelsMessages {
   [channel: string]: {
     messages: Message[];
