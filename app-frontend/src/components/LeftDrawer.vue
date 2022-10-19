@@ -7,7 +7,15 @@
         <activity-badge status="online" />
         <user-settings></user-settings>
       </q-btn>
-      <div class="text-subtitle2 text-weight-bolder">User Name</div>
+      <div column v-if = "userstore.user.nickname == null">
+        <div class="text-subtitle2 text-weight-bolder">dsafagfadg</div>
+        <div class="text-weight-light">Janko Hrasko</div>
+      </div>
+      <div column v-else>
+        <div class="text-subtitle2 text-weight-bolder">{{userstore.user.nickname}}</div>
+        <div class="text-weight-light">{{userstore.user.name}} {{userstore.user.surname}}</div>
+      </div>
+      
       <q-separator class="absolute-bottom"></q-separator>
     </div>
 

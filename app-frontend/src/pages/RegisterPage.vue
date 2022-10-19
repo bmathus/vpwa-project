@@ -6,20 +6,18 @@
             <h4 class="text-center">Registration </h4>
 
             <q-input filled v-model="name" label="Enter name *" lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
 
             <q-input filled v-model="surname" label="Enter surname *" lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
 
             <q-input filled v-model="nickname" label="Enter nickname *" lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 20 || 'Too many characters']" />
 
-            <q-input filled v-model="email" label="Enter email *" lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please type something']" />
+            <q-input filled type="email" v-model="email" label="Enter email *" lazy-rules
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 320 || 'Too many characters']" />
 
-            <q-input filled type="any" v-model="password" label="Password *" lazy-rules :rules="[
-              val => val && val !== '' || 'Type your password'
-            ]" />
+            <q-input filled type="password" v-model="password" label="Password *" lazy-rules :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 256 || 'Too many characters']" />
 
 
             <q-toggle v-model="accept" label="I accept the license and terms" />
@@ -35,20 +33,23 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import { useQuasar } from 'quasar'
 import { ref } from 'vue'
+import { useUserStore } from '../stores/userstore';
+import { useRouter } from 'vue-router'
 
 export default {
     name: 'LoginPage',
     setup() {
         const $q = useQuasar()
-
-        const name = ref(null)
-        const surname = ref(null)
-        const nickname = ref(null)
-        const email = ref(null)
-        const password = ref(null)
+        const router = useRouter()
+        
+        const name = ref('')
+        const surname = ref('')
+        const nickname = ref('')
+        const email = ref('')
+        const password = ref('')
         const accept = ref(false)
 
         return {
@@ -58,9 +59,11 @@ export default {
             email,
             password,
             accept,
-
+           
             onSubmit() {
+                
                 if (accept.value !== true) {
+                    
                     $q.notify({
                         color: 'red-5',
                         textColor: 'white',
@@ -69,12 +72,10 @@ export default {
                     })
                 }
                 else {
-                    $q.notify({
-                        color: 'green-4',
-                        textColor: 'white',
-                        icon: 'cloud_done',
-                        message: 'Submitted'
-                    })
+                  
+                    
+                    useUserStore().makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
+                    router.push('/') 
                 }
             },
         }
