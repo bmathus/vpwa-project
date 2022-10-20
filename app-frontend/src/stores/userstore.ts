@@ -6,12 +6,16 @@ const dummyInvitations: Invitation[] = [
   {
     id: 1,
     channel_id: 23438,
+    sender_id: 221,
+    admin_id: 72,
     channel_name: 'Channel 78',
     is_public: false,
   },
   {
     id: 2,
     channel_id: 23438,
+    sender_id: 222,
+    admin_id: 72,
     channel_name: 'Channel 78',
     is_public: true,
   },
@@ -22,6 +26,7 @@ const defaultUser: User = {
   name: 'Jozko',
   surname: 'Mrkvicka',
   nickname: 'Default User',
+  status: Status.online,
   email: 'defaultuser@gmail.com',
   password: 'defaultuser123',
 };
@@ -68,7 +73,8 @@ export const useUserStore = defineStore('userstore', {
     acceptInvitation(invitation: Invitation): void {
       this.channelstore.createNewChannel(
         invitation.channel_name,
-        invitation.is_public
+        invitation.is_public,
+        invitation.admin_id
       );
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;

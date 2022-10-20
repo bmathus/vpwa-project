@@ -30,17 +30,19 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useChannelStore } from 'src/stores/channelstore';
+import { useUserStore } from '../stores/userstore';
 
 export default defineComponent({
   name: 'CreateChannelDialog',
   emits: ['dialogVisibility'],
   setup(props, ctx) {
     const store = useChannelStore()
+    const userstore = useUserStore()
     const name = ref('');
     const isPublic = ref(false);
 
     function onSubmit(): void {
-      store.createNewChannel(name.value, isPublic.value);
+      store.createNewChannel(name.value, isPublic.value, userstore.getUser.id);
       ctx.emit('dialogVisibility');
       name.value = '';
     }

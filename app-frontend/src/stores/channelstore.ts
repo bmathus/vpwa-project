@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Channel, ChannelsMessages, Message } from './interfaces';
+import { Channel, ChannelsMessages, User, Message, Status } from './interfaces';
 import { useQuasar } from 'quasar';
 
 const dummyMessages: Array<Message> = [
@@ -35,48 +35,117 @@ const dummyMessages: Array<Message> = [
   },
 ];
 
+
+const channelMembersList: User[] = [
+  {
+    id: 5,
+    name: 'Lucia',
+    surname: 'D',
+    nickname: 'a',
+    status: Status.online,
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+  {
+    id: 2,
+    name: 'Peter',
+    surname: 'D',
+    status: Status.DND,
+    nickname: 'aaaaaa',
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+  {
+    id: 5,
+    name: 'Adam',
+    surname: 'D',
+    status: Status.offline,
+    nickname: 'aa',
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+
+]
+
+const channelMembersList2: User[] = [
+  {
+    id: 5,
+    name: 'Lucia',
+    surname: 'D',
+    nickname: 'd',
+    status: Status.online,
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+  {
+    id: 2,
+    name: 'Peter',
+    surname: 'D',
+    nickname: 'ddd',
+    status: Status.DND,
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+  {
+    id: 5,
+    name: 'AdamDDDDLMAO',
+    surname: 'D',
+    nickname: 'dddddd',
+    status: Status.DND,
+    email: 'defaultuser@gmail.com',
+    password: 'defaultuser123',
+  },
+]
+
 const dummyChannels: Channel[] = [
   {
     id: 1,
     name: 'Channel 1',
-    members: [],
+    members: channelMembersList,
     is_public: true,
+    admin_id: 0
   },
   {
     id: 2,
     name: 'Channel 2',
-    members: [],
+    members: channelMembersList,
     is_public: false,
+    admin_id: 0
   },
   {
     id: 3,
     name: 'Channel 3',
-    members: [],
+    members: channelMembersList2,
     is_public: false,
+    admin_id: 0
   },
   {
     id: 4,
     name: 'Channel 4',
-    members: [],
+    members: channelMembersList,
     is_public: true,
+    admin_id: 0
   },
   {
     id: 5,
     name: 'Channel 5',
-    members: [],
+    members: channelMembersList2,
     is_public: false,
+    admin_id: 0
   },
   {
     id: 6,
     name: 'Channel 6',
-    members: [],
+    members: channelMembersList,
     is_public: true,
+    admin_id: 0
   },
   {
     id: 7,
     name: 'Channel 7',
-    members: [],
+    members: channelMembersList2,
     is_public: true,
+    admin_id: 0
   },
 ];
 
@@ -150,12 +219,13 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    createNewChannel(channel_name: string, is_public: boolean): void {
+    createNewChannel(channel_name: string, is_public: boolean, admin_id: number): void {
       const new_channel: Channel = {
         id: Date.now(),
         name: channel_name,
         members: [], // treba pridat neviem či seba alebo ako to vymysliet - zatial prazdny list
         is_public: is_public,
+        admin_id: admin_id
       };
 
       this.channels.push(new_channel);

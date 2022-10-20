@@ -11,7 +11,7 @@
 
       <q-scroll-area class="area">
         <q-list>
-          <q-item dense v-for="member in channelMembersList" :key="member.name">
+          <q-item dense v-for="member in store.active_channel.members" :key="member.name">
             <q-item-section avatar>
               <q-avatar rounded :color="member.avatarColor" text-color="dark" class="q-my-xs"
                 style="height:38px; width:38px">
@@ -36,42 +36,7 @@
 import { defineComponent } from 'vue'
 import ActivityBadge from './ActivityBadge.vue'
 import { useChannelStore } from '../stores/channelstore';
-import { Status } from '../stores/interfaces'
 
-type Member = {
-  name: string,
-  avatarColor: string,
-  status: Status
-}
-
-const channelMembersList: Member[] = [
-  {
-    name: 'Matus',
-    avatarColor: 'primary',
-    status: Status.online
-  },
-  {
-    name: 'Jozef',
-    avatarColor: 'orange',
-    status: Status.DND
-  },
-  {
-    name: 'Marek',
-    avatarColor: 'red',
-    status: Status.offline
-  },
-  {
-    name: 'Lucia',
-    avatarColor: 'blue',
-    status: Status.DND
-  },
-  {
-    name: 'Andrea',
-    avatarColor: 'green',
-    status: Status.offline
-  },
-
-]
 
 export default defineComponent({
   name: 'MembersDialog',
@@ -84,8 +49,8 @@ export default defineComponent({
       store.resumeMessagesLoading()
     }
     return {
-      channelMembersList,
-      resumeMessagesLoading
+      resumeMessagesLoading,
+      store
     }
   }
 });
