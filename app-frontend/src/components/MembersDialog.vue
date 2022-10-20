@@ -36,38 +36,39 @@
 import { defineComponent } from 'vue'
 import ActivityBadge from './ActivityBadge.vue'
 import { useChannelStore } from '../stores/channelstore';
+import { Status } from '../stores/interfaces'
 
 type Member = {
   name: string,
   avatarColor: string,
-  status: string
+  status: Status
 }
 
 const channelMembersList: Member[] = [
   {
     name: 'Matus',
     avatarColor: 'primary',
-    status: 'online'
+    status: Status.online
   },
   {
     name: 'Jozef',
     avatarColor: 'orange',
-    status: 'dnd'
+    status: Status.DND
   },
   {
     name: 'Marek',
     avatarColor: 'red',
-    status: 'offline'
+    status: Status.offline
   },
   {
     name: 'Lucia',
     avatarColor: 'blue',
-    status: 'online'
+    status: Status.DND
   },
   {
     name: 'Andrea',
     avatarColor: 'green',
-    status: 'dnd'
+    status: Status.offline
   },
 
 ]

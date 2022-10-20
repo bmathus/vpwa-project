@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { Invitation, User } from './interfaces';
+import { Invitation, User, Status } from './interfaces';
 import { useChannelStore } from './channelstore';
 
 const dummyInvitations: Invitation[] = [
@@ -17,23 +17,32 @@ const dummyInvitations: Invitation[] = [
   },
 ];
 
+const defaultUser: User = {
+  id: 2,
+  name: 'Jozko',
+  surname: 'Mrkvicka',
+  nickname: 'Default User',
+  email: 'defaultuser@gmail.com',
+  password: 'defaultuser123',
+};
+
 export const useUserStore = defineStore('userstore', {
   state: () => ({
-    user: {} as User,
-    status: 'online' as string | null,
+    user: defaultUser as User,
+    status: Status.online as Status,
     invitations: dummyInvitations as Invitation[],
     channelstore: useChannelStore(),
   }),
 
   getters: {
-    getName(): string {
-      return this.user.name;
+    getUser(): User {
+      return this.user;
     },
-    getStatus(state) {
-      return state.status;
+    getStatus(): Status {
+      return this.status;
     },
-    getInvitations(state) {
-      return state.invitations;
+    getInvitations(): Invitation[] {
+      return this.invitations;
     },
   },
 
@@ -52,6 +61,9 @@ export const useUserStore = defineStore('userstore', {
       this.user.nickname = nickname;
       this.user.email = email;
       this.user.password = password;
+    },
+    setStatus(status: Status) {
+      this.status = status;
     },
     acceptInvitation(invitation: Invitation): void {
       this.channelstore.createNewChannel(

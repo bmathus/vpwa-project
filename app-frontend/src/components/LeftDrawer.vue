@@ -4,18 +4,10 @@
     <div class="absolute-top row items-center" style="height:50px;">
       <q-btn unelevated color="primary" padding="none" style="height:32px; width:32px" label="M" class="q-ma-sm"
         text-color="black">
-        <activity-badge status="online" />
+        <activity-badge :status="userstore.getStatus" />
         <user-settings></user-settings>
       </q-btn>
-      <div column v-if="userstore.user.nickname == null">
-        <div class="text-subtitle2 text-weight-bolder">Dsafagfadg</div>
-        <div class="text-subtitle2 text-weight-light">Janko Hrasko</div>
-      </div>
-      <div column v-else>
-        <div class="text-subtitle2 text-weight-bolder">{{userstore.user.nickname}}</div>
-        <div class="text-subtitle1">{{userstore.user.name}} {{userstore.user.surname}}</div>
-      </div>
-
+      <div class="text-subtitle2 text-weight-bolder">{{userstore.getUser.nickname}}</div>
       <q-separator class="absolute-bottom"></q-separator>
     </div>
 

@@ -36,3 +36,9 @@ export interface User {
   email: string;
   password: string;
 }
+
+export enum Status {
+  online = 'online',
+  DND = 'DND',
+  offline = 'offline',
+}

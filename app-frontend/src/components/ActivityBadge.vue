@@ -2,31 +2,24 @@
   <div class="badge" :style="{'background-color':statusColor}"></div>
 </template>
 
-<script lang="ts">
-import { defineComponent, computed } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
+import { Status } from '../stores/interfaces'
 
-export default defineComponent({
-  name: 'ActivityBadge',
-  props: {
-    status: String
-  },
-  setup(props) {
+const props = defineProps<{
+  status: Status
+}>()
 
-    const statusColor = computed(() => {
-      if (props.status === 'online') {
-        return 'green';
-      } else if (props.status === 'offline') {
-        return 'red';
-      } else {
-        return 'grey';
-      }
-    })
-
-    return {
-      statusColor
-    }
+const statusColor = computed(() => {
+  if (props.status === Status.online) {
+    return 'green';
+  } else if (props.status === Status.offline) {
+    return 'red';
+  } else {
+    return 'grey';
   }
-});
+})
+
 </script>
 
 <style scoped>

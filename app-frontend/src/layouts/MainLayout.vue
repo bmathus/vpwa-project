@@ -43,6 +43,7 @@ export default defineComponent({
 
     const drawerVisible = ref(false)
     const text = ref('')
+
     const activeComponent = computed(() => {
       if (store.channelsAreEmpty) {
         return NoChannelPage

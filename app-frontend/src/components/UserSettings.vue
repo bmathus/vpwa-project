@@ -9,7 +9,8 @@
       <q-card-section>
         <div class="row items-center justify-between">
           <div class="text-subtitle2">Set Status:</div>
-          <q-select dense outlined v-model="option" :options="options" class="status-select" :color="outlineColor" />
+          <q-select dense outlined v-model="option" :options="options" class="status-select"
+            :color="setStatusAndColor" />
         </div>
         <div class="q-mt-sm row items-center justify-between">
           <div class="text-subtitle2">Notifications:</div>
@@ -30,25 +31,33 @@
 
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
+import { useUserStore } from '../stores/userstore';
+import { Status } from '../stores/interfaces'
+
 export default defineComponent({
   name: 'UserSettings',
   setup() {
+    const userstore = useUserStore()
     const notifications = ref(true);
-    const option = ref('online');
+    const option = ref(userstore.getStatus);
+
     const options = [
       'online', 'DND', 'offline'
     ];
-    const outlineColor = computed(() => {
+    const setStatusAndColor = computed(() => {
       if (option.value === 'online') {
+        userstore.setStatus(Status.online)
         return 'teal';
       } else if (option.value === 'offline') {
+        userstore.setStatus(Status.offline)
         return 'red-4';
       } else {
+        userstore.setStatus(Status.DND)
         return 'grey';
       }
     })
     return {
-      option, options, outlineColor, notifications
+      option, options, setStatusAndColor, notifications
     }
   }
 })

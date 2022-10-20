@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { Channel, ChannelsMessages, Message } from './interfaces';
+import { useQuasar } from 'quasar';
 
 const dummyMessages: Array<Message> = [
   {
@@ -88,13 +89,19 @@ export const useChannelStore = defineStore('channelstore', {
   state: () => ({
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
-    active_channel: {} as Channel,
+    active_channel: null as Channel | null,
+    //other imports
     infiniteScroll: {} as InfiniteScroll,
+    q: useQuasar(),
   }),
 
   getters: {
     getMessages(): Message[] {
-      return this.channels_messages[this.active_channel.id.toString()].messages;
+      if (this.active_channel !== null) {
+        return this.channels_messages[this.active_channel.id.toString()]
+          .messages;
+      }
+      return [];
     },
     getPublicChannels(): Channel[] {
       return this.channels.filter((channel) => channel.is_public === true);
@@ -115,20 +122,26 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
-    pushMessage(message: string) {
+    pushMessage(message: string): void {
       const date = new Date();
-      this.channels_messages[this.active_channel.id.toString()].messages.push({
-        id: Date.now(),
-        message: message,
-        send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
-        sender_name: 'Matus',
-      });
+      if (this.active_channel !== null) {
+        this.channels_messages[this.active_channel.id.toString()].messages.push(
+          {
+            id: Date.now(),
+            message: message,
+            send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
+            sender_name: 'Matus',
+          }
+        );
+      }
     },
-    
+
     fetchMessages(): void {
-      this.channels_messages[this.active_channel.id.toString()].messages.push(
-        ...dummyMessages
-      );
+      if (this.active_channel !== null) {
+        this.channels_messages[this.active_channel.id.toString()].messages.push(
+          ...dummyMessages
+        );
+      }
     },
     fetchChannels(): void {
       this.channels = dummyChannels;
@@ -151,6 +164,7 @@ export const useChannelStore = defineStore('channelstore', {
 
     setActiveChannel(channel: Channel): void {
       this.active_channel = channel;
+      //ak nema v channel messages ešte svoje pole messages tak sa vytvorí
       if (!(channel.id.toString() in this.channels_messages)) {
         this.channels_messages[channel.id.toString()] = {
           messages: [],
@@ -158,11 +172,29 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    deleteTargetChannel(id: number | undefined): void {
+    leaveChannel(id: number | null): void {
+      this.q.notify({
+        type: 'info',
+        message: 'You left channel: ' + this.getActiveChannel?.name,
+        color: 'teal',
+        timeout: 2500,
+      });
+
       this.channels = this.channels.filter((obj) => {
         return obj.id !== id;
       });
+
+      //nastavenie active kanala po tom ako leavneš kanal
+      if (this.channels.length === 0) {
+        this.active_channel = null;
+      } else {
+        //po livnuti kanala ak som clenom nejakych kanalov tak bude aktivny prvy v zozname kanalov
+        this.setActiveChannel(this.channels[0]);
+      }
+
+      delete this.channels_messages[id !== null ? id.toString() : ''];
     },
+
     //infinite scroll control - kvoli members dialogu
     stopMessagesLoading(): void {
       this.infiniteScroll.stopOnLoad();

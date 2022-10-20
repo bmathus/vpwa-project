@@ -12,7 +12,7 @@
         <p class="text-caption q-mb-md">After you leave public channel you can join it back with command \join
           channelname
         </p>
-        <q-btn color="red" outline>Leave</q-btn>
+        <q-btn color="red" outline @click="leaveChannel" v-close-popup>Leave</q-btn>
 
       </q-card-section>
     </q-card>
@@ -23,13 +23,18 @@
 import { defineComponent } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 
-
 export default defineComponent({
   name: 'ChannelSettings',
   setup() {
     const store = useChannelStore()
+
+    function leaveChannel(): void {
+      store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
+    }
+
     return {
-      store
+      store,
+      leaveChannel
     }
   }
 

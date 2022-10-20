@@ -6,11 +6,7 @@
                 v-if="store.getActiveChannel !== null">
                 <div class="text-weight-bold">{{store.getActiveChannel?.name}}</div>
                 <q-icon name="expand_more" size="18px" />
-                <channel-setting></channel-setting>
-            </q-btn>
-            <q-btn flat dense no-caps color="white" size="16px" padding="2px 6px" v-else>
-                <div class="text-weight-bold">No channels</div>
-                <q-icon name="expand_more" size="18px" />
+                <channel-setting />
             </q-btn>
         </q-toolbar-title>
         <q-btn dense flat @click="toggleDialog">
