@@ -13,32 +13,25 @@
   </q-menu>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import { useUserStore } from '../stores/userstore';
 
-export default defineComponent({
-  name: 'AcceptInvitation',
-  props: {
-    channel_id : Number},
-  setup(props) {
+import { Invitation } from '../stores/interfaces'
 
-    const userstore = useUserStore()
+const props = defineProps<{
+  invitation: Invitation
+}>()
 
-    function acceptInvitation(): void {
-      console.log('accepted');
-    }
+const userstore = useUserStore()
 
-    function declineInvitation(): void {
-      console.log(props.channel_id)
-      userstore.declineInvitation(props.channel_id)
-    }
-    return {
-      acceptInvitation,
-      declineInvitation
-    }
-  }
-});
+function acceptInvitation(): void {
+  userstore.acceptInvitation(props.invitation)
+}
+
+function declineInvitation(): void {
+  userstore.declineInvitation(props.invitation.id)
+}
+
 </script>
 
 <style scoped>

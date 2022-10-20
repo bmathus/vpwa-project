@@ -7,15 +7,15 @@
         <activity-badge status="online" />
         <user-settings></user-settings>
       </q-btn>
-      <div column v-if = "userstore.user.nickname == null">
-        <div class="text-subtitle2 text-weight-bolder">dsafagfadg</div>
-        <div class="text-weight-light">Janko Hrasko</div>
+      <div column v-if="userstore.user.nickname == null">
+        <div class="text-subtitle2 text-weight-bolder">Dsafagfadg</div>
+        <div class="text-subtitle2 text-weight-light">Janko Hrasko</div>
       </div>
       <div column v-else>
         <div class="text-subtitle2 text-weight-bolder">{{userstore.user.nickname}}</div>
-        <div class="text-weight-light">{{userstore.user.name}} {{userstore.user.surname}}</div>
+        <div class="text-subtitle1">{{userstore.user.name}} {{userstore.user.surname}}</div>
       </div>
-      
+
       <q-separator class="absolute-bottom"></q-separator>
     </div>
 
@@ -25,11 +25,11 @@
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
           <template v-for="invite in userstore.getInvitations" :key="invite.id">
             <q-item dense clickable>
-              <q-item-section :channel_id ="invite.id" class="text-subtitle2">
-                  
+              <q-item-section :channel_id="invite.id" class="text-subtitle2">
+
                 # {{ invite.channel_name }}
-              </q-item-section >
-              <accept-invitation></accept-invitation>
+              </q-item-section>
+              <accept-invitation :invitation="invite" />
             </q-item>
           </template>
         </q-expansion-item>

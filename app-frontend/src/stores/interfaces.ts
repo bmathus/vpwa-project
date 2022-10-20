@@ -19,6 +19,7 @@ export interface Invitation {
   id: number;
   channel_id: number;
   channel_name: string;
+  is_public: boolean;
 }
 
 export interface ChannelsMessages {
