@@ -5,8 +5,9 @@
             <q-btn flat dense no-caps color="white" size="16px" padding="2px 6px" v-if="!store.channelsAreEmpty">
                 <div class="text-weight-bold">{{store.getActiveChannel?.name}}</div>
                 <q-icon name="expand_more" size="18px" />
-                <channel-setting v-if="userIsAdmin()" :text_info="textinfo" button_title="Delete" />
-                <channel-setting v-else :text_info="textinfo" button_title="Left" />
+                <channel-setting v-if="userIsAdmin()" :text_info="quitinfo" button_title="Quit"
+                    label_text="Quit channel" />
+                <channel-setting v-else :text_info="leaveinfo" button_title="Leave" label_text="Leave channel" />
             </q-btn>
         </q-toolbar-title>
         <q-btn dense flat @click="toggleDialog" v-if="!store.channelsAreEmpty">
@@ -37,7 +38,8 @@ export default defineComponent({
         const userstore = useUserStore();
         const openDialog = ref(false)
 
-        const textinfo = 'After you leave public channel you can join it back with command \join channelname'
+        const leaveinfo = 'After you leave channel you can join it back or need to receive an invitation.'
+        const quitinfo = 'After you quit channel it will be completely removed.';
 
         function userIsAdmin(): boolean {
             if (store.getActiveChannel !== null && store.getActiveChannel.admin_id == userstore.getUser.id) {
@@ -55,7 +57,7 @@ export default defineComponent({
         function drawerVisibility(): void {
             emit('drawer')
         }
-        return { drawerVisibility, openDialog, toggleDialog, store, textinfo, userIsAdmin }
+        return { drawerVisibility, openDialog, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin }
     }
 });
 

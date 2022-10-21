@@ -6,22 +6,62 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import { useChannelStore } from '../stores/channelstore';
+import { useUserStore } from '../stores/userstore';
 
 export default defineComponent({
   name: 'MessageField',
   setup() {
     const store = useChannelStore();
+    const userstore = useUserStore();
     const messageText = ref('')
+
+
+    const iamAdmin = computed(() => {
+      if (store.getActiveChannel !== null && (store.getActiveChannel.admin_id === userstore.getUser.id)) {
+        return true
+      } else {
+        return false;
+      }
+    })
+
+    const channelIsPublic = computed(() => {
+      if (store.getActiveChannel !== null && store.getActiveChannel.is_public) {
+        return true;
+      } else {
+        return false;
+      }
+    })
+
+    const myPermitions = computed(() => {
+      if (store.channelsAreEmpty) {
+        return ['join']
+      }
+      if (!iamAdmin.value && !channelIsPublic.value) {
+        return ['join', 'list', 'cancel']
+      }
+      if (!iamAdmin.value && channelIsPublic.value) {
+        return ['join', 'list', 'invite', 'kick', 'cancel']
+      }
+      if (iamAdmin.value && !channelIsPublic.value) {
+        return ['join', 'list', 'invite', 'revoke', 'kick', 'quit', '/cancel'];
+      }
+      if (iamAdmin.value && channelIsPublic.value) {
+        return ['join', 'list', 'invite', 'kick', 'quit', 'cancel'];
+      }
+      return []
+    })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     function sendMessage(event: any): void {
       if (!event.shiftKey && messageText.value.trim() !== '') {
-        store.pushMessage(messageText.value)
+        store.pushMessage(messageText.value, userstore.getUser)
         messageText.value = ''
       }
     }
+
+
     return {
       messageText,
       sendMessage

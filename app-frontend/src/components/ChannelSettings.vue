@@ -8,7 +8,7 @@
       <q-separator class="q-mx-md" />
 
       <q-card-section class="my-card">
-        <p class="text-subtitle2 q-mb-md">Leave channel</p>
+        <p class="text-subtitle2 q-mb-md">{{props.label_text}}</p>
         <p class="text-caption q-mb-md">
           {{props.text_info}}
         </p>
@@ -26,7 +26,8 @@ import { useChannelStore } from '../stores/channelstore';
 
 const props = defineProps<{
   button_title: string,
-  text_info: string
+  text_info: string,
+  label_text: string
 }>()
 
 const store = useChannelStore();

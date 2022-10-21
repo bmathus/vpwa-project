@@ -14,31 +14,36 @@ const dummyMessages: Array<Message> = [
     id: 1,
     message: 'Ahoj',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Matus',
+    user_id: 2,
+    sender_nickname: 'DefaultUser',
   },
   {
     id: 2,
     message: 'Ahoj',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Matus',
+    user_id: 2,
+    sender_nickname: 'DefaultUser',
   },
   {
     id: 3,
-    message: 'Ahoj',
+    message: 'Ahoj @DefaultUser',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Matus',
+    user_id: 99,
+    sender_nickname: 'Lucia',
   },
   {
     id: 4,
     message: 'Ahoj',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Matus',
+    user_id: 2,
+    sender_nickname: 'DefaultUser',
   },
   {
     id: 5,
     message: 'Ahoj',
     send_at: '10.02.2020 9:30',
-    sender_name: 'Lucia',
+    user_id: 99,
+    sender_nickname: 'Lucia',
   },
 ];
 
@@ -202,7 +207,7 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
-    pushMessage(message: string): void {
+    pushMessage(message: string, user: User): void {
       const date = new Date();
       if (this.active_channel !== null) {
         this.channels_messages[this.active_channel.id.toString()].messages.push(
@@ -210,7 +215,8 @@ export const useChannelStore = defineStore('channelstore', {
             id: Date.now(),
             message: message,
             send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
-            sender_name: 'Matus',
+            user_id: user.id,
+            sender_nickname: user.nickname,
           }
         );
       }

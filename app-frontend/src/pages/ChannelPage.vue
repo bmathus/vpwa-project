@@ -8,14 +8,14 @@
             <q-spinner color="primary" name="dots" size="40px" />
           </div>
         </template>
-        <q-chat-message :text="[message.message]" :sent="message.id % 2 == 0 ? true : false"
-          v-for="message in store.getMessages" :key="message.id" :bg-color="message.id % 2 == 0 ? '' : 'teal-3'">
-          <template v-slot:name>{{message.sender_name}}</template>
+        <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
+          v-for="message in store.getMessages" :key="message.id" :bg-color="userIsSender(message) ? '' : 'teal-3'">
+          <template v-slot:name>{{message.sender_nickname}}</template>
           <template v-slot:stamp>{{message.send_at}}</template>
           <template v-slot:avatar>
-            <q-avatar rounded color="primary" text-color="dark"
-              :class="messageClass(message.id % 2 == 0 ? true : false)" style="height:35px; width:35px">
-              <div class="text-body1 text-weight-medium">{{message.sender_name[0].toUpperCase()}}</div>
+            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
+              style="height:35px; width:35px">
+              <div class="text-body1 text-weight-medium">{{message.sender_nickname[0].toUpperCase()}}</div>
             </q-avatar>
           </template>
         </q-chat-message>
@@ -29,23 +29,39 @@
 <script lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
-
+import { Message } from '../stores/interfaces'
+import { useUserStore } from '../stores/userstore';
 
 export default {
 
   setup() {
+    const store = useChannelStore();
+    const userstore = useUserStore();
     const infiniteScroll = ref()
-    const store = useChannelStore()
+    store.fetchMessages()
 
     onMounted(() => {
       store.$state.infiniteScroll = {
         stopOnLoad: () => infiniteScroll.value.stop(),
         resumeOnLoad: () => infiniteScroll.value.resume()
       }
-    }),
+    })
 
+    function userIsSender(message: Message): boolean {
+      if (message.user_id === userstore.getUser.id) {
+        return true;
+      } else {
+        return false;
+      }
+    }
 
-      store.fetchMessages()
+    function messageClass(isSend: boolean): object {
+      return reactive({
+        'q-mb-xs': true,
+        'q-message-avatar--sent': isSend,
+        'q-message-avatar--received': !isSend
+      })
+    }
 
     function onLoad(index: unknown, done: () => void) {
       setTimeout(() => {
@@ -54,18 +70,28 @@ export default {
       }, 2000)
     }
 
-    function messageClass(isSent: boolean): object {
-      return reactive({
-        'q-mb-xs': true,
-        'q-message-avatar--sent': isSent,
-        'q-message-avatar--received': !isSent
-      })
+    function highlightPing(message: string): string {
+      const trimmed_message = message.trim()
+      const ping_string =
+        `<div style="background-color:rgb(242,192,55); border-radius: 3px; display:inline-block;" class="text-weight-medium">
+        @${userstore.getUser.nickname}
+        </div>`
+
+      if (trimmed_message.startsWith(`@${userstore.getUser.nickname}`)) {
+        return trimmed_message.replace(`@${userstore.getUser.nickname}`, ping_string)
+      } else {
+        return trimmed_message.replace(` @${userstore.getUser.nickname}`, ping_string)
+      }
+
     }
+
     return {
       infiniteScroll,
       store,
       messageClass,
       onLoad,
+      userIsSender,
+      highlightPing
     }
   }
 }
@@ -76,5 +102,9 @@ export default {
 .messages-box {
   width: 100%;
   max-width: 1250px;
+}
+
+.ping {
+  color: brown;
 }
 </style>

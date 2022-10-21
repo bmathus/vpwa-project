@@ -23,7 +23,7 @@ const defaultUser: User = {
   id: 2,
   name: 'Jozko',
   surname: 'Mrkvicka',
-  nickname: 'Default User',
+  nickname: 'DefaultUser',
   email: 'defaultuser@gmail.com',
   password: 'defaultuser123',
   avatar_color: 'primary',

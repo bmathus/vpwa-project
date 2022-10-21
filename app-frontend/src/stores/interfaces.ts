@@ -10,7 +10,8 @@ export interface Message {
   id: number;
   message: string;
   send_at: string;
-  sender_name: string;
+  user_id: number;
+  sender_nickname: string;
 }
 export interface Member {
   id: number;
