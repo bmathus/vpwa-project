@@ -11,17 +11,17 @@
 
       <q-scroll-area class="area">
         <q-list>
-          <q-item dense v-for="member in store.active_channel.members" :key="member.name">
+          <q-item dense v-for="member in store.getActiveChannelMembers" :key="member.nickname">
             <q-item-section avatar>
-              <q-avatar rounded :color="member.avatarColor" text-color="dark" class="q-my-xs"
+              <q-avatar rounded :color="member.avatar_color" text-color="dark" class="q-my-xs"
                 style="height:38px; width:38px">
-                <div>{{member.name[0].toUpperCase()}}</div>
+                <div>{{member.nickname[0].toUpperCase()}}</div>
                 <activity-badge :status="member.status" />
               </q-avatar>
             </q-item-section>
 
             <q-item-section>
-              {{member.name}}
+              {{member.nickname}}
             </q-item-section>
 
           </q-item>

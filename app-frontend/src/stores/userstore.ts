@@ -6,7 +6,6 @@ const dummyInvitations: Invitation[] = [
   {
     id: 1,
     channel_id: 23438,
-    sender_id: 221,
     admin_id: 72,
     channel_name: 'Channel 78',
     is_public: false,
@@ -14,7 +13,6 @@ const dummyInvitations: Invitation[] = [
   {
     id: 2,
     channel_id: 23438,
-    sender_id: 222,
     admin_id: 72,
     channel_name: 'Channel 78',
     is_public: true,
@@ -26,9 +24,9 @@ const defaultUser: User = {
   name: 'Jozko',
   surname: 'Mrkvicka',
   nickname: 'Default User',
-  status: Status.online,
   email: 'defaultuser@gmail.com',
   password: 'defaultuser123',
+  avatar_color: 'primary',
 };
 
 export const useUserStore = defineStore('userstore', {
@@ -71,10 +69,12 @@ export const useUserStore = defineStore('userstore', {
       this.status = status;
     },
     acceptInvitation(invitation: Invitation): void {
+      //todo namiesto creatovania by sa mal joinuť kanal spravit si nejake na joinutie a metodu nato
       this.channelstore.createNewChannel(
         invitation.channel_name,
         invitation.is_public,
-        invitation.admin_id
+        this.user,
+        this.status
       );
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;

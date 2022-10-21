@@ -9,44 +9,32 @@
 
       <q-card-section class="my-card">
         <p class="text-subtitle2 q-mb-md">Leave channel</p>
-        <p class="text-caption q-mb-md">After you leave public channel you can join it back with command \join
-          channelname
+        <p class="text-caption q-mb-md">
+          {{props.text_info}}
         </p>
-        <div v-if="store.getActiveChannel === null ? null : store.getActiveChannel.admin_id == userstore.getUser.id">
-          <q-btn color="red" outline @click="leaveChannel" v-close-popup>Delete</q-btn>
+        <div>
+          <q-btn color="red" outline @click="leaveChannel" v-close-popup>{{props.button_title}}</q-btn>
         </div>
-        <div v-else>
-          <q-btn color="red" outline @click="leaveChannel" v-close-popup>Leave</q-btn>
-        </div>
-
-
       </q-card-section>
     </q-card>
   </q-menu>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+
 import { useChannelStore } from '../stores/channelstore';
-import { useUserStore } from '../stores/userstore';
-export default defineComponent({
-  name: 'ChannelSettings',
-  setup() {
-    const store = useChannelStore()
-    const userstore = useUserStore()
 
-    function leaveChannel(): void {
-      store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
-    }
+const props = defineProps<{
+  button_title: string,
+  text_info: string
+}>()
 
-    return {
-      store,
-      userstore,
-      leaveChannel
-    }
-  }
+const store = useChannelStore();
 
-});
+function leaveChannel(): void {
+  store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
+}
+
 </script>
 
 <style scoped>

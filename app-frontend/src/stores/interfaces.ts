@@ -1,9 +1,9 @@
 export interface Channel {
   id: number;
   name: string;
-  members: User[];
+  members: Member[];
   is_public: boolean;
-  admin_id: number
+  admin_id: number;
 }
 
 export interface Message {
@@ -14,12 +14,14 @@ export interface Message {
 }
 export interface Member {
   id: number;
+  nickname: string;
+  avatar_color: string;
+  status: Status;
 }
 
 export interface Invitation {
   id: number;
   channel_id: number;
-  sender_id: number;
   admin_id: number;
   channel_name: string;
   is_public: boolean;
@@ -36,9 +38,9 @@ export interface User {
   name: string;
   surname: string;
   nickname: string;
-  status: Status
   email: string;
   password: string;
+  avatar_color: string;
 }
 
 export enum Status {

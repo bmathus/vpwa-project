@@ -2,8 +2,8 @@
 
   <q-drawer show-if-above side="left" :width="225" :breakpoint="600" class="bg-grey-3">
     <div class="absolute-top row items-center" style="height:50px;">
-      <q-btn unelevated color="primary" padding="none" style="height:32px; width:32px" label="M" class="q-ma-sm"
-        text-color="black">
+      <q-btn unelevated :color="userstore.getUser.avatar_color" padding="none" style="height:32px; width:32px"
+        :label="userstore.getUser.nickname[0].toUpperCase()" class="q-ma-sm" text-color="black">
         <activity-badge :status="userstore.getStatus" />
         <user-settings></user-settings>
       </q-btn>

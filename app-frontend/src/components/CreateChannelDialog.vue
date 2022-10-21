@@ -42,7 +42,7 @@ export default defineComponent({
     const isPublic = ref(false);
 
     function onSubmit(): void {
-      store.createNewChannel(name.value, isPublic.value, userstore.getUser.id);
+      store.createNewChannel(name.value, isPublic.value, userstore.getUser, userstore.getStatus)
       ctx.emit('dialogVisibility');
       name.value = '';
     }
