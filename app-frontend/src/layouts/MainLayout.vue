@@ -57,7 +57,7 @@ export default defineComponent({
       text,
       activeComponent
     }
-  }
+  },
 });
 </script>
 

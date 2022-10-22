@@ -9,11 +9,11 @@
                 <h4 class="text-center">Login </h4>
 
                 <q-input filled v-model="email" label="Enter email *" lazy-rules
-                    :rules="[ val => val && val.length > 0 || 'Please type something']" />
+                    :rules="[ val => val && val.length > 0 || 'Too few characters', val => val && val.length < 320 || 'Too many characters']" />
 
 
                 <q-input filled type="password" v-model="password" label="Password *" lazy-rules
-                    :rules="[val => val && val !== '' || 'Type your password']" />
+                    :rules="[val => val && val.length > 8 || 'Too few password', val => val && val.length < 128 || 'Too many characters']" />
 
                 <q-btn label="Submit" type="submit" color="primary" />
 
@@ -54,7 +54,7 @@ export default {
                 })
             },
 
-           
+
         }
     }
 }

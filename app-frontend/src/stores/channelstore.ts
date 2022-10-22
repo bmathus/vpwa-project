@@ -294,6 +294,10 @@ export const useChannelStore = defineStore('channelstore', {
       delete this.channels_messages[id !== null ? id.toString() : ''];
     },
 
+    addKick(): void {
+      this.infiniteScroll.resumeOnLoad();
+    },
+
     //infinite scroll control - kvoli members dialogu
     stopMessagesLoading(): void {
       this.infiniteScroll.stopOnLoad();

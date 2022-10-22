@@ -6,6 +6,14 @@ export interface Channel {
   admin_id: number;
 }
 
+export interface Kicks {
+  id: number;
+  channel_id: number;
+  user_id: number
+  sender_id: number;
+
+}
+
 export interface Message {
   id: number;
   message: string;
