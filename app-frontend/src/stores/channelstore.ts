@@ -117,7 +117,7 @@ const dummyChannels: Channel[] = [
   },
   {
     id: 2,
-    name: 'Channel 2',
+    name: 'Verryyy Big Channel',
     members: channelMembersList,
     is_public: false,
     admin_id: 2,
@@ -304,7 +304,7 @@ export const useChannelStore = defineStore('channelstore', {
       this.active_dialog = !this.active_dialog
     },
 
-    revokeMember(nickname: string): number{
+    makeRevoke(nickname: string): number{
      
       const len = this.active_channel?.members.length
       
@@ -318,15 +318,23 @@ export const useChannelStore = defineStore('channelstore', {
       if (len == this.active_channel?.members.length){
         return 2
       }
-    
-      return 1
-    
     }
-      return 0
+      return 1
     },
 
-    addKick(): void {
-      this.infiniteScroll.resumeOnLoad();
+    addKick(nickname: string): number {
+      const len = this.active_channel?.members.length
+      
+      const new_members = this.active_channel?.members.filter((member) =>member.nickname !== nickname);
+      
+
+     if (new_members != undefined) {
+
+      if (len == this.active_channel?.members.length){
+        return 2
+      }
+    }
+      return 1
     },
 
     //infinite scroll control - kvoli members dialogu

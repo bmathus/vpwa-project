@@ -110,7 +110,7 @@ export default defineComponent({
           }
 
         }
-        if (messageText.value.includes('/cancel') && myPermitions.value.includes('cancel')) {
+        else if (messageText.value.includes('/cancel') && myPermitions.value.includes('cancel')) {
 
           if (messageText.value.split(' ', 2).length > 1) {
             notify_err('Incorrect command')
@@ -129,7 +129,7 @@ export default defineComponent({
 
 
         }
-        if (messageText.value.includes('/quit') && myPermitions.value.includes('quit')) {
+        else if (messageText.value.includes('/quit') && myPermitions.value.includes('quit')) {
           if (messageText.value.split(' ', 2).length > 1) {
             notify_err('Incorrect command')
           }
@@ -141,29 +141,75 @@ export default defineComponent({
 
         }
 
-        if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
+        else if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
           store.setActiveMembers()
           store.stopMessagesLoading() //je to spravne?
 
         }
-        if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
+        else if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
 
           let command = messageText.value.split(' ', 3)
 
           if (command.length == 2) {
-            const status = store.revokeMember(command[1].replace('\n', ''))
 
-            if (status == 2) {
-              notify_err('Such user doesnt exist in this channel')
+            if (command[1].replace('\n', '') == userstore.getUser.nickname) {
+              notify_err('You cannot throw yourself out of the channel')
             }
+
+            else {
+              const status = store.makeRevoke(command[1].replace('\n', ''))
+
+              if (status == 2) {
+                notify_err('Such user doesnt exist in this channel')
+              }
+            }
+
+
           }
           else {
             notify_err('Incorrect command')
           }
 
-
-
         }
+        else if (messageText.value.includes('/kick') && myPermitions.value.includes('kick')) {
+          let command = messageText.value.split(' ', 3)
+
+          if (command.length == 2) {
+
+            if (command[1].replace('\n', '') == userstore.getUser.nickname) {
+              notify_err('You cannot kick yourself out of the channel')
+            }
+
+            else {
+              const status = store.makeRevoke(command[1].replace('\n', ''))
+
+              if (status == 1) {
+                notify_err('It works')
+              }
+
+              if (status == 2) {
+                notify_err('Such user doesnt exist in this channel')
+              }
+
+            }
+
+          }
+          else {
+            notify_err('Incorrect command')
+          }
+        }
+        else if (messageText.value.includes('/invite') && myPermitions.value.includes('invite')) {
+          let command = messageText.value.split(' ', 3)
+
+          if (command.length == 2) {
+            notify_err('It works')
+
+          }
+          else {
+            notify_err('Incorrect command')
+          }
+        }
+
         else {
           store.pushMessage(messageText.value, userstore.getUser)
 
