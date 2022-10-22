@@ -15,12 +15,12 @@
             <div class="text-subtile2">{{store.getActiveChannelMembers.length}}</div>
         </q-btn>
     </q-toolbar>
-    <members-dialog v-model="openDialog" @hide="whenDialogCloses">
+    <members-dialog v-model="store.active_dialog" @hide="whenDialogCloses">
     </members-dialog>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
 import MembersDialog from './MembersDialog.vue';
@@ -37,7 +37,6 @@ export default defineComponent({
     setup(props, { emit }) {
         const store = useChannelStore()
         const userstore = useUserStore();
-        const openDialog = ref(false)
 
         const leaveinfo = 'After you leave channel you can join it back or need to receive an invitation.'
         const quitinfo = 'After you quit channel it will be completely removed.';
@@ -52,8 +51,9 @@ export default defineComponent({
 
         function toggleDialog(): void {
             store.stopMessagesLoading()
+
             setTimeout(() => {
-                openDialog.value = !openDialog.value;
+                store.setActiveMembers()
             }, 20)
         }
 
@@ -64,7 +64,7 @@ export default defineComponent({
         function drawerVisibility(): void {
             emit('drawer')
         }
-        return { drawerVisibility, openDialog, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin, whenDialogCloses }
+        return { drawerVisibility, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin, whenDialogCloses }
     }
 });
 

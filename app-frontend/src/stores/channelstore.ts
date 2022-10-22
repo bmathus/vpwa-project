@@ -169,6 +169,7 @@ export const useChannelStore = defineStore('channelstore', {
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: null as Channel | null,
+    active_dialog: false,
     //other imports
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
@@ -181,6 +182,9 @@ export const useChannelStore = defineStore('channelstore', {
           .messages;
       }
       return [];
+    },
+    getMemberDialog(): boolean{
+      return  this.active_dialog
     },
     getPublicChannels(): Channel[] {
       return this.channels.filter((channel) => channel.is_public === true);
@@ -204,6 +208,7 @@ export const useChannelStore = defineStore('channelstore', {
       }
       return [];
     },
+  
   },
 
   actions: {
@@ -239,6 +244,7 @@ export const useChannelStore = defineStore('channelstore', {
     createNewChannel(
       channel_name: string,
       is_public: boolean,
+      
       user: User,
       status: Status
     ): void {
@@ -292,6 +298,31 @@ export const useChannelStore = defineStore('channelstore', {
       }
 
       delete this.channels_messages[id !== null ? id.toString() : ''];
+    },
+
+    setActiveMembers():void {
+      this.active_dialog = !this.active_dialog
+    },
+
+    revokeMember(nickname: string): number{
+     
+      const len = this.active_channel?.members.length
+      
+      const new_members = this.active_channel?.members.filter((member) =>member.nickname !== nickname);
+      
+
+     if (new_members != undefined) {
+     
+      this.active_channel!.members = new_members
+
+      if (len == this.active_channel?.members.length){
+        return 2
+      }
+    
+      return 1
+    
+    }
+      return 0
     },
 
     addKick(): void {

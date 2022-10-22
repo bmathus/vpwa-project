@@ -94,14 +94,14 @@ export default defineComponent({
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
         if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
-          let command = messageText.value.split(' ', 3)
+          let command = messageText.value.split(' ', 4)
           let setpublic: boolean
 
-          if (command.length < 4 && command[2].toLocaleLowerCase() == 'true') {
+          if (command.length == 3 && command[2] == 'public\n') {
             setpublic = true
             store.createNewChannel(command[1], setpublic, userstore.getUser, userstore.getStatus)
           }
-          else if (command.length < 4 && command[2].toLocaleLowerCase() == 'false') {
+          else if (command.length == 3 && command[2].toLocaleLowerCase() == 'private\n') {
             setpublic = false
             store.createNewChannel(command[1], setpublic, userstore.getUser, userstore.getStatus)
           }
@@ -142,6 +142,25 @@ export default defineComponent({
         }
 
         if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
+          store.setActiveMembers()
+          store.stopMessagesLoading() //je to spravne?
+
+        }
+        if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
+
+          let command = messageText.value.split(' ', 3)
+
+          if (command.length == 2) {
+            const status = store.revokeMember(command[1].replace('\n', ''))
+
+            if (status == 2) {
+              notify_err('Such user doesnt exist in this channel')
+            }
+          }
+          else {
+            notify_err('Incorrect command')
+          }
+
 
 
         }
