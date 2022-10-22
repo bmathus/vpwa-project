@@ -15,7 +15,8 @@
             <div class="text-subtile2">{{store.getActiveChannelMembers.length}}</div>
         </q-btn>
     </q-toolbar>
-    <members-dialog v-model="openDialog"></members-dialog>
+    <members-dialog v-model="openDialog" @hide="whenDialogCloses">
+    </members-dialog>
 </template>
 
 <script lang="ts">
@@ -51,13 +52,19 @@ export default defineComponent({
 
         function toggleDialog(): void {
             store.stopMessagesLoading()
-            openDialog.value = !openDialog.value;
+            setTimeout(() => {
+                openDialog.value = !openDialog.value;
+            }, 20)
+        }
+
+        function whenDialogCloses(): void {
+            store.resumeMessagesLoading
         }
 
         function drawerVisibility(): void {
             emit('drawer')
         }
-        return { drawerVisibility, openDialog, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin }
+        return { drawerVisibility, openDialog, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin, whenDialogCloses }
     }
 });
 

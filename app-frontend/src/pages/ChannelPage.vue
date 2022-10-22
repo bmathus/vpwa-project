@@ -1,6 +1,6 @@
 
 <template>
-  <q-page class="row justify-center">
+  <q-page>
     <div class="q-pa-md messages-box">
       <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll">
         <template v-slot:loading>
@@ -91,7 +91,7 @@ export default {
       messageClass,
       onLoad,
       userIsSender,
-      highlightPing
+      highlightPing,
     }
   }
 }

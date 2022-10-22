@@ -20,15 +20,27 @@ export default defineComponent({
     const messageText = ref('')
     const $q = useQuasar()
 
-    function confirm(msg: string) {
+    function confirm(msg: string, title: string) {
+      store.stopMessagesLoading()
       $q.dialog({
-        title: 'Confirm',
+        title: title,
         message: msg,
-        cancel: true,
-        persistent: true
+        persistent: true,
+        ok: {
+          label: 'yes',
+          color: 'teal',
+          flat: true
+        },
+        cancel: {
+          color: 'teal',
+          flat: true
+        },
+        class: 'q-pa-sm'
       }).onOk(() => {
         store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
+        store.resumeMessagesLoading()
       }).onCancel(() => {
+        store.resumeMessagesLoading()
         //console.log('>>>> Cancel')
       })
     }
@@ -111,7 +123,7 @@ export default defineComponent({
             else {
               message = 'Do you really want to leave this channel?'
             }
-            confirm(message)
+            confirm(message, 'Leave channel')
           }
 
 
@@ -123,7 +135,7 @@ export default defineComponent({
           }
           else {
             let message = 'Do you really want to leave this channel? Channel will be deleted'
-            confirm(message)
+            confirm(message, 'Quit channel')
           }
 
 

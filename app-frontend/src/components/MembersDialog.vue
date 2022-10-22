@@ -4,7 +4,7 @@
       <q-card-section class="row items-center q-pa-sm">
         <div class="text-subtitle1 text-weight-bold q-ml-sm">Channel Members</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup @click="resumeMessagesLoading" />
+        <q-btn icon="close" flat round dense v-close-popup />
       </q-card-section>
 
       <q-separator class="q-mx-md" />
@@ -45,11 +45,7 @@ export default defineComponent({
   },
   setup() {
     const store = useChannelStore()
-    function resumeMessagesLoading() {
-      store.resumeMessagesLoading()
-    }
     return {
-      resumeMessagesLoading,
       store
     }
   }
