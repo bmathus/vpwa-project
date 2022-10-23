@@ -7,17 +7,17 @@
           <div class="close-badge bg-white" @click="hideLiveTyping">
             <q-icon class="row" name="close" color="teal" />
           </div>
-          <span class="text-weight-medium">{{shownMember.nickname + ':'}}</span>
-          {{shownMember.live_text}}
+          <span class="text-weight-medium">{{ shownMember.nickname + ':' }}</span>
+          {{ shownMember.live_text }}
         </div>
       </div>
 
       <div class="nowtyping-box q-mx-md q-pb-xs q-px-xs text-dark bg-white text-weight-medium text-caption"
         v-if="membersTyping.length !== 0">
         <button v-for="member in membersTyping" :key="member.id" @click="showLiveTyping(member)">
-          {{prepareButtonLabel(member.nickname)}}
+          {{ prepareButtonLabel(member.nickname) }}
         </button>
-        <div class="q-ml-xs">{{typingText}}</div>
+        <div class="q-ml-xs">{{ typingText }}</div>
       </div>
       <div class="text-box">
         <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage($event)" />
@@ -125,21 +125,25 @@ export default defineComponent({
           message_join.splice(-1, 1)
 
           let channel_name = message_join.join(' ')
-          let setpublic: boolean
           let duplicate = store.checkDuplicateChannel(channel_name)
 
-          if (duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
-            setpublic = true
+          if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
+            let setpublic = true
             store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
             notify_event('Public channel ' + channel_name + ' was created')
           }
-          else if (duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
-            setpublic = false
+          else if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
+            let setpublic = false
             store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
             notify_event('Private channel ' + channel_name + ' was created')
           }
           else {
-            if (duplicate == 2) {
+
+            if (channel_name.includes('/')) {
+              notify_event('Cannot create channel with special characters')
+            }
+
+            else if (duplicate == 2) {
               notify_event('Cannot create channel that already exists')
             }
             else {

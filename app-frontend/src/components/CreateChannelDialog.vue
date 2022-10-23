@@ -11,10 +11,10 @@
 
       <q-card-section s>
         <q-form @submit.prevent="onSubmit" class="column justify-center area">
-          <q-input filled dense v-model="name" label="Channel name" hint="Enter unique channel name" lazy-rules
-            :rules="[(val:any)  => val && val.length > 0 || 'Name must be at least 1 character',(val:any) => val && val.length <= 20  || 'Name is too long']" />
+          <q-input filled dense v-model="name" label="Channel name" hint="Enter unique channel name" lazy-rules :rules="[(val: any) => val && val.length > 0 || 'Name must be at least 1 character', (val: any) => val && val.length <= 20 || 'Name is too long',
+          (val: any) => val && !val.includes('/') || 'Cannot create channel with special characters']" />
 
-          <q-toggle v-model="isPublic" color="teal" keep-color :label="isPublic ? 'Public' :'Private' " />
+          <q-toggle v-model="isPublic" color="teal" keep-color :label="isPublic ? 'Public' : 'Private'" />
           <q-separator />
           <div class="row justify-end items-center q-mt-sm">
             <q-btn flat label="Create" type="submit" color="teal" style="display:block" />
