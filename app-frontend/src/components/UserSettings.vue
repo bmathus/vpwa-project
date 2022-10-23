@@ -3,7 +3,9 @@
     <q-card class="text-dark">
 
       <q-card-section class="q-pa-sm my-card">
-        <div class="text-subtitle1 text-weight-bold q-ml-sm">User Settings</div>
+        <div column class="text-subtitle1 text-weight-bold q-ml-sm">{{userstore.user.name}} {{userstore.user.surname}}
+        </div>
+
       </q-card-section>
       <q-separator class="q-mx-md" />
       <q-card-section>
@@ -22,7 +24,7 @@
       <q-card-section class="q-pt-none items-end">
         <q-separator />
         <div style="width:100%" class="column justify-center items-end">
-          <q-btn color="red" outline class="q-mt-md">Log Out</q-btn>
+          <q-btn color="red" outline class="q-mt-md" @click="$router.push('/login')">Log Out</q-btn>
         </div>
       </q-card-section>
     </q-card>
@@ -57,7 +59,7 @@ export default defineComponent({
       }
     })
     return {
-      option, options, setStatusAndColor, notifications
+      option, options, setStatusAndColor, notifications, userstore
     }
   }
 })

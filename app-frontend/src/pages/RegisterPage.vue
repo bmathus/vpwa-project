@@ -6,24 +6,25 @@
             <h4 class="text-center">Registration </h4>
 
             <q-input filled v-model="name" label="Enter name *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']" />
 
             <q-input filled v-model="surname" label="Enter surname *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']" />
 
             <q-input filled v-model="nickname" label="Enter nickname *" lazy-rules
-                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters']" />
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']" />
 
             <q-input filled type="email" v-model="email" label="Enter email *" lazy-rules
                 :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length <= 320 || 'Too many characters']" />
 
-            <q-input filled type="password" v-model="password" label="Password *" lazy-rules :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 256 || 'Too many characters']" />
+            <q-input filled type="password" v-model="password" label="Password *" lazy-rules
+                :rules="[ val => val && val.length != '' || 'Please type something', val => val && val.length < 256 || 'Too many characters']" />
 
 
             <q-toggle v-model="accept" label="I accept the license and terms" />
 
             <div lass="fixed-center">
-                <q-btn label="Submit" type="submit" color="primary" />
+                <q-btn label="Submit" type="submit" class="bg-dark text-white" />
 
             </div>
 
@@ -44,7 +45,7 @@ export default {
     setup() {
         const $q = useQuasar()
         const router = useRouter()
-        
+
         const name = ref('')
         const surname = ref('')
         const nickname = ref('')
@@ -59,11 +60,11 @@ export default {
             email,
             password,
             accept,
-           
+
             onSubmit() {
-                
+
                 if (accept.value !== true) {
-                    
+
                     $q.notify({
                         color: 'red-5',
                         textColor: 'white',
@@ -72,10 +73,10 @@ export default {
                     })
                 }
                 else {
-                  
-                    
+
+
                     useUserStore().makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
-                    router.push('/') 
+                    router.push('/')
                 }
             },
         }
@@ -89,7 +90,7 @@ export default {
     margin: 50px auto;
     overflow: auto;
     min-height: 300px;
-    border: 1px solid steelblue;
+    border: 1px solid rgb(6, 9, 12);
     padding: 30px;
     border-radius: 5px;
 }

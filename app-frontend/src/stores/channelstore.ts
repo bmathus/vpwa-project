@@ -364,8 +364,27 @@ export const useChannelStore = defineStore('channelstore', {
       return 1;
     },
 
+    checkDuplicateChannel(name: string): number {
+
+
+      const new_channel = this.channels?.filter(
+        (channel) => channel.name === name
+      );
+
+      if(new_channel.length == 0) {
+        return 1
+      }
+
+      else{
+        return 2
+      }
+
+      return 0
+    },
+
     addKick(nickname: string): number {
       const len = this.active_channel?.members.length;
+      
 
       const new_members = this.active_channel?.members.filter(
         (member) => member.nickname !== nickname

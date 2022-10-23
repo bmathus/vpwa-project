@@ -70,7 +70,7 @@ export default defineComponent({
       })
     }
 
-    function notify_err(msg: string) {
+    function notify_event(msg: string) {
       $q.notify({
         type: 'info',
         message: msg,
@@ -119,26 +119,40 @@ export default defineComponent({
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
         if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
-          let command = messageText.value.split(' ', 4)
-          let setpublic: boolean
 
-          if (command.length == 3 && command[2] == 'public\n') {
+          let command = messageText.value.split(' ')
+          let message_join = messageText.value.split(' ').slice(1)
+          message_join.splice(-1, 1)
+
+          let channel_name = message_join.join(' ')
+          let setpublic: boolean
+          let duplicate = store.checkDuplicateChannel(channel_name)
+
+          if (duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
             setpublic = true
-            store.createNewChannel(command[1], setpublic, userstore.getUser, userstore.getStatus)
+            store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
+            notify_event('Public channel ' + channel_name + ' was created')
           }
-          else if (command.length == 3 && command[2].toLocaleLowerCase() == 'private\n') {
+          else if (duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
             setpublic = false
-            store.createNewChannel(command[1], setpublic, userstore.getUser, userstore.getStatus)
+            store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
+            notify_event('Private channel ' + channel_name + ' was created')
           }
           else {
-            notify_err('Incorrect command')
+            if (duplicate == 2) {
+              notify_event('Cannot create channel that already exists')
+            }
+            else {
+              notify_event('Incorrect command')
+            }
+
           }
 
         }
         else if (messageText.value.includes('/cancel') && myPermitions.value.includes('cancel')) {
 
           if (messageText.value.split(' ', 2).length > 1) {
-            notify_err('Incorrect command')
+            notify_event('Incorrect command')
           }
           else {
             let message = ''
@@ -156,7 +170,7 @@ export default defineComponent({
         }
         else if (messageText.value.includes('/quit') && myPermitions.value.includes('quit')) {
           if (messageText.value.split(' ', 2).length > 1) {
-            notify_err('Incorrect command')
+            notify_event('Incorrect command')
           }
           else {
             let message = 'Do you really want to leave this channel? Channel will be deleted'
@@ -167,69 +181,73 @@ export default defineComponent({
         }
 
         else if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
-          store.toogleMembersDialog()
+          if (messageText.value.length == 6)
+            store.toogleMembersDialog()
+          else {
+            notify_event('Incorrect command')
+          }
         }
         else if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
 
-          let command = messageText.value.split(' ', 3)
+          let command = messageText.value.split(' ', 2)
 
-          if (command.length == 2) {
+          if (command[0] == '/revoke') {
 
             if (command[1].replace('\n', '') == userstore.getUser.nickname) {
-              notify_err('You cannot throw yourself out of the channel')
+              notify_event('You cannot throw yourself out of the channel')
             }
 
             else {
               const status = store.makeRevoke(command[1].replace('\n', ''))
 
               if (status == 2) {
-                notify_err('Such user doesnt exist in this channel')
+                notify_event('Such user doesnt exist in this channel')
               }
             }
 
 
           }
           else {
-            notify_err('Incorrect command')
+            notify_event('Incorrect command')
           }
 
         }
         else if (messageText.value.includes('/kick') && myPermitions.value.includes('kick')) {
-          let command = messageText.value.split(' ', 3)
+          let command = messageText.value.split(' ', 2)
 
-          if (command.length == 2) {
+          if (command[0] == '/kick') {
 
             if (command[1].replace('\n', '') == userstore.getUser.nickname) {
-              notify_err('You cannot kick yourself out of the channel')
+              notify_event('You cannot kick yourself out of the channel')
             }
 
             else {
               const status = store.makeRevoke(command[1].replace('\n', ''))
 
               if (status == 1) {
-                notify_err('It works')
+                notify_event('It works')
               }
 
               if (status == 2) {
-                notify_err('Such user doesnt exist in this channel')
+                notify_event('Such user doesnt exist in this channel')
               }
 
             }
 
           }
           else {
-            notify_err('Incorrect command')
+            notify_event('Incorrect command')
           }
         }
         else if (messageText.value.includes('/invite') && myPermitions.value.includes('invite')) {
-          let command = messageText.value.split(' ', 3)
+          let command = messageText.value.split(' ', 2)
 
-          if (command.length == 2) {
-            notify_err('It works')
+          if (command[0] == '/invite') {
+            notify_event('It works')
 
           }
           else {
-            notify_err('Incorrect command')
+            notify_event('Incorrect command')
           }
         }
 
