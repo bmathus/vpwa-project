@@ -13,7 +13,7 @@
 
 
                 <q-input filled type="password" v-model="password" label="Password *" lazy-rules
-                    :rules="[val => val && val.length > 8 || 'Too few password', val => val && val.length < 128 || 'Too many characters']" />
+                    :rules="[val => val && val.length > 0 || 'No password', val => val && val.length < 64 || 'Too many characters']" />
 
                 <q-btn label="Submit" type="submit" class="bg-dark text-white" />
 
