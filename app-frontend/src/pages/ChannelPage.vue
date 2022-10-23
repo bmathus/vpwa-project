@@ -2,7 +2,7 @@
 <template>
   <q-page class="column justify-center items-center">
     <div class="q-pa-md messages-box">
-      <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll">
+      <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll" id="infinite">
         <template v-slot:loading>
           <div class="row justify-center q-my-md">
             <q-spinner color="primary" name="dots" size="40px" />
@@ -10,18 +10,19 @@
         </template>
         <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
           v-for="message in store.getMessages" :key="message.id" :bg-color="userIsSender(message) ? '' : 'teal-3'">
-          <template v-slot:name>{{message.sender_nickname}}</template>
-          <template v-slot:stamp>{{message.send_at}}</template>
+          <template v-slot:name>{{ message.sender_nickname }}</template>
+          <template v-slot:stamp>{{ message.send_at }}</template>
           <template v-slot:avatar>
             <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
               style="height:35px; width:35px">
-              <div class="text-body1 text-weight-medium">{{message.sender_nickname[0].toUpperCase()}}</div>
+              <div class="text-body1 text-weight-medium">{{ message.sender_nickname[0].toUpperCase() }}</div>
             </q-avatar>
           </template>
         </q-chat-message>
       </q-infinite-scroll>
 
     </div>
+
   </q-page>
 
 </template>
@@ -39,6 +40,14 @@ export default {
     const userstore = useUserStore();
     const infiniteScroll = ref()
     store.fetchMessages()
+
+
+    // store.scroll.tobottom = function (): void {
+    //   let elmnt = document.getElementById('infinite');
+    //   if (elmnt !== null) {
+    //     elmnt.scrollIntoView(false);
+    //   }
+    // }
 
     onMounted(() => {
       store.$state.infiniteScroll = {

@@ -1,37 +1,38 @@
 <template>
-    <div>
-
-        <q-form class="fixed-center container" @submit="onSubmit">
-
-            <h4 class="text-center">Registration </h4>
-
-            <q-input filled v-model="name" label="Enter name *" lazy-rules :rules="[val => val && val.length != '' || 'Please type something',
-            val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters',
-            val => val && !val.match(/\d+/g) || 'No numbers']" />
-
-            <q-input filled v-model="surname" label="Enter surname *" lazy-rules
-                :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters',
-                val => val && !val.includes('/') || 'No special characters', val => val && !val.match(/\d+/g) || 'No numbers']" />
-
-            <q-input filled v-model="nickname" label="Enter nickname *" lazy-rules
-                :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']" />
-
-            <q-input filled type="email" v-model="email" label="Enter email *" lazy-rules
-                :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 320 || 'Too many characters']" />
-
-            <q-input filled type="password" v-model="password" label="Password *" lazy-rules
-                :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length < 64 || 'Too many characters']" />
+    <div class="align-box column items-center justify-center q-pa-md">
+        <q-card class="container">
+            <q-form @submit="onSubmit">
 
 
-            <q-toggle v-model="accept" label="I accept the license and terms" />
+                <h4 class="text-center">Registration </h4>
 
-            <div lass="fixed-center">
-                <q-btn label="Submit" type="submit" class="bg-dark text-white" />
+                <q-input dense filled v-model="name" label="Enter name *" lazy-rules :rules="[val => val && val.length != '' || 'Please type something',
+                val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters',
+                val => val && !val.match(/\d+/g) || 'No numbers']" />
 
-            </div>
+                <q-input dense color="teal" filled v-model="surname" label="Enter surname *" lazy-rules
+                    :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters',
+                    val => val && !val.includes('/') || 'No special characters', val => val && !val.match(/\d+/g) || 'No numbers']" />
+
+                <q-input dense color="teal" filled v-model="nickname" label="Enter nickname *" lazy-rules
+                    :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']" />
+
+                <q-input dense color="teal" filled type="email" v-model="email" label="Enter email *" lazy-rules
+                    :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 320 || 'Too many characters']" />
+
+                <q-input dense color="teal" filled type="password" v-model="password" label="Password *" lazy-rules
+                    :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length < 64 || 'Too many characters']" />
 
 
-        </q-form>
+                <q-toggle color="teal" v-model="accept" label="I accept the license and terms" />
+
+
+                <q-btn label="Submit" type="submit" class="bg-dark text-white q-mt-sm" />
+
+
+
+            </q-form>
+        </q-card>
 
     </div>
 </template>
@@ -88,16 +89,19 @@ export default {
 
 <style scoped>
 .container {
-    max-width: 500px;
-    margin: 50px auto;
+    max-width: 400px;
+    width: 100%;
     overflow: auto;
     min-height: 300px;
-    border: 1px solid rgb(6, 9, 12);
     padding: 30px;
     border-radius: 5px;
 }
 
+.align-box {
+    height: 100vh;
+}
+
 .q-input {
-    margin: 10px auto;
+    margin: 6px auto;
 }
 </style>

@@ -203,6 +203,10 @@ interface InfiniteScroll {
   resumeOnLoad: () => void;
 }
 
+// interface scroll {
+//   tobottom: () => void;
+// }
+
 export const useChannelStore = defineStore('channelstore', {
   state: () => ({
     channels: [] as Channel[],
@@ -212,6 +216,7 @@ export const useChannelStore = defineStore('channelstore', {
     //other imports
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
+    // scroll: {} as scroll,
   }),
 
   getters: {
@@ -249,6 +254,11 @@ export const useChannelStore = defineStore('channelstore', {
 
   actions: {
     pushMessage(message: string, user: User): void {
+      // if (this.scroll !== null) {
+      //   setTimeout(() => {
+      //     this.scroll.tobottom();
+      //   }, 20);
+      // }
       const date = new Date();
       if (this.active_channel !== null) {
         this.channels_messages[this.active_channel.id.toString()].messages.push(
@@ -365,26 +375,21 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
     checkDuplicateChannel(name: string): number {
-
-
       const new_channel = this.channels?.filter(
         (channel) => channel.name === name
       );
 
-      if(new_channel.length == 0) {
-        return 1
+      if (new_channel.length == 0) {
+        return 1;
+      } else {
+        return 2;
       }
 
-      else{
-        return 2
-      }
-
-      return 0
+      return 0;
     },
 
     addKick(nickname: string): number {
       const len = this.active_channel?.members.length;
-      
 
       const new_members = this.active_channel?.members.filter(
         (member) => member.nickname !== nickname
