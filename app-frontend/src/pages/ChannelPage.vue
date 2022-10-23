@@ -1,6 +1,6 @@
 
 <template>
-  <q-page>
+  <q-page class="column justify-center items-center">
     <div class="q-pa-md messages-box">
       <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll">
         <template v-slot:loading>
@@ -101,7 +101,7 @@ export default {
 <style scoped>
 .messages-box {
   width: 100%;
-  max-width: 1250px;
+  max-width: 1300px;
 }
 
 .ping {

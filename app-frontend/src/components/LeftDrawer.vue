@@ -55,7 +55,7 @@
 
     <div class="absolute-bottom bg-grey-3">
       <q-separator />
-      <q-item dense clickable v-ripple @click="toggleDialog">
+      <q-item dense clickable v-ripple @click="showDialog">
         <q-item-section class="text-subtitle2">
           Create Channel
         </q-item-section>
@@ -64,7 +64,7 @@
         </q-item-section>
       </q-item>
     </div>
-    <create-channel-dialog v-model="openDialog" @dialogVisibility="toggleDialog" />
+    <create-channel-dialog v-model="dialogIsOpen" @dialogVisibility="hideDialog" />
   </q-drawer>
 
 </template>
@@ -90,14 +90,29 @@ export default defineComponent({
   setup() {
     const store = useChannelStore();
     const userstore = useUserStore();
-    const openDialog = ref(false);
+    const dialogIsOpen = ref(false);
 
-    function toggleDialog(): void {
-      openDialog.value = !openDialog.value;
+    function hideDialog(): void {
+      dialogIsOpen.value = false;
+      if (!store.channelsAreEmpty) {
+        setTimeout(() => {
+          store.resumeMessagesLoading()
+        }, 20);
+      }
+
+    }
+    function showDialog(): void {
+      if (!store.channelsAreEmpty) {
+        store.stopMessagesLoading()
+      }
+      setTimeout(() => {
+        dialogIsOpen.value = true;
+      }, 20);
     }
     return {
-      toggleDialog,
-      openDialog,
+      showDialog,
+      hideDialog,
+      dialogIsOpen,
       store,
       userstore
     }

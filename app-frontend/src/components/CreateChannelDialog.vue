@@ -4,7 +4,7 @@
       <q-card-section class="q-pa-sm row items-center">
         <div class="text-subtitle1 text-weight-bold q-ml-sm">Create channel</div>
         <q-space />
-        <q-btn icon="close" flat round dense v-close-popup />
+        <q-btn icon="close" flat round dense @click="closeDialog" />
       </q-card-section>
 
       <q-separator class="q-mx-md" />
@@ -46,8 +46,11 @@ export default defineComponent({
       ctx.emit('dialogVisibility');
       name.value = '';
     }
+    function closeDialog() {
+      ctx.emit('dialogVisibility');
+    }
     return {
-      name, onSubmit, isPublic, store
+      name, onSubmit, isPublic, store, closeDialog
     }
   }
 });

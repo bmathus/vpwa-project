@@ -53,18 +53,23 @@ const channelMembersList: Member[] = [
     nickname: 'Lucia',
     avatar_color: 'primary',
     status: Status.online,
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
   },
   {
     id: 45,
-    nickname: 'Peter',
+    nickname: 'PeterSMedzerov',
     avatar_color: 'orange',
     status: Status.DND,
+    live_text: ' ',
   },
   {
     id: 13,
     nickname: 'Adam',
     avatar_color: 'blue',
     status: Status.online,
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
 ];
 
@@ -74,36 +79,70 @@ const channelMembersList2: Member[] = [
     nickname: 'Lucia',
     avatar_color: 'primary',
     status: Status.online,
+    live_text: '',
   },
   {
     id: 45,
     nickname: 'Peter',
     avatar_color: 'orange',
     status: Status.DND,
+    live_text: '',
   },
   {
     id: 13,
     nickname: 'Adam',
     avatar_color: 'blue',
     status: Status.offline,
+    live_text: '',
   },
   {
     id: 87,
     nickname: 'David',
     avatar_color: 'red',
     status: Status.online,
+    live_text: '',
   },
   {
     id: 45,
     nickname: 'Jozo raz',
     avatar_color: 'green',
     status: Status.DND,
+    live_text: '',
   },
   {
     id: 13,
-    nickname: 'Adam',
+    nickname: 'Adamko',
     avatar_color: 'blue',
     status: Status.offline,
+    live_text: '',
+  },
+  {
+    id: 99,
+    nickname: 'Jozo1234',
+    avatar_color: 'green',
+    status: Status.DND,
+    live_text: '',
+  },
+  {
+    id: 100,
+    nickname: 'UsersdlhýmMenom',
+    avatar_color: 'blue',
+    status: Status.offline,
+    live_text: '',
+  },
+  {
+    id: 99,
+    nickname: 'Jozo1234',
+    avatar_color: 'green',
+    status: Status.DND,
+    live_text: '',
+  },
+  {
+    id: 110,
+    nickname: 'Xbojko',
+    avatar_color: 'blue',
+    status: Status.offline,
+    live_text: '',
   },
 ];
 
@@ -169,7 +208,7 @@ export const useChannelStore = defineStore('channelstore', {
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: null as Channel | null,
-    active_dialog: false,
+    membersDialogOpen: false,
     //other imports
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
@@ -183,9 +222,7 @@ export const useChannelStore = defineStore('channelstore', {
       }
       return [];
     },
-    getMemberDialog(): boolean{
-      return  this.active_dialog
-    },
+
     getPublicChannels(): Channel[] {
       return this.channels.filter((channel) => channel.is_public === true);
     },
@@ -208,7 +245,6 @@ export const useChannelStore = defineStore('channelstore', {
       }
       return [];
     },
-  
   },
 
   actions: {
@@ -244,7 +280,7 @@ export const useChannelStore = defineStore('channelstore', {
     createNewChannel(
       channel_name: string,
       is_public: boolean,
-      
+
       user: User,
       status: Status
     ): void {
@@ -257,6 +293,7 @@ export const useChannelStore = defineStore('channelstore', {
             nickname: user.nickname,
             avatar_color: user.avatar_color,
             status: status,
+            live_text: '',
           },
         ],
         is_public: is_public,
@@ -300,41 +337,46 @@ export const useChannelStore = defineStore('channelstore', {
       delete this.channels_messages[id !== null ? id.toString() : ''];
     },
 
-    setActiveMembers():void {
-      this.active_dialog = !this.active_dialog
+    toogleMembersDialog(): void {
+      this.stopMessagesLoading();
+
+      setTimeout(() => {
+        this.membersDialogOpen = !this.membersDialogOpen;
+      }, 20);
     },
 
-    makeRevoke(nickname: string): number{
-     
-      const len = this.active_channel?.members.length
-      
-      const new_members = this.active_channel?.members.filter((member) =>member.nickname !== nickname);
-      
+    makeRevoke(nickname: string): number {
+      const len = this.active_channel?.members.length;
 
-     if (new_members != undefined) {
-     
-      this.active_channel!.members = new_members
+      const new_members = this.active_channel?.members.filter(
+        (member) => member.nickname !== nickname
+      );
 
-      if (len == this.active_channel?.members.length){
-        return 2
+      if (new_members != undefined) {
+        if (this.active_channel !== null) {
+          this.active_channel.members = new_members;
+        }
+
+        if (len == this.active_channel?.members.length) {
+          return 2;
+        }
       }
-    }
-      return 1
+      return 1;
     },
 
     addKick(nickname: string): number {
-      const len = this.active_channel?.members.length
-      
-      const new_members = this.active_channel?.members.filter((member) =>member.nickname !== nickname);
-      
+      const len = this.active_channel?.members.length;
 
-     if (new_members != undefined) {
+      const new_members = this.active_channel?.members.filter(
+        (member) => member.nickname !== nickname
+      );
 
-      if (len == this.active_channel?.members.length){
-        return 2
+      if (new_members != undefined) {
+        if (len == this.active_channel?.members.length) {
+          return 2;
+        }
       }
-    }
-      return 1
+      return 1;
     },
 
     //infinite scroll control - kvoli members dialogu

@@ -1,15 +1,39 @@
 <template>
-  <div class="text-box">
-    <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage($event)" />
-    <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage($event)" />
+  <div class="aligh-box column justify-center items-center">
+    <div class="max-width-box">
+      <div v-if="openLiveTyping && shownMember"
+        class="livetyping-box text-black q-mx-md text-dark text-caption bg-teal-1 q-pb-sm">
+        <div class="inner-box q-px-sm">
+          <div class="close-badge bg-white" @click="hideLiveTyping">
+            <q-icon class="row" name="close" color="teal" />
+          </div>
+          <span class="text-weight-medium">{{shownMember.nickname + ':'}}</span>
+          {{shownMember.live_text}}
+        </div>
+      </div>
+
+      <div class="nowtyping-box q-mx-md q-pb-xs q-px-xs text-dark bg-white text-weight-medium text-caption"
+        v-if="membersTyping.length !== 0">
+        <button v-for="member in membersTyping" :key="member.id" @click="showLiveTyping(member)">
+          {{prepareButtonLabel(member.nickname)}}
+        </button>
+        <div class="q-ml-xs">{{typingText}}</div>
+      </div>
+      <div class="text-box">
+        <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage($event)" />
+        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage($event)" />
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script lang="ts">
 import { useQuasar } from 'quasar';
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
+import { Member } from '../stores/interfaces';
 
 export default defineComponent({
   name: 'MessageField',
@@ -18,7 +42,8 @@ export default defineComponent({
     const store = useChannelStore();
     const userstore = useUserStore();
     const messageText = ref('')
-    const $q = useQuasar()
+    const $q = useQuasar();
+
 
     function confirm(msg: string, title: string) {
       store.stopMessagesLoading()
@@ -142,9 +167,7 @@ export default defineComponent({
         }
 
         else if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
-          store.setActiveMembers()
-          store.stopMessagesLoading() //je to spravne?
-
+          store.toogleMembersDialog()
         }
         else if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
 
@@ -218,10 +241,65 @@ export default defineComponent({
       }
     }
 
+    //live typing code
+    const openLiveTyping = ref(false);
+    const shownMember = ref();
+
+    const activeChannel = computed(() => {
+      return store.getActiveChannel;
+    })
+
+
+    const membersTyping = computed(() => {
+      return store.getActiveChannelMembers.filter((member) => {
+        //chceme zobrazit len memberov ktory maju prazdny live text string a niesom tam ani ja prihlaseny user
+        if (member.live_text.length !== 0 && member.id !== userstore.getUser.id) {
+          return member
+        }
+      })
+    })
+
+    function prepareButtonLabel(nickname: string): string {
+      if (nickname !== membersTyping.value[membersTyping.value.length - 1].nickname) {
+        return nickname + ', '
+      } else {
+        return nickname
+      }
+    }
+    const typingText = computed(() => {
+      if (membersTyping.value.length > 1) {
+        return 'are typing...'
+      } else {
+        return 'is typing...'
+      }
+    })
+
+    function showLiveTyping(member: Member): void {
+      shownMember.value = member;
+      openLiveTyping.value = true;
+    }
+
+    function hideLiveTyping(): void {
+      openLiveTyping.value = false;
+    }
+
+    //keby prepnem channel tak aby sa zatvoril live typing box
+    watch(activeChannel, () => {
+      hideLiveTyping()
+    });
+
+
 
     return {
       messageText,
-      sendMessage
+      sendMessage,
+      membersTyping,
+      prepareButtonLabel,
+      typingText,
+      openLiveTyping,
+      showLiveTyping,
+      hideLiveTyping,
+      shownMember
     }
   }
 })
@@ -233,6 +311,7 @@ export default defineComponent({
   width: 100%;
   display: flex;
   align-items: flex-end;
+  position: relative;
 }
 
 .text-box textarea {
@@ -254,5 +333,74 @@ export default defineComponent({
   position: absolute;
   bottom: 5px;
   right: 4px;
+}
+
+
+/* live typing classes */
+.nowtyping-box,
+.livetyping-box {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.nowtyping-box {
+  border: solid 2px teal;
+  margin-top: -10px;
+}
+
+.nowtyping-box button {
+  border: none;
+  background-color: transparent;
+  padding: 0px;
+  cursor: pointer;
+  transition: all 0.1s ease-in;
+}
+
+.nowtyping-box button:hover {
+  color: teal;
+}
+
+.nowtyping-box button:active {
+  transform: translateY(2px);
+}
+
+.nowtyping-box div {
+  display: inline-block;
+}
+
+.livetyping-box {
+  border: solid 2px teal;
+}
+
+.close-badge {
+  cursor: pointer;
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  display: inline-block;
+  border-radius: 8px;
+  padding: 1px;
+  border: solid 1px teal;
+  transition: all 0.1s ease-in;
+}
+
+.inner-box {
+  max-height: 200px;
+  overflow: auto;
+  position: relative;
+}
+
+.close-badge:active {
+  transform: translateY(1px);
+}
+
+.max-width-box {
+  max-width: 1300px;
+  width: 100%;
+}
+
+
+.align-box {
+  width: 100%;
 }
 </style>

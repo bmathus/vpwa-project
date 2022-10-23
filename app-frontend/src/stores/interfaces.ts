@@ -9,9 +9,8 @@ export interface Channel {
 export interface Kicks {
   id: number;
   channel_id: number;
-  user_id: number
+  user_id: number;
   sender_id: number;
-
 }
 
 export interface Message {
@@ -26,6 +25,7 @@ export interface Member {
   nickname: string;
   avatar_color: string;
   status: Status;
+  live_text: string;
 }
 
 export interface Invitation {
