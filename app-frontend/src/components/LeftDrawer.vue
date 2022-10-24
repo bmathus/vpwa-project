@@ -7,7 +7,7 @@
         <activity-badge :status="userstore.getStatus" />
         <user-settings></user-settings>
       </q-btn>
-      <div class="text-subtitle2 text-weight-bolder">{{userstore.getUser.nickname}}</div>
+      <div class="text-subtitle2 text-weight-bolder">{{ userstore.getUser.nickname }}</div>
       <q-separator class="absolute-bottom"></q-separator>
     </div>
 
@@ -18,8 +18,11 @@
           <template v-for="invite in userstore.getInvitations" :key="invite.id">
             <q-item dense clickable>
               <q-item-section :channel_id="invite.id" class="text-subtitle2">
+                <div row>
 
-                # {{ invite.channel_name }}
+                  <q-icon name="mail" size="18px" />
+                  {{ invite.channel_name }}
+                </div>
               </q-item-section>
               <accept-invitation :invitation="invite" />
             </q-item>
@@ -31,7 +34,12 @@
           <template v-for="channel in store.getPrivateChannels" :key="channel.id">
             <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
-                # {{ channel.name }}
+                <div row>
+
+                  <q-icon v-if="userIsAdminChannel(channel.admin_id)" name="star" size="18px" />
+                  <q-icon v-else class="material-icons-outlined" name="label" size="18px" />
+                  {{ channel.name }}
+                </div>
               </q-item-section>
 
             </q-item>
@@ -43,7 +51,13 @@
           <template v-for=" channel in store.getPublicChannels" :key="channel.id">
             <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
-                # {{ channel.name }}
+                <div row>
+
+                  <q-icon v-if="userIsAdminChannel(channel.admin_id)" name="star" size="18px" />
+                  <q-icon v-else name="label" size="18px" />
+                  {{ channel.name }}
+                </div>
+
               </q-item-section>
 
             </q-item>
@@ -92,6 +106,14 @@ export default defineComponent({
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
 
+    function userIsAdminChannel(id: number): boolean {
+      if (id == userstore.getUser.id) {
+        return true
+      } else {
+        return false
+      }
+    }
+
     function hideDialog(): void {
       dialogIsOpen.value = false;
       if (!store.channelsAreEmpty) {
@@ -110,6 +132,7 @@ export default defineComponent({
       }, 20);
     }
     return {
+      userIsAdminChannel,
       showDialog,
       hideDialog,
       dialogIsOpen,
