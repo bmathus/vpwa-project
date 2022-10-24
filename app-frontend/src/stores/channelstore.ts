@@ -12,7 +12,8 @@ import { useQuasar } from 'quasar';
 const dummyMessages: Array<Message> = [
   {
     id: 1,
-    message: 'Ahoj',
+    message:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
     send_at: '10.02.2020 9:30',
     user_id: 2,
     sender_nickname: 'DefaultUser',
@@ -26,7 +27,8 @@ const dummyMessages: Array<Message> = [
   },
   {
     id: 3,
-    message: 'Ahoj @DefaultUser',
+    message:
+      'Ahoj @DeeeeeeeeeefaultUser Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
     send_at: '10.02.2020 9:30',
     user_id: 99,
     sender_nickname: 'Lucia',
@@ -40,7 +42,8 @@ const dummyMessages: Array<Message> = [
   },
   {
     id: 5,
-    message: 'Ahoj',
+    message:
+      'Ahoj Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
     send_at: '10.02.2020 9:30',
     user_id: 99,
     sender_nickname: 'Lucia',
@@ -93,28 +96,32 @@ const channelMembersList2: Member[] = [
     nickname: 'Adam',
     avatar_color: 'blue',
     status: Status.offline,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 87,
     nickname: 'David',
     avatar_color: 'red',
     status: Status.online,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 45,
     nickname: 'Jozo raz',
     avatar_color: 'green',
     status: Status.DND,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 13,
     nickname: 'Adamko',
     avatar_color: 'blue',
     status: Status.offline,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 99,
@@ -128,21 +135,24 @@ const channelMembersList2: Member[] = [
     nickname: 'UsersdlhýmMenom',
     avatar_color: 'blue',
     status: Status.offline,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 99,
     nickname: 'Jozo1234',
     avatar_color: 'green',
     status: Status.DND,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
   {
     id: 110,
     nickname: 'Xbojko',
     avatar_color: 'blue',
     status: Status.offline,
-    live_text: '',
+    live_text:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
   },
 ];
 

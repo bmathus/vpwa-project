@@ -229,7 +229,7 @@ export default defineComponent({
               const status = store.makeRevoke(command[1].replace('\n', ''))
 
               if (status == 1) {
-                notify_event('It works')
+                notify_event('You kicked member ' + command[1])
               }
 
               if (status == 2) {
@@ -247,7 +247,7 @@ export default defineComponent({
           let command = messageText.value.split(' ', 2)
 
           if (command[0] == '/invite') {
-            notify_event('It works')
+            notify_event('You invited user X')
 
           }
           else {
