@@ -1,11 +1,11 @@
 
 <template>
   <q-page class="column justify-center items-center">
-    <div class="q-pa-md messages-box">
+    <div class="q-px-md messages-box">
       <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll" id="infinite">
         <template v-slot:loading>
           <div class="row justify-center q-my-md">
-            <q-spinner color="primary" name="dots" size="40px" />
+            <q-spinner-oval color="teal" size="lg" />
           </div>
         </template>
         <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
@@ -19,6 +19,7 @@
             </q-avatar>
           </template>
         </q-chat-message>
+        <div ref="scrolltobox" class="text-white">scrolltobox</div>
       </q-infinite-scroll>
 
     </div>
@@ -39,20 +40,20 @@ export default {
     const store = useChannelStore();
     const userstore = useUserStore();
     const infiniteScroll = ref()
+    const scrolltobox = ref()
     store.fetchMessages()
-
-
-    // store.scroll.tobottom = function (): void {
-    //   let elmnt = document.getElementById('infinite');
-    //   if (elmnt !== null) {
-    //     elmnt.scrollIntoView(false);
-    //   }
-    // }
 
     onMounted(() => {
       store.$state.infiniteScroll = {
         stopOnLoad: () => infiniteScroll.value.stop(),
-        resumeOnLoad: () => infiniteScroll.value.resume()
+        resumeOnLoad: () => infiniteScroll.value.resume(),
+        scrollBottom: (smooth: boolean) => {
+          if (smooth) {
+            scrolltobox.value.scrollIntoView({ behavior: 'smooth' })
+          } else {
+            scrolltobox.value.scrollIntoView()
+          }
+        }
       }
     })
 
@@ -101,6 +102,7 @@ export default {
       onLoad,
       userIsSender,
       highlightPing,
+      scrolltobox
     }
   }
 }

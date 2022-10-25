@@ -30,7 +30,7 @@ import ChannelSetting from './ChannelSettings.vue'
 
 export default defineComponent({
     name: 'ToolbarHeader',
-    emits: ['drawer'],
+    emits: ['toggledrawer'],
     components: {
         MembersDialog,
         ChannelSetting
@@ -38,7 +38,6 @@ export default defineComponent({
     setup(props, { emit }) {
         const store = useChannelStore()
         const userstore = useUserStore();
-
         const leaveinfo = 'After you leave channel you can join it back or need to receive an invitation.'
         const quitinfo = 'After you quit channel it will be completely removed.';
 
@@ -50,16 +49,17 @@ export default defineComponent({
             }
         }
 
+        //members dialog controll
         function toggleDialog(): void {
             store.toogleMembersDialog()
         }
-
         function whenDialogCloses(): void {
             store.resumeMessagesLoading()
         }
 
+        //drawer control
         function drawerVisibility(): void {
-            emit('drawer')
+            emit('toggledrawer')
         }
         return { drawerVisibility, toggleDialog, store, leaveinfo, quitinfo, userIsAdmin, whenDialogCloses }
     }

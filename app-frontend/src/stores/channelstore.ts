@@ -211,22 +211,20 @@ const dummyChannels: Channel[] = [
 interface InfiniteScroll {
   stopOnLoad: () => void;
   resumeOnLoad: () => void;
+  scrollBottom: (smooth: boolean) => void;
 }
-
-// interface scroll {
-//   tobottom: () => void;
-// }
 
 export const useChannelStore = defineStore('channelstore', {
   state: () => ({
+    //data states
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: null as Channel | null,
+
+    //other state
     membersDialogOpen: false,
-    //other imports
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
-    // scroll: {} as scroll,
   }),
 
   getters: {
@@ -263,12 +261,27 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
+    //template controll actions
+    stopMessagesLoading(): void {
+      this.infiniteScroll.stopOnLoad();
+    },
+    resumeMessagesLoading(): void {
+      this.infiniteScroll.resumeOnLoad();
+    },
+    scrollToBottom(smooth: boolean): void {
+      setTimeout(() => {
+        this.infiniteScroll.scrollBottom(smooth);
+      }, 1);
+    },
+    toogleMembersDialog(): void {
+      this.stopMessagesLoading();
+
+      setTimeout(() => {
+        this.membersDialogOpen = !this.membersDialogOpen;
+      }, 20);
+    },
+
     pushMessage(message: string, user: User): void {
-      // if (this.scroll !== null) {
-      //   setTimeout(() => {
-      //     this.scroll.tobottom();
-      //   }, 20);
-      // }
       const date = new Date();
       if (this.active_channel !== null) {
         this.channels_messages[this.active_channel.id.toString()].messages.push(
@@ -280,6 +293,7 @@ export const useChannelStore = defineStore('channelstore', {
             sender_nickname: user.nickname,
           }
         );
+        this.scrollToBottom(true);
       }
     },
 
@@ -332,6 +346,7 @@ export const useChannelStore = defineStore('channelstore', {
           messages: [],
         };
       }
+      this.scrollToBottom(false);
     },
 
     leaveChannel(id: number | null): void {
@@ -355,14 +370,6 @@ export const useChannelStore = defineStore('channelstore', {
       }
 
       delete this.channels_messages[id !== null ? id.toString() : ''];
-    },
-
-    toogleMembersDialog(): void {
-      this.stopMessagesLoading();
-
-      setTimeout(() => {
-        this.membersDialogOpen = !this.membersDialogOpen;
-      }, 20);
     },
 
     makeRevoke(nickname: string): number {
@@ -411,14 +418,6 @@ export const useChannelStore = defineStore('channelstore', {
         }
       }
       return 1;
-    },
-
-    //infinite scroll control - kvoli members dialogu
-    stopMessagesLoading(): void {
-      this.infiniteScroll.stopOnLoad();
-    },
-    resumeMessagesLoading(): void {
-      this.infiniteScroll.resumeOnLoad();
     },
   },
 });

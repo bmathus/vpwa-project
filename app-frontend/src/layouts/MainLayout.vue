@@ -2,10 +2,10 @@
   <q-layout view="lHh Lpr lFf">
 
     <q-header>
-      <toolbar-header @drawer="drawerVisible = !drawerVisible" />
+      <toolbar-header @toggledrawer="toggleDrawer" />
     </q-header>
 
-    <left-drawer v-model="drawerVisible" />
+    <left-drawer v-model="drawerVisible" @hide="drawerAfterHidden" />
 
     <q-page-container>
       <component :is="activeComponent"></component>
@@ -21,7 +21,7 @@
 <script lang="ts">
 
 import { ref, defineComponent, computed } from 'vue'
-
+import { useQuasar } from 'quasar';
 import ToolbarHeader from '../components/ToolbarHeader.vue';
 import LeftDrawer from '../components/LeftDrawer.vue';
 import { useChannelStore } from '../stores/channelstore'
@@ -37,12 +37,28 @@ export default defineComponent({
     MessageField
   },
   setup() {
-    const store = useChannelStore()
+    const store = useChannelStore();
+    const drawerVisible = ref(false);
+    const text = ref('');
+    const $q = useQuasar();
+    store.fetchChannels();
 
-    store.fetchChannels()
-
-    const drawerVisible = ref(false)
-    const text = ref('')
+    //drawer controll
+    function toggleDrawer() {
+      if (!drawerVisible.value && $q.screen.width <= 750) {
+        console.log('stop')
+        store.stopMessagesLoading()
+        setTimeout(() => {
+          drawerVisible.value = !drawerVisible.value;
+        }, 20);
+      } else {
+        drawerVisible.value = !drawerVisible.value;
+      }
+    }
+    function drawerAfterHidden() {
+      console.log('resume')
+      store.resumeMessagesLoading()
+    }
 
     const activeComponent = computed(() => {
       if (store.channelsAreEmpty) {
@@ -55,7 +71,9 @@ export default defineComponent({
     return {
       drawerVisible,
       text,
-      activeComponent
+      activeComponent,
+      toggleDrawer,
+      drawerAfterHidden
     }
   },
 });

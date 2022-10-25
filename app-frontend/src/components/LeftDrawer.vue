@@ -1,6 +1,6 @@
 <template>
 
-  <q-drawer show-if-above side="left" :width="225" :breakpoint="600" class="bg-grey-3">
+  <q-drawer show-if-above side="left" :width="225" :breakpoint="750" class="bg-grey-3">
     <div class="absolute-top row items-center" style="height:50px;">
       <q-btn unelevated :color="userstore.getUser.avatar_color" padding="none" style="height:32px; width:32px"
         :label="userstore.getUser.nickname[0].toUpperCase()" class="q-ma-sm" text-color="black">
