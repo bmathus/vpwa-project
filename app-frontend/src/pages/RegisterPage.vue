@@ -1,12 +1,12 @@
 <template>
     <div class="align-box column items-center justify-center q-pa-md">
         <q-card class="container">
-            <q-form @submit="onSubmit">
+            <q-form @submit="onSubmit" class="column">
 
 
                 <h4 class="text-center">Registration </h4>
 
-                <q-input dense filled v-model="name" label="Enter name *" lazy-rules :rules="[val => val && val.length != '' || 'Please type something',
+                <q-input color="teal" dense filled v-model="name" label="Enter name *" lazy-rules :rules="[val => val && val.length != '' || 'Please type something',
                 val => val && val.length <= 20 || 'Too many characters',
                 val => val && validate_input(val) || 'No special characters']" />
 
@@ -25,8 +25,10 @@
 
                 <q-toggle color="teal" v-model="accept" label="I accept the license and terms" />
 
-
-                <q-btn label="Submit" type="submit" class="bg-dark text-white q-mt-sm" />
+                <q-btn type="submit" class="bg-dark text-white row q-mt-sm">
+                    <div class="q-pr-sm">Submit</div>
+                    <q-spinner v-if="loading" color="white" size="sm" :thickness="6" />
+                </q-btn>
 
 
 
@@ -47,6 +49,7 @@ export default {
     setup() {
         const $q = useQuasar()
         const router = useRouter()
+        const loading = ref(false);
 
         const name = ref('')
         const surname = ref('')
@@ -55,6 +58,37 @@ export default {
         const password = ref('')
         const accept = ref(false)
 
+        function onSubmit() {
+            if (accept.value !== true) {
+                $q.notify({
+                    color: 'red-5',
+                    textColor: 'white',
+                    icon: 'warning',
+                    message: 'You need to accept the license and terms first'
+                })
+            }
+            else {
+                loading.value = true;
+                setTimeout(() => {
+                    useUserStore().makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
+                    router.push('/')
+                    loading.value = false;
+                }, 1000)
+            }
+        }
+
+        function validate_input(name: string): boolean {
+            for (let i = 0; i < name.length; i++) {
+                if ((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')) {
+                    continue
+                }
+                else {
+                    return false
+                }
+            }
+            return true
+        }
+
         return {
             name,
             surname,
@@ -62,51 +96,23 @@ export default {
             email,
             password,
             accept,
-
-            onSubmit() {
-
-                if (accept.value !== true) {
-
-                    $q.notify({
-                        color: 'red-5',
-                        textColor: 'white',
-                        icon: 'warning',
-                        message: 'You need to accept the license and terms first'
-                    })
-                }
-                else {
-
-
-                    useUserStore().makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
-                    router.push('/')
-                }
-            }
+            loading,
+            onSubmit,
+            validate_input
         }
-    }, methods: {
-        validate_input(name: string): boolean {
-            for (let i = 0; i < name.length; i++) {
-                if ((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')) {
-                    continue
-
-                }
-                else {
-                    return false
-                }
-
-            }
-            return true
-        }
-    }
+    },
 }
 </script>
 
 <style scoped>
 .container {
-    max-width: 400px;
     width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
     overflow: auto;
     min-height: 300px;
-    padding: 30px;
+
+    padding: 20px;
     border-radius: 5px;
 }
 
@@ -115,6 +121,6 @@ export default {
 }
 
 .q-input {
-    margin: 6px auto;
+    margin-bottom: 10px;
 }
 </style>

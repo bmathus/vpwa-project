@@ -19,8 +19,11 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-import Database from '@ioc:Adonis/Lucid/Database'
 
 Route.get('/', async () => {
-  return Database.from('tabulka').select('*')
+  return 'hello'
 })
+
+Route.get('channels', 'ChannelsController.index')
+
+Route.post('channels', 'ChannelsController.store')

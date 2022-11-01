@@ -15,7 +15,10 @@
                 <q-input color="teal" dense filled type="password" v-model="password" label="Password *" lazy-rules
                     :rules="[val => val && val.length > 0 || 'No password', val => val && val.length < 64 || 'Too many characters']" />
 
-                <q-btn label="Submit" type="submit" class="bg-dark text-white q-mt-sm" />
+                <q-btn type="submit" class="bg-dark text-white row">
+                    <div class="q-pr-sm">Submit</div>
+                    <q-spinner v-if="loading" color="white" size="sm" :thickness="6" />
+                </q-btn>
 
                 <q-btn flat label="Register" class="q-mt-md" @click="$router.push('/register')" />
 
@@ -36,24 +39,29 @@ export default {
     name: 'LoginPage',
     setup() {
         const $q = useQuasar()
-
+        const loading = ref(false);
         const email = ref(null)
         const password = ref(null)
+
+        function onSubmit() {
+            loading.value = true;
+            setTimeout(() => {
+                $q.notify({
+                    color: 'teal',
+                    textColor: 'white',
+                    icon: 'cloud_done',
+                    message: 'Welcome back'
+                })
+                loading.value = false;
+            }, 1000)
+
+        }
 
         return {
             email,
             password,
-
-            onSubmit() {
-                $q.notify({
-                    color: 'green-4',
-                    textColor: 'white',
-                    icon: 'cloud_done',
-                    message: 'Submitted'
-                })
-            },
-
-
+            loading,
+            onSubmit
         }
     }
 }
@@ -73,5 +81,9 @@ export default {
 
 .aligh-box {
     height: 100vh;
+}
+
+.q-input {
+    margin-bottom: 10px;
 }
 </style>
