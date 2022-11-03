@@ -3,18 +3,18 @@ import { BaseModel, column,belongsTo,BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Channel from './Channel'
 
-export default class Message extends BaseModel {
+export default class Invite extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
-  public message: string
+  public user_id: number
 
   @column()
-  public user_id: number;
+  public sender_id: number
 
   @column()
-  public channel_id: number;
+  public channel_id: number
 
   @belongsTo(() => User, {
     foreignKey: 'user_id',
@@ -27,5 +27,6 @@ export default class Message extends BaseModel {
   public channel: BelongsTo<typeof Channel>;
 
   @column.dateTime({ autoCreate: true })
-  public sendAt: DateTime
+  public createdAt: DateTime
+
 }

@@ -24,6 +24,14 @@ Route.get('/', async () => {
   return 'hello'
 })
 
+//vrati všetky channels daneho usera
 Route.get('channels', 'ChannelsController.index')
 
-Route.post('channels', 'ChannelsController.store')
+//join teda vytvorenie kanala alebo joinutie
+Route.post('channels', 'ChannelsController.join')
+
+//vratenie všetkych messages daneho kanala
+Route.get('channels/:id/messages','ChannelsController.index_messages')
+
+//ulozenie noveho message daneho kanala
+Route.post('channels/:id/messages','ChannelsController.store_messages')

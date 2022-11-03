@@ -36,7 +36,7 @@
               <q-item-section class="text-subtitle2">
                 <div row>
 
-                  <q-icon v-if="userIsAdminChannel(channel.admin_id)" name="star" size="18px" />
+                  <q-icon v-if="channel.admin" name="star" size="18px" />
                   <q-icon v-else class="material-icons-outlined" name="label" size="18px" />
                   {{ channel.name }}
                 </div>
@@ -53,7 +53,7 @@
               <q-item-section class="text-subtitle2">
                 <div row>
 
-                  <q-icon v-if="userIsAdminChannel(channel.admin_id)" name="star" size="18px" />
+                  <q-icon v-if="channel.admin" name="star" size="18px" />
                   <q-icon v-else name="label" size="18px" />
                   {{ channel.name }}
                 </div>
@@ -106,13 +106,6 @@ export default defineComponent({
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
 
-    function userIsAdminChannel(id: number): boolean {
-      if (id == userstore.getUser.id) {
-        return true
-      } else {
-        return false
-      }
-    }
 
     function hideDialog(): void {
       dialogIsOpen.value = false;
@@ -132,7 +125,6 @@ export default defineComponent({
       }, 20);
     }
     return {
-      userIsAdminChannel,
       showDialog,
       hideDialog,
       dialogIsOpen,

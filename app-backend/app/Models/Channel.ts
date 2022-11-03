@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column,hasMany,HasMany,manyToMany,ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Message from './Message'
 import User from './User'
+import Invite from './Invite'
 
 enum type {
   public = "public",
@@ -18,20 +19,25 @@ export default class Channel extends BaseModel {
   @column()
   public type: type
 
-  @hasMany(() => Message)
-  public profile: HasMany<typeof Message>
+  @hasMany(() => Message, {
+    foreignKey: 'channel_id',
+  })
+  public messages: HasMany<typeof Message>;
+
+  @hasMany(() => Invite, {
+    foreignKey: 'channel_id',
+  })
+  public invites: HasMany<typeof Invite>;
 
   @manyToMany(() => User, {
     pivotTable: 'members',
     pivotForeignKey: 'channel_id',
     pivotRelatedForeignKey: 'user_id',
+    pivotColumns: ['admin'],
   })
-  public owners: ManyToMany<typeof User>;
+  public users: ManyToMany<typeof User>;
 
+  @column.dateTime()
+  public deletedAt: DateTime
 
-
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
-
-  //este deleted at ale ten neviem načo mame
 }

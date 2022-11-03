@@ -3,7 +3,7 @@ export interface Channel {
   name: string;
   members: Member[];
   is_public: boolean;
-  admin_id: number;
+  admin: boolean;
 }
 
 export interface Kicks {
@@ -16,9 +16,9 @@ export interface Kicks {
 export interface Message {
   id: number;
   message: string;
-  send_at: string;
   user_id: number;
   sender_nickname: string;
+  send_at: string;
 }
 export interface Member {
   id: number;

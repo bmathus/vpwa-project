@@ -9,9 +9,7 @@ export default class extends BaseSchema {
       table.integer('user_id').unsigned().references('users.id')
       table.integer('channel_id').unsigned().references('channels.id')
       table.unique(['user_id', 'channel_id'])
-      
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
+      table.boolean('admin').defaultTo(false)
     })
   }
 

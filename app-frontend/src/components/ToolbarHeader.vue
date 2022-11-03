@@ -23,7 +23,6 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
-import { useUserStore } from '../stores/userstore';
 import MembersDialog from './MembersDialog.vue';
 import ChannelSetting from './ChannelSettings.vue'
 
@@ -37,12 +36,11 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const store = useChannelStore()
-        const userstore = useUserStore();
         const leaveinfo = 'After you leave channel you can join it back or need to receive an invitation.'
         const quitinfo = 'After you quit channel it will be completely removed.';
 
         function userIsAdmin(): boolean {
-            if (store.getActiveChannel !== null && store.getActiveChannel.admin_id == userstore.getUser.id) {
+            if (store.getActiveChannel !== null && store.getActiveChannel.admin) {
                 return true
             } else {
                 return false

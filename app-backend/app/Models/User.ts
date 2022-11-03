@@ -1,7 +1,8 @@
-import { DateTime } from 'luxon'
+
 import { BaseModel, column,hasMany,HasMany,manyToMany,ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Message from './Message'
 import Channel from './Channel'
+import Invite from './Invite'
 
 
 enum status {
@@ -32,8 +33,15 @@ export default class User extends BaseModel {
   @column()
   public avatarColor: string
 
-  @hasMany(() => Message)
-  public profile: HasMany<typeof Message>
+  @hasMany(() => Message, {
+    foreignKey: 'user_id',
+  })
+  public messages: HasMany<typeof Message>;
+
+  @hasMany(() => Invite, {
+    foreignKey: 'user_id',
+  })
+  public invites: HasMany<typeof Invite>;
 
   @manyToMany(() => Channel, { 
     pivotTable: 'members',
@@ -41,12 +49,8 @@ export default class User extends BaseModel {
     pivotForeignKey: 'user_id',
     relatedKey: 'id',
     pivotRelatedForeignKey: 'channel_id',
+    pivotColumns: ['admin'],
   })
   public channels: ManyToMany<typeof Channel>
 
-  @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
-
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
 }

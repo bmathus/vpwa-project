@@ -16,12 +16,6 @@ export default class extends BaseSchema {
         existingType: false
       })
       table.string('avatar_color',10).notNullable()
-
-      /**
-       * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
-       */
-      table.timestamp('created_at', { useTz: true })
-      table.timestamp('updated_at', { useTz: true })
     })
   }
 

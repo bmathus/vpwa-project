@@ -80,7 +80,7 @@ export default defineComponent({
     }
 
     const iamAdmin = computed(() => {
-      if (store.getActiveChannel !== null && (store.getActiveChannel.admin_id === userstore.getUser.id)) {
+      if (store.getActiveChannel !== null && store.getActiveChannel.admin) {
         return true
       } else {
         return false;

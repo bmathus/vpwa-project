@@ -162,49 +162,49 @@ const dummyChannels: Channel[] = [
     name: 'Channel 1',
     members: channelMembersList,
     is_public: true,
-    admin_id: 2,
+    admin: true,
   },
   {
     id: 2,
     name: 'Verryyy Big Channel',
     members: channelMembersList,
     is_public: false,
-    admin_id: 2,
+    admin: true,
   },
   {
     id: 3,
     name: 'Channel 3',
     members: channelMembersList2,
     is_public: false,
-    admin_id: 0,
+    admin: false,
   },
   {
     id: 4,
     name: 'Channel 4',
     members: channelMembersList,
     is_public: true,
-    admin_id: 2,
+    admin: true,
   },
   {
     id: 5,
     name: 'Channel 5',
     members: channelMembersList2,
     is_public: false,
-    admin_id: 0,
+    admin: false,
   },
   {
     id: 6,
     name: 'Channel 6',
     members: channelMembersList,
     is_public: true,
-    admin_id: 0,
+    admin: false,
   },
   {
     id: 7,
     name: 'Channel 7',
     members: channelMembersList2,
     is_public: true,
-    admin_id: 0,
+    admin: false,
   },
 ];
 
@@ -314,7 +314,6 @@ export const useChannelStore = defineStore('channelstore', {
     createNewChannel(
       channel_name: string,
       is_public: boolean,
-
       user: User,
       status: Status
     ): void {
@@ -331,7 +330,7 @@ export const useChannelStore = defineStore('channelstore', {
           },
         ],
         is_public: is_public,
-        admin_id: user.id,
+        admin: true,
       };
 
       this.channels.push(new_channel);
