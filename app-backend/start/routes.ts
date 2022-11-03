@@ -34,4 +34,17 @@ Route.post('channels', 'ChannelsController.join')
 Route.get('channels/:id/messages','ChannelsController.index_messages')
 
 //ulozenie noveho message daneho kanala
-Route.post('channels/:id/messages','ChannelsController.store_messages')
+Route.post('channels/:id/messages','ChannelsController.store_message')
+
+//channel members
+Route.get('channels/:id/members','ChannelsController.index_members')
+
+//opustenie kanala, ak spravca tak zrušenie kanala, prikazy /quit /cancel
+Route.delete('channels/:id/leave','ChannelsController.leave')
+
+//všetky pozvanky ktore prisli použivatelovi na pridanie sa do kanalov
+Route.get('invitations','UsersController.index_invitations')
+
+
+
+

@@ -2,7 +2,7 @@ export interface Channel {
   id: number;
   name: string;
   members: Member[];
-  is_public: boolean;
+  is_public: boolean; // prerobiť na type teda enum public private
   admin: boolean;
 }
 
@@ -20,8 +20,9 @@ export interface Message {
   sender_nickname: string;
   send_at: string;
 }
+
 export interface Member {
-  id: number;
+  id: number; //sem posielam id usera nie id z member tabulky
   nickname: string;
   avatar_color: string;
   status: Status;

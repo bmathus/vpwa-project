@@ -10,10 +10,10 @@ export default class Invite extends BaseModel {
   @column()
   public user_id: number
 
-  @column()
+  @column({serializeAs:null})
   public sender_id: number
 
-  @column()
+  @column({serializeAs:null})
   public channel_id: number
 
   @belongsTo(() => User, {
@@ -21,12 +21,17 @@ export default class Invite extends BaseModel {
   })
   public user: BelongsTo<typeof User>;
 
+  @belongsTo(() => User, {
+    foreignKey: 'sender_id',
+  })
+  public sender: BelongsTo<typeof User>;
+
   @belongsTo(() => Channel, {
     foreignKey: 'channel_id',
   })
   public channel: BelongsTo<typeof Channel>;
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ autoCreate: true,serializeAs:null })
   public createdAt: DateTime
 
 }
