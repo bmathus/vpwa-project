@@ -50,6 +50,12 @@ export const useUserStore = defineStore('userstore', {
   },
 
   actions: {
+    login() {
+      console.log('login');
+    },
+    register() {
+      console.log('register');
+    },
     makeRegistration(
       id: number,
       name: string,

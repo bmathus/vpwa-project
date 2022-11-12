@@ -4,6 +4,7 @@ import Message from 'App/Models/Message';
 import User from "App/Models/User"
 
 export default class ChannelsController {
+  
   public async index() {
     const user = await User.query().preload('channels').first();    
     let channels = [] as Channel[];
@@ -35,67 +36,121 @@ export default class ChannelsController {
   }
 
   //prikaz /cancel a /quit pre spravcu
-  public async leave({request}:HttpContextContract) {
+  public async leave({ request, response }:HttpContextContract) {
     const channel_id = request.param('id')
     const user = await User.find(1);
-
     const membership = await user?.related('channels').pivotQuery().where('channel_id',channel_id) as any[]
-    console.log(membership)
+
 
     if(membership?.length != 0 ) {//user je sucastou kanala
 
       if(membership[0].admin) {//ak je user admin tak delete channel
 
         await Channel.query().where('id',channel_id).delete()
+        return {
+          message:"You deleted channel: "+channel_id
+        } 
 
       } else { //user nieje admin -> opustenie kanala
-        user?.related('channels').detach([channel_id])
+        await user?.related('channels').detach([channel_id])
+
+        return {
+          message:"You left channel: "+channel_id
+        } 
       }
     } else {
-      console.log('User nieje clenom daneho kanala')
+
+      response.status(403)
+      return {
+        message:"You are not member of this channel."
+      } 
     }
+
    
   }
 
   public async index_messages({request}:HttpContextContract){
     const channel_id = request.param('id')
     
-    //opravit
     const messages = await Message
       .query()
       .where('channel_id',channel_id)
-      .preload('user')
-      .paginate(3,2)
+      .preload('user',(query) => {
+        query.select('id','nickname','avatar_color')
+      })
+      .paginate(1,1)
 
     return messages
   }
   
-  public async store_message({request}:HttpContextContract) {
+  public async store_message({ request,response }:HttpContextContract) {
     const channel_id = request.param('id')
     const newMessage = request.body()
 
-    const message = await Message.create({
-      user_id:newMessage.user_id,
-      channel_id:channel_id,
-      message:newMessage.message
-    })
+    const channel = await Channel.query().where('id',channel_id).preload('users',(query) => {
+      query.where('user_id',newMessage.user_id)
+    });
+  
+    if(channel.length != 0) {//kanal existuje
+     
+      if(channel[0].users.length != 0) {//user patri do kanala
 
-    return message
+        const message = await Message.create({
+          user_id:newMessage.user_id,
+          channel_id:channel_id,
+          message:newMessage.message
+        })
+
+        await message.load('user',(query)=> {
+          query.select('id','nickname','avatar_color')
+        })
+
+        return message
+        
+      } else {
+        response.status(403)
+        return {
+          message: 'You are not member of this channel.'
+        }
+      }
+      
+    } else {
+      response.status(404)
+      return {
+        message:`Channel ${channel_id} doesnt exist.`
+      }
+    }
+    
   }
 
   //vrati members daneho kanala
-  public async index_members({request}:HttpContextContract) {
+  public async index_members({ request,response }:HttpContextContract) {
     const channel_id = request.param('id')
+    const user_id = 1; //id usera ktory si pýta m
     const channel = await Channel.find(channel_id)
-    const members = await channel?.related('users').query()
 
-    return members?.map((member) => {
-      return member.serialize({
-        fields:{
-          pick:['id','nickname','avatar_color','status']
-        }
-      })
-    })
+    if(!channel) {
+      response.status(404)
+      return {
+        message: `Channel ${channel_id} doesnt exist.`
+      }
+    }
+
+    console.log(channel)
+
+    const members = await channel?.related('users')
+      .query()
+      .select('id','nickname','avatar_color','status');
+
+    if(!members.find(member => member.id == user_id)) {
+      response.status(403)
+        return {
+          message: 'You are not member of this channel.'
+      }
+    }
+
+    return members
+
   }
 
 }

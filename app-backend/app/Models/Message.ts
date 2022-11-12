@@ -10,7 +10,7 @@ export default class Message extends BaseModel {
   @column()
   public message: string
 
-  @column()
+  @column({serializeAs: null})
   public user_id: number;
 
   @column()
