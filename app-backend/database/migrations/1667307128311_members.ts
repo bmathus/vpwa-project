@@ -6,9 +6,22 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.integer('user_id').unsigned().references('users.id')
-      table.integer('channel_id').unsigned().references('channels.id').onDelete('CASCADE') 
+      table
+        .integer('user_id')
+        .unsigned()
+        .notNullable()
+        .references('users.id')
+        .onDelete('CASCADE')
+    
+      table
+        .integer('channel_id')
+        .unsigned()
+        .notNullable()
+        .references('channels.id')
+        .onDelete('CASCADE') 
+
       table.unique(['user_id', 'channel_id'])
+
       table.boolean('admin').defaultTo(false)
     })
   }

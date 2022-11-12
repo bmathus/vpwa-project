@@ -6,7 +6,7 @@ export default class extends BaseSchema {
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id').primary()
-      table.string('name',20).unique()
+      table.string('name',20).notNullable().unique()
       table.enu('type',['public','private'],{
         useNative: true,
         enumName: 'type',

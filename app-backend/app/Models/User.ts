@@ -1,9 +1,9 @@
-
-import { BaseModel, column,hasMany,HasMany,manyToMany,ManyToMany } from '@ioc:Adonis/Lucid/Orm'
+import { DateTime } from 'luxon'
+import Hash from '@ioc:Adonis/Core/Hash'
+import { column, beforeSave, BaseModel,hasMany,HasMany, manyToMany,ManyToMany } from '@ioc:Adonis/Lucid/Orm'
 import Message from './Message'
 import Channel from './Channel'
 import Invite from './Invite'
-
 
 enum status {
   online = 'online',
@@ -24,8 +24,14 @@ export default class User extends BaseModel {
   @column()
   public nickname: string
 
-  @column({serializeAs:null})
+  @column()
+  public email: string
+
+  @column({ serializeAs: null })
   public password: string
+
+  @column()
+  public rememberMeToken: string | null
 
   @column()
   public status: status
@@ -53,4 +59,16 @@ export default class User extends BaseModel {
   })
   public channels: ManyToMany<typeof Channel>
 
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  public updatedAt: DateTime
+
+  @beforeSave()
+  public static async hashPassword (user: User) {
+    if (user.$dirty.password) {
+      user.password = await Hash.make(user.password)
+    }
+  }
 }
