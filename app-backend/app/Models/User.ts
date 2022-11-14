@@ -33,7 +33,7 @@ export default class User extends BaseModel {
   @column()
   public rememberMeToken: string | null
 
-  @column()
+  @column({serializeAs: null})
   public status: status
 
   @column()
@@ -49,7 +49,7 @@ export default class User extends BaseModel {
   })
   public invites: HasMany<typeof Invite>;
 
-  @manyToMany(() => Channel, { 
+  @manyToMany(() => Channel, {
     pivotTable: 'members',
     localKey: 'id',
     pivotForeignKey: 'user_id',
@@ -59,10 +59,10 @@ export default class User extends BaseModel {
   })
   public channels: ManyToMany<typeof Channel>
 
-  @column.dateTime({ autoCreate: true })
+  @column.dateTime({ autoCreate: true,serializeAs:null })
   public createdAt: DateTime
 
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  @column.dateTime({ autoCreate: true, autoUpdate: true,serializeAs: null })
   public updatedAt: DateTime
 
   @beforeSave()

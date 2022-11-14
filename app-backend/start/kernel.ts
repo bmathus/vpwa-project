@@ -44,5 +44,3 @@ Server.middleware.registerNamed({
   auth: () => import('App/Middleware/Auth'),
 })
 
-Server.middleware.registerNamed({
-})

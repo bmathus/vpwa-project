@@ -8,7 +8,7 @@
     <left-drawer v-model="drawerVisible" @hide="drawerAfterHidden" />
 
     <q-page-container>
-      <component :is="activeComponent"></component>
+      <router-view />
     </q-page-container>
 
     <q-footer style="background-color:white">
@@ -20,13 +20,13 @@
 
 <script lang="ts">
 
-import { ref, defineComponent, computed } from 'vue'
+import { ref, defineComponent } from 'vue'
 import { useQuasar } from 'quasar';
 import ToolbarHeader from '../components/ToolbarHeader.vue';
 import LeftDrawer from '../components/LeftDrawer.vue';
 import { useChannelStore } from '../stores/channelstore'
-import ChannelPage from '../pages/ChannelPage.vue';
-import NoChannelPage from '../pages/NoChannelPage.vue';
+//import ChannelPage from '../pages/ChannelPage.vue';
+//import NoChannelPage from '../pages/NoChannelPage.vue';
 import MessageField from '../components/MessageField.vue'
 
 export default defineComponent({
@@ -60,18 +60,17 @@ export default defineComponent({
       store.resumeMessagesLoading()
     }
 
-    const activeComponent = computed(() => {
-      if (store.channelsAreEmpty) {
-        return NoChannelPage
-      } else {
-        return ChannelPage
-      }
-    })
+    // const activeComponent = computed(() => {
+    //   if (store.channelsAreEmpty) {
+    //     return NoChannelPage
+    //   } else {
+    //     return ChannelPage
+    //   }
+    // })
 
     return {
       drawerVisible,
       text,
-      activeComponent,
       toggleDrawer,
       drawerAfterHidden
     }

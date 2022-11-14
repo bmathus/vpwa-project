@@ -24,7 +24,10 @@
       <q-card-section class="q-pt-none items-end">
         <q-separator />
         <div style="width:100%" class="column justify-center items-end">
-          <q-btn color="red" outline class="q-mt-md" @click="$router.push('/login')">Log Out</q-btn>
+          <q-btn color="red" outline class="q-mt-md" @click="logout">
+            <div :class="{'q-mr-sm':loading}">Logout</div>
+            <q-spinner v-if="loading" color="red" size="xs" :thickness="4" />
+          </q-btn>
         </div>
       </q-card-section>
     </q-card>
@@ -34,14 +37,18 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useUserStore } from '../stores/userstore';
+import { useAuthStore } from 'src/stores/authstore';
 import { Status } from '../stores/interfaces'
+//import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'UserSettings',
   setup() {
     const userstore = useUserStore()
+    const $authstore = useAuthStore()
     const notifications = ref(true);
     const option = ref(userstore.getStatus);
+    //const $router = useRouter();
 
     const options = [
       'online', 'DND', 'offline'
@@ -58,8 +65,16 @@ export default defineComponent({
         return 'grey';
       }
     })
+
+    const loading = computed((): boolean => {
+      return $authstore.status === 'pending';
+    })
+
+    function logout() {
+      $authstore.logout()
+    }
     return {
-      option, options, setStatusAndColor, notifications, userstore
+      option, options, setStatusAndColor, notifications, userstore,logout,loading
     }
   }
 })

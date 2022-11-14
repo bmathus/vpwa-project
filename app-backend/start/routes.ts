@@ -46,5 +46,13 @@ Route.delete('channels/:id/leave','ChannelsController.leave')
 Route.get('invitations','UsersController.index_invitations')
 
 
+Route.group(() => {
+  Route.post('register', 'UsersController.register')
+  Route.post('login', 'UsersController.login')
+  Route.post('logout', 'UsersController.logout').middleware('auth')
+  Route.get('me', 'UsersController.me').middleware('auth')
+}).prefix('auth')
+
+
 
 
