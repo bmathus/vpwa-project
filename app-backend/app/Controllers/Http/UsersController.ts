@@ -8,8 +8,9 @@ import Invite from 'App/Models/Invite';
 export default class UsersController {
   public async register({ request }: HttpContextContract) {
     // if invalid, exception
-    console.log(request.body())
+    
     const data = await request.validate(RegisterUserValidator)
+    console.log(request)
 
     const user = await User.create(data)
     // join user to general channel

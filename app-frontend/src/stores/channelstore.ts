@@ -6,7 +6,7 @@ import {
   Status,
   Member,
   User,
-} from './interfaces';
+} from '../contracts';
 import { useQuasar } from 'quasar';
 
 const dummyMessages: Array<Message> = [
@@ -281,7 +281,7 @@ export const useChannelStore = defineStore('channelstore', {
       }, 20);
     },
 
-    pushMessage(message: string, user: User): void {
+    pushMessage(message: string, user: User | null): void {
       const date = new Date();
       if (this.active_channel !== null) {
         this.channels_messages[this.active_channel.id.toString()].messages.push(
@@ -289,8 +289,8 @@ export const useChannelStore = defineStore('channelstore', {
             id: Date.now(),
             message: message,
             send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
-            user_id: user.id,
-            sender_nickname: user.nickname,
+            user_id: user == null ? 0 : user.id,
+            sender_nickname: user == null ? '' : user.nickname,
           }
         );
         this.scrollToBottom(true);
@@ -314,7 +314,8 @@ export const useChannelStore = defineStore('channelstore', {
     createNewChannel(
       channel_name: string,
       is_public: boolean,
-      user: User,
+      user_nickname:string,
+      user_avatar_color:string,
       status: Status
     ): void {
       const new_channel: Channel = {
@@ -323,8 +324,8 @@ export const useChannelStore = defineStore('channelstore', {
         members: [
           {
             id: 87,
-            nickname: user.nickname,
-            avatar_color: user.avatar_color,
+            nickname: user_nickname,
+            avatar_color: user_avatar_color,
             status: status,
             live_text: '',
           },

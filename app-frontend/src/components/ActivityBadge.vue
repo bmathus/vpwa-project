@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Status } from '../stores/interfaces'
+import { Status } from '../contracts'
 
 const props = defineProps<{
   status: Status

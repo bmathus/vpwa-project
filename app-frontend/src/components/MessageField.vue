@@ -33,7 +33,7 @@ import { useQuasar } from 'quasar';
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
-import { Member } from '../stores/interfaces';
+import { Member } from '../contracts';
 
 export default defineComponent({
   name: 'MessageField',
@@ -129,12 +129,12 @@ export default defineComponent({
 
           if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
             let setpublic = true
-            store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
+            store.createNewChannel(channel_name,setpublic,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
             notify_event('Public channel ' + channel_name + ' was created')
           }
           else if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
             let setpublic = false
-            store.createNewChannel(channel_name, setpublic, userstore.getUser, userstore.getStatus)
+            store.createNewChannel(channel_name,setpublic,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
             notify_event('Private channel ' + channel_name + ' was created')
           }
           else {
@@ -197,7 +197,7 @@ export default defineComponent({
 
           if (command[0] == '/revoke') {
 
-            if (command[1].replace('\n', '') == userstore.getUser.nickname) {
+            if (command[1].replace('\n', '') == userstore.getUserNickname) {
               notify_event('You cannot throw yourself out of the channel')
             }
 
@@ -221,7 +221,7 @@ export default defineComponent({
 
           if (command[0] == '/kick') {
 
-            if (command[1].replace('\n', '') == userstore.getUser.nickname) {
+            if (command[1].replace('\n', '') == userstore.getUserNickname) {
               notify_event('You cannot kick yourself out of the channel')
             }
 
@@ -256,7 +256,7 @@ export default defineComponent({
         }
 
         else {
-          store.pushMessage(messageText.value, userstore.getUser)
+          store.pushMessage(messageText.value,userstore.getUser)
 
         }
         messageText.value = ''
@@ -275,7 +275,7 @@ export default defineComponent({
     const membersTyping = computed(() => {
       return store.getActiveChannelMembers.filter((member) => {
         //chceme zobrazit len memberov ktory maju prazdny live text string a niesom tam ani ja prihlaseny user
-        if (member.live_text.length !== 0 && member.id !== userstore.getUser.id) {
+        if (member.live_text.length !== 0 && member.id !== userstore.getUserId) {
           return member
         }
       })

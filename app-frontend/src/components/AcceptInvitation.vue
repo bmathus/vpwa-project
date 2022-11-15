@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { useUserStore } from '../stores/userstore';
 
-import { Invitation } from '../stores/interfaces'
+import { Invitation } from '../contracts'
 
 const props = defineProps<{
   invitation: Invitation

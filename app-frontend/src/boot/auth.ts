@@ -1,7 +1,7 @@
 import { boot } from 'quasar/wrappers';
 import { authManager } from 'src/services';
 import { RouteLocationNormalized, RouteLocationRaw } from 'vue-router';
-import { useAuthStore } from '../stores/authstore';
+import { useUserStore } from '../stores/userstore'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -26,8 +26,8 @@ export default boot(({ router }) => {
 
   // add route guard to check auth user
   router.beforeEach(async (to) => {
-    const authstore = useAuthStore();
-    const isAuthenticated = await authstore.check();
+    const $userstore = useUserStore();
+    const isAuthenticated = await $userstore.check();
 
     // route requires authentication
     if (to.meta.requiresAuth && !isAuthenticated) {

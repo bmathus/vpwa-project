@@ -3,7 +3,8 @@
     <q-card class="text-dark">
 
       <q-card-section class="q-pa-sm my-card">
-        <div column class="text-subtitle1 text-weight-bold q-ml-sm">{{userstore.user.name}} {{userstore.user.surname}}
+        <div column class="text-subtitle1 text-weight-bold q-ml-sm">
+          {{userstore.getUserFullName}}
         </div>
 
       </q-card-section>
@@ -37,15 +38,13 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue';
 import { useUserStore } from '../stores/userstore';
-import { useAuthStore } from 'src/stores/authstore';
-import { Status } from '../stores/interfaces'
+import { Status } from '../contracts'
 //import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'UserSettings',
   setup() {
     const userstore = useUserStore()
-    const $authstore = useAuthStore()
     const notifications = ref(true);
     const option = ref(userstore.getStatus);
     //const $router = useRouter();
@@ -67,11 +66,15 @@ export default defineComponent({
     })
 
     const loading = computed((): boolean => {
-      return $authstore.status === 'pending';
+      return userstore.auth_status === 'pending';
     })
 
     function logout() {
-      $authstore.logout()
+      userstore.logout()
+        // .then(() => {
+        //   $router.push({ name: 'login' })
+        // })
+
     }
     return {
       option, options, setStatusAndColor, notifications, userstore,logout,loading

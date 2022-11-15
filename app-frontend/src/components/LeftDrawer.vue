@@ -2,12 +2,12 @@
 
   <q-drawer show-if-above side="left" :width="225" :breakpoint="750" class="bg-grey-3">
     <div class="absolute-top row items-center" style="height:50px;">
-      <q-btn unelevated :color="userstore.getUser.avatar_color" padding="none" style="height:32px; width:32px"
-        :label="userstore.getUser.nickname[0].toUpperCase()" class="q-ma-sm" text-color="black">
+      <q-btn unelevated :color="userstore.getUserAvatarColor" padding="none" style="height:32px; width:32px"
+        :label="nicknameUpper" class="q-ma-sm" text-color="black">
         <activity-badge :status="userstore.getStatus" />
         <user-settings></user-settings>
       </q-btn>
-      <div class="text-subtitle2 text-weight-bolder">{{ userstore.getUser.nickname }}</div>
+      <div class="text-subtitle2 text-weight-bolder">{{ userstore.getUserNickname }}</div>
       <q-separator class="absolute-bottom"></q-separator>
     </div>
 
@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref, computed } from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
@@ -105,6 +105,10 @@ export default defineComponent({
     const store = useChannelStore();
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
+
+    const nicknameUpper = computed(() => {
+      return userstore.getUserNickname[0] !== undefined ? userstore.getUserNickname[0].toUpperCase() : ' '
+    })
 
 
     function hideDialog(): void {
@@ -129,7 +133,8 @@ export default defineComponent({
       hideDialog,
       dialogIsOpen,
       store,
-      userstore
+      userstore,
+      nicknameUpper
     }
   }
 

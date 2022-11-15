@@ -31,7 +31,7 @@
 <script lang="ts">
 import { reactive, ref, onMounted } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
-import { Message } from '../stores/interfaces'
+import { Message } from '../contracts'
 import { useUserStore } from '../stores/userstore';
 
 export default {
@@ -58,7 +58,7 @@ export default {
     })
 
     function userIsSender(message: Message): boolean {
-      if (message.user_id === userstore.getUser.id) {
+      if (message.user_id === userstore.getUserId) {
         return true;
       } else {
         return false;
@@ -84,13 +84,13 @@ export default {
       const trimmed_message = message.trim()
       const ping_string =
         `<div style="background-color:rgb(242,192,55); border-radius: 3px; display:inline-block;" class="text-weight-medium">
-        @${userstore.getUser.nickname}
+        @${userstore.getUserNickname}
         </div>`
 
-      if (trimmed_message.startsWith(`@${userstore.getUser.nickname}`)) {
-        return trimmed_message.replace(`@${userstore.getUser.nickname}`, ping_string)
+      if (trimmed_message.startsWith(`@${userstore.getUserNickname}`)) {
+        return trimmed_message.replace(`@${userstore.getUserNickname}`, ping_string)
       } else {
-        return trimmed_message.replace(` @${userstore.getUser.nickname}`, ping_string)
+        return trimmed_message.replace(` @${userstore.getUserNickname}`, ping_string)
       }
 
     }

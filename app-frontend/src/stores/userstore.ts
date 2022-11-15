@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineStore } from 'pinia';
-import { Invitation, User, Status } from './interfaces';
+import { Invitation, User, Status, RegisterData, LoginCredentials } from '../contracts';
 import { useChannelStore } from './channelstore';
+import { authManager, authService } from 'src/services';
 
 const dummyInvitations: Invitation[] = [
   {
@@ -19,27 +21,44 @@ const dummyInvitations: Invitation[] = [
   },
 ];
 
-const defaultUser: User = {
-  id: 2,
-  name: 'Jozko',
-  surname: 'Mrkvicka',
-  nickname: 'DeeeeeeeeeefaultUser',
-  email: 'defaultuser@gmail.com',
-  password: 'defaultuser123',
-  avatar_color: 'primary',
-};
+// const defaultUser: User = {
+//   id: 2,
+//   name: 'Jozko',
+//   surname: 'Mrkvicka',
+//   nickname: 'DeeeeeeeeeefaultUser',
+//   email: 'defaultuser@gmail.com',
+//   avatar_color: 'primary',
+// };
 
 export const useUserStore = defineStore('userstore', {
   state: () => ({
-    user: defaultUser as User,
+    user: null as User | null,
     status: Status.online as Status,
+    auth_status: 'pending' as 'pending' | 'success' | 'error',
+    errors: [] as { message: string; field?: string }[],
+
     invitations: dummyInvitations as Invitation[],
     channelstore: useChannelStore(),
   }),
 
   getters: {
-    getUser(): User {
+    isAuthenticated(state) {
+      return state.user !== null;
+    },
+    getUser(): User | null {
       return this.user;
+    },
+    getUserId(): number {
+      return this.user == null ? 0 : this.user.id
+    },
+    getUserNickname(): string {
+      return this.user == null ? '' : this.user.nickname
+    },
+    getUserFullName(): string {
+      return this.user == null ? '' : (this.user.name + ' ' + this.user.surname)
+    },
+    getUserAvatarColor(): string {
+      return this.user == null ? '' : this.user.avatar_color
     },
     getStatus(): Status {
       return this.status;
@@ -50,27 +69,67 @@ export const useUserStore = defineStore('userstore', {
   },
 
   actions: {
-    login() {
-      console.log('login');
+    //Auth actions
+    AuthStart() {
+      this.auth_status = 'pending';
+      this.errors = [];
     },
-    register() {
-      console.log('register');
+    AuthSuccess(user: User | null) {
+      this.auth_status = 'success';
+      this.user = user;
     },
-    makeRegistration(
-      id: number,
-      name: string,
-      surname: string,
-      nickname: string,
-      email: string,
-      password: string
-    ): void {
-      this.user.id = 1;
-      this.user.name = name;
-      this.user.surname = surname;
-      this.user.nickname = nickname;
-      this.user.email = email;
-      this.user.password = password;
+    AuthError(errors: { message: string; field?: string | undefined }[]) {
+      this.auth_status = 'error';
+      this.errors = errors;
     },
+
+    async check() {
+      try {
+        this.AuthStart();
+        const user = await authService.me();
+        this.AuthSuccess(user);
+        return user !== null;
+      } catch (err: any) {
+        this.AuthError(err);
+        throw err;
+      }
+    },
+    async register(form: RegisterData) {
+      try {
+        this.AuthStart();
+        const user = await authService.register(form);
+        this.AuthSuccess(null);
+        return user;
+      } catch (err: any) {
+        this.AuthError(err);
+        throw err;
+      }
+    },
+    async login(credentials: LoginCredentials) {
+      try {
+        this.AuthStart();
+        const apiToken = await authService.login(credentials);
+        this.AuthSuccess(null);
+        authManager.setToken(apiToken.token);
+        return apiToken;
+      } catch (err: any) {
+        this.AuthError(err);
+        throw err;
+      }
+    },
+    async logout() {
+      try {
+        this.AuthStart();
+        await authService.logout();
+        this.AuthSuccess(null);
+        authManager.removeToken();
+      } catch (err: any) {
+        this.AuthError(err);
+        throw err;
+      }
+    },
+
+    ////////
     setStatus(status: Status) {
       this.status = status;
     },
@@ -79,7 +138,8 @@ export const useUserStore = defineStore('userstore', {
       this.channelstore.createNewChannel(
         invitation.channel_name,
         invitation.is_public,
-        this.user,
+        this.getUserNickname,
+        this.getUserAvatarColor,
         this.status
       );
       this.invitations = this.invitations.filter((obj) => {

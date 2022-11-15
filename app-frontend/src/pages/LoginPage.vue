@@ -59,14 +59,14 @@
 import { useQuasar } from 'quasar'
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter, RouteLocationRaw } from 'vue-router'
-import { useAuthStore } from 'src/stores/authstore'
+import { useUserStore } from 'src/stores/userstore'
 
 
 export default {
   name: 'LoginPage',
   setup() {
     const $q = useQuasar()
-    const $authstore = useAuthStore()
+    const userstore = useUserStore()
     const $route = useRoute()
     const $router = useRouter()
 
@@ -82,13 +82,13 @@ export default {
     })
 
     const loading = computed((): boolean => {
-      return $authstore.status === 'pending';
+      return userstore.auth_status === 'pending';
     })
 
     function onSubmit() {
-      $authstore.login(credentials)
+      userstore.login(credentials)
         .then(() => {
-          $router.push(redirectTo.value)
+          $router.push({ name: 'home' })
           $q.notify({
             color: 'teal',
             textColor: 'white',

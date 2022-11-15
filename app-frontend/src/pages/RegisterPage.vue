@@ -88,7 +88,7 @@
 <script lang="ts">
 import { useQuasar } from 'quasar'
 import { ref,reactive, computed } from 'vue'
-import { useAuthStore } from 'src/stores/authstore';
+import { useUserStore } from 'src/stores/userstore'
 import { useRouter,RouteLocationRaw } from 'vue-router'
 
 export default {
@@ -96,7 +96,7 @@ export default {
     setup() {
         const $q = useQuasar()
         const $router = useRouter()
-        const $authstore = useAuthStore()
+        const userstore = useUserStore()
 
         const accept = ref(false)
         const showPassword = ref(false);
@@ -111,7 +111,7 @@ export default {
         })
 
         const loading = computed(():boolean => {
-          return $authstore.status === 'pending';
+          return userstore.auth_status === 'pending';
         });
 
         const redirectTo = computed((): RouteLocationRaw => {
@@ -128,7 +128,7 @@ export default {
                 })
             }
             else {
-              $authstore.register(form)
+              userstore.register(form)
                 .then(()=> {
                   //$userstore.makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
                   $router.push(redirectTo.value)
