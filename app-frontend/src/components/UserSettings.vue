@@ -39,7 +39,7 @@
 import { defineComponent, ref, computed } from 'vue';
 import { useUserStore } from '../stores/userstore';
 import { Status } from '../contracts'
-//import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'UserSettings',
@@ -47,7 +47,7 @@ export default defineComponent({
     const userstore = useUserStore()
     const notifications = ref(true);
     const option = ref(userstore.getStatus);
-    //const $router = useRouter();
+    const $router = useRouter();
 
     const options = [
       'online', 'DND', 'offline'
@@ -71,9 +71,9 @@ export default defineComponent({
 
     function logout() {
       userstore.logout()
-        // .then(() => {
-        //   $router.push({ name: 'login' })
-        // })
+        .then(() => {
+          $router.push({ name: 'login' })
+        })
 
     }
     return {
