@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineStore } from 'pinia';
 import {
   Channel,
@@ -6,8 +7,11 @@ import {
   Status,
   Member,
   User,
+  SerializedMessage,
+  RawMessage
 } from '../contracts';
 import { useQuasar } from 'quasar';
+import { channelService } from 'src/services';
 
 const dummyMessages: Array<Message> = [
   {
@@ -225,9 +229,30 @@ export const useChannelStore = defineStore('channelstore', {
     membersDialogOpen: false,
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
+
+    //state from tutorial part 3
+    loading: false as boolean,
+    error: null as Error | null,
+    messages: {} as {[channel: string]: SerializedMessage[]},
+    active:null as string | null
   }),
 
   getters: {
+    //getters from tutorial part 3
+    joinedChannels(): string[] {
+      return Object.keys(this.messages)
+    },
+    currentMessages(): SerializedMessage[] {
+      return this.active !== null ? this.messages[this.active] : []
+    },
+    lastMessageOf() {
+      return (channel: string) => {
+        const messages = this.messages[channel]
+        return messages.length > 0 ? messages[messages.length - 1] : null
+      }
+    },
+
+    //other
     getMessages(): Message[] {
       if (this.active_channel !== null) {
         return this.channels_messages[this.active_channel.id.toString()]
@@ -261,6 +286,56 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
+    //mustations from tutorial part 3
+    LoadingStart() {
+      this.loading = true;
+      this.error = null;
+    },
+    LoadingSuccess({channel, messages}: {channel:string, messages: SerializedMessage[]}) {
+      this.loading = false;
+      this.messages[channel] = messages;
+    },
+    LoadingError(error : Error | null) {
+      this.loading = false;
+      this.error = error;
+    },
+    ClearChannel(channel: string) {
+      this.active = null;
+      delete this.messages[channel]
+    },
+    SetActive(channel: string) {
+      this.active = channel;
+    },
+    NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
+      this.messages[channel].push(message);
+    },
+
+    //actions from tutorial part 3
+    async join(channel: string) {
+      try {
+        this.LoadingStart();
+        const messages = await channelService.join(channel).loadMessages();
+        this.LoadingSuccess({ channel, messages })
+      } catch(err : any) {
+        this.LoadingError(err)
+        throw err;
+      }
+    },
+
+    async leave(channel: string | null) {
+      const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
+
+      leaving.forEach((c) => {
+        channelService.leave(c)
+        this.ClearChannel(c)
+      })
+    },
+
+    async addMessage({ channel, message }: { channel: string, message: RawMessage }) {
+      const newMessage = await channelService.in(channel)?.addMessage(message) as SerializedMessage
+      this.NewMessage({channel,message: newMessage})
+    },
+
     //template controll actions
     stopMessagesLoading(): void {
       this.infiniteScroll.stopOnLoad();
