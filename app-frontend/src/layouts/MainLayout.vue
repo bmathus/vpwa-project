@@ -41,7 +41,6 @@ export default defineComponent({
     const drawerVisible = ref(false);
     const text = ref('');
     const $q = useQuasar();
-    store.fetchChannels();
 
     //drawer controll
     function toggleDrawer() {

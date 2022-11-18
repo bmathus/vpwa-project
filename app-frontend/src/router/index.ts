@@ -5,6 +5,7 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
+import { useChannelStore } from 'src/stores/channelstore';
 
 import routes from './routes';
 
@@ -30,6 +31,10 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach(() => {
+    useChannelStore()
   });
 
   return Router;

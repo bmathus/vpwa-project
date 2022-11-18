@@ -30,6 +30,7 @@ export abstract class SocketManager implements SocketManagerContract {
   private static namespaces: Set<string> = new Set()
   //params edited to true
   private static params: any | null = null
+  public static hi = 'hi'
 
   public static getManager () {
     if (!this.manager) {

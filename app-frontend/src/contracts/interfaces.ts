@@ -1,9 +1,10 @@
 ///other
+
 export interface Channel {
   id: number;
   name: string;
   members: Member[];
-  is_public: boolean; // prerobiť na type teda enum public private
+  type: 'public' | 'private'
   admin: boolean;
 }
 
@@ -12,14 +13,6 @@ export interface Kicks {
   channel_id: number;
   user_id: number;
   sender_id: number;
-}
-
-export interface Message {
-  id: number;
-  message: string;
-  user_id: number;
-  sender_nickname: string;
-  send_at: string;
 }
 
 export interface Member {
@@ -38,11 +31,6 @@ export interface Invitation {
   is_public: boolean;
 }
 
-export interface ChannelsMessages {
-  [channel: string]: {
-    messages: Message[];
-  };
-}
 
 export enum Status {
   online = 'online',

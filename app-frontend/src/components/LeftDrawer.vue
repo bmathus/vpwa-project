@@ -29,7 +29,7 @@
           </template>
         </q-expansion-item>
 
-        <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
+        <!-- <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
           class="text-subtitle2">
           <template v-for="channel in store.getPrivateChannels" :key="channel.id">
             <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
@@ -44,22 +44,21 @@
 
             </q-item>
           </template>
-        </q-expansion-item>
+        </q-expansion-item> -->
 
         <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
           class="text-subtitle2">
-          <template v-for=" channel in store.getPublicChannels" :key="channel.id">
-            <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
+          <template v-for=" channel in joinedChannels" :key="channel">
+            <q-item dense clickable v-ripple @click="setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 <div row>
 
-                  <q-icon v-if="channel.admin" name="star" size="18px" />
-                  <q-icon v-else name="label" size="18px" />
-                  {{ channel.name }}
+                  <!-- <q-icon v-if="channel.admin" name="star" size="18px" />
+                  <q-icon v-else name="label" size="18px" /> -->
+                  {{ channel}}
                 </div>
 
               </q-item-section>
-
             </q-item>
           </template>
         </q-expansion-item>
@@ -84,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, onMounted } from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
@@ -106,11 +105,24 @@ export default defineComponent({
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
 
+    onMounted(async ()=>{
+      await store.loadChannels()
+      console.log(store.channels)
+    })
+
     const nicknameUpper = computed(() => {
       return userstore.getUserNickname[0] !== undefined ? userstore.getUserNickname[0].toUpperCase() : ' '
     })
 
+    const joinedChannels = computed((): string[] => {
+      return store.joinedChannels
+    })
 
+    function setActiveChannel(name: string) {
+      store.SetActive(name)
+    }
+
+    //dialog controll
     function hideDialog(): void {
       dialogIsOpen.value = false;
       if (!store.channelsAreEmpty) {
@@ -134,7 +146,9 @@ export default defineComponent({
       dialogIsOpen,
       store,
       userstore,
-      nicknameUpper
+      nicknameUpper,
+      joinedChannels,
+      setActiveChannel
     }
   }
 

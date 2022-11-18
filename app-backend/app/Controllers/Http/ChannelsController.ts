@@ -4,20 +4,19 @@ import Message from 'App/Models/Message';
 import User from "App/Models/User"
 
 export default class ChannelsController {
-  
-  public async index() {
-    const user = await User.query().preload('channels').first();    
-    let channels = [] as Channel[];
 
-    user?.channels.forEach((ch)=>{
+  public async index() {
+    const user = await User.query().preload('channels').first();
+
+    return user?.channels.map((ch)=>{
       const channel = ch.serialize()
       delete channel.deleted_at
       channel.admin = ch.$extras.pivot_admin
       channel.members = []
-      channels.push(channel as Channel)
+      return channel
     });
 
-    return channels
+
   }
 
   //treba dorobiť všetky edge cases
@@ -49,40 +48,37 @@ export default class ChannelsController {
         await Channel.query().where('id',channel_id).delete()
         return {
           message:"You deleted channel: "+channel_id
-        } 
+        }
 
       } else { //user nieje admin -> opustenie kanala
         await user?.related('channels').detach([channel_id])
 
         return {
           message:"You left channel: "+channel_id
-        } 
+        }
       }
     } else {
 
       response.status(403)
       return {
         message:"You are not member of this channel."
-      } 
+      }
     }
 
-   
+
   }
 
   public async index_messages({request}:HttpContextContract){
     const channel_id = request.param('id')
-    
+
     const messages = await Message
       .query()
       .where('channel_id',channel_id)
-      .preload('user',(query) => {
-        query.select('id','nickname','avatar_color')
-      })
-      .paginate(1,1)
+      .preload('user')
 
-    return messages
+    return messages.map((message) => message.serialize())
   }
-  
+
   public async store_message({ request,response }:HttpContextContract) {
     const channel_id = request.param('id')
     const newMessage = request.body()
@@ -90,9 +86,9 @@ export default class ChannelsController {
     const channel = await Channel.query().where('id',channel_id).preload('users',(query) => {
       query.where('user_id',newMessage.user_id)
     });
-  
+
     if(channel.length != 0) {//kanal existuje
-     
+
       if(channel[0].users.length != 0) {//user patri do kanala
 
         const message = await Message.create({
@@ -106,21 +102,21 @@ export default class ChannelsController {
         })
 
         return message
-        
+
       } else {
         response.status(403)
         return {
           message: 'You are not member of this channel.'
         }
       }
-      
+
     } else {
       response.status(404)
       return {
         message:`Channel ${channel_id} doesnt exist.`
       }
     }
-    
+
   }
 
   //vrati members daneho kanala

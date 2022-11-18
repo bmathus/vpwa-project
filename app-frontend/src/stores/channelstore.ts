@@ -3,214 +3,14 @@ import { defineStore } from 'pinia';
 import {
   Channel,
   ChannelsMessages,
-  Message,
   Status,
   Member,
-  User,
   SerializedMessage,
   RawMessage
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
 
-const dummyMessages: Array<Message> = [
-  {
-    id: 1,
-    message:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
-    send_at: '10.02.2020 9:30',
-    user_id: 2,
-    sender_nickname: 'DefaultUser',
-  },
-  {
-    id: 2,
-    message: 'Ahoj',
-    send_at: '10.02.2020 9:30',
-    user_id: 2,
-    sender_nickname: 'DefaultUser',
-  },
-  {
-    id: 3,
-    message:
-      'Ahoj @DeeeeeeeeeefaultUser Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
-    send_at: '10.02.2020 9:30',
-    user_id: 99,
-    sender_nickname: 'Lucia',
-  },
-  {
-    id: 4,
-    message: 'Ahoj',
-    send_at: '10.02.2020 9:30',
-    user_id: 2,
-    sender_nickname: 'DefaultUser',
-  },
-  {
-    id: 5,
-    message:
-      'Ahoj Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet,',
-    send_at: '10.02.2020 9:30',
-    user_id: 99,
-    sender_nickname: 'Lucia',
-  },
-];
-
-const channelMembersList: Member[] = [
-  {
-    id: 87,
-    nickname: 'Lucia',
-    avatar_color: 'primary',
-    status: Status.online,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  },
-  {
-    id: 45,
-    nickname: 'PeterSMedzerov',
-    avatar_color: 'orange',
-    status: Status.DND,
-    live_text: ' ',
-  },
-  {
-    id: 13,
-    nickname: 'Adam',
-    avatar_color: 'blue',
-    status: Status.online,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-];
-
-const channelMembersList2: Member[] = [
-  {
-    id: 87,
-    nickname: 'Lucia',
-    avatar_color: 'primary',
-    status: Status.online,
-    live_text: '',
-  },
-  {
-    id: 45,
-    nickname: 'Peter',
-    avatar_color: 'orange',
-    status: Status.DND,
-    live_text: '',
-  },
-  {
-    id: 13,
-    nickname: 'Adam',
-    avatar_color: 'blue',
-    status: Status.offline,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 87,
-    nickname: 'David',
-    avatar_color: 'red',
-    status: Status.online,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 45,
-    nickname: 'Jozo raz',
-    avatar_color: 'green',
-    status: Status.DND,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 13,
-    nickname: 'Adamko',
-    avatar_color: 'blue',
-    status: Status.offline,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor,Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 99,
-    nickname: 'Jozo1234',
-    avatar_color: 'green',
-    status: Status.DND,
-    live_text: '',
-  },
-  {
-    id: 100,
-    nickname: 'UsersdlhýmMenom',
-    avatar_color: 'blue',
-    status: Status.offline,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 99,
-    nickname: 'Jozo1234',
-    avatar_color: 'green',
-    status: Status.DND,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-  {
-    id: 110,
-    nickname: 'Xbojko',
-    avatar_color: 'blue',
-    status: Status.offline,
-    live_text:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor',
-  },
-];
-
-const dummyChannels: Channel[] = [
-  {
-    id: 1,
-    name: 'Channel 1',
-    members: channelMembersList,
-    is_public: true,
-    admin: true,
-  },
-  {
-    id: 2,
-    name: 'Verryyy Big Channel',
-    members: channelMembersList,
-    is_public: false,
-    admin: true,
-  },
-  {
-    id: 3,
-    name: 'Channel 3',
-    members: channelMembersList2,
-    is_public: false,
-    admin: false,
-  },
-  {
-    id: 4,
-    name: 'Channel 4',
-    members: channelMembersList,
-    is_public: true,
-    admin: true,
-  },
-  {
-    id: 5,
-    name: 'Channel 5',
-    members: channelMembersList2,
-    is_public: false,
-    admin: false,
-  },
-  {
-    id: 6,
-    name: 'Channel 6',
-    members: channelMembersList,
-    is_public: true,
-    admin: false,
-  },
-  {
-    id: 7,
-    name: 'Channel 7',
-    members: channelMembersList2,
-    is_public: true,
-    admin: false,
-  },
-];
 
 interface InfiniteScroll {
   stopOnLoad: () => void;
@@ -224,48 +24,38 @@ export const useChannelStore = defineStore('channelstore', {
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: null as Channel | null,
+    loading: false as boolean,
+    error: null as Error | null,
+    active:null as string | null,
 
     //other state
     membersDialogOpen: false,
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
-
-    //state from tutorial part 3
-    loading: false as boolean,
-    error: null as Error | null,
-    messages: {} as {[channel: string]: SerializedMessage[]},
-    active:null as string | null
   }),
 
   getters: {
     //getters from tutorial part 3
     joinedChannels(): string[] {
-      return Object.keys(this.messages)
+      return Object.keys(this.channels_messages)
     },
     currentMessages(): SerializedMessage[] {
-      return this.active !== null ? this.messages[this.active] : []
-    },
-    lastMessageOf() {
-      return (channel: string) => {
-        const messages = this.messages[channel]
-        return messages.length > 0 ? messages[messages.length - 1] : null
-      }
+      return this.active !== null ? this.channels_messages[this.active] : []
     },
 
     //other
-    getMessages(): Message[] {
+    getMessages(): SerializedMessage[] {
       if (this.active_channel !== null) {
         return this.channels_messages[this.active_channel.id.toString()]
-          .messages;
       }
       return [];
     },
 
     getPublicChannels(): Channel[] {
-      return this.channels.filter((channel) => channel.is_public === true);
+      return this.channels.filter((channel) => channel.type === 'public');
     },
     getPrivateChannels(): Channel[] {
-      return this.channels.filter((channel) => channel.is_public === false);
+      return this.channels.filter((channel) => channel.type === 'private');
     },
     getActiveChannel(): Channel | null {
       return this.active_channel;
@@ -293,7 +83,7 @@ export const useChannelStore = defineStore('channelstore', {
     },
     LoadingSuccess({channel, messages}: {channel:string, messages: SerializedMessage[]}) {
       this.loading = false;
-      this.messages[channel] = messages;
+      this.channels_messages[channel] = messages;
     },
     LoadingError(error : Error | null) {
       this.loading = false;
@@ -301,13 +91,13 @@ export const useChannelStore = defineStore('channelstore', {
     },
     ClearChannel(channel: string) {
       this.active = null;
-      delete this.messages[channel]
+      delete this.channels_messages[channel]
     },
     SetActive(channel: string) {
       this.active = channel;
     },
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
-      this.messages[channel].push(message);
+      this.channels_messages[channel].push(message);
     },
 
     //actions from tutorial part 3
@@ -334,6 +124,7 @@ export const useChannelStore = defineStore('channelstore', {
     async addMessage({ channel, message }: { channel: string, message: RawMessage }) {
       const newMessage = await channelService.in(channel)?.addMessage(message) as SerializedMessage
       this.NewMessage({channel,message: newMessage})
+      this.scrollToBottom(true);
     },
 
     //template controll actions
@@ -356,34 +147,33 @@ export const useChannelStore = defineStore('channelstore', {
       }, 20);
     },
 
-    pushMessage(message: string, user: User | null): void {
-      const date = new Date();
-      if (this.active_channel !== null) {
-        this.channels_messages[this.active_channel.id.toString()].messages.push(
-          {
-            id: Date.now(),
-            message: message,
-            send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
-            user_id: user == null ? 0 : user.id,
-            sender_nickname: user == null ? '' : user.nickname,
-          }
-        );
-        this.scrollToBottom(true);
-      }
-    },
+    // pushMessage(message: string, user: User | null): void {
+    //   const date = new Date();
+    //   if (this.active_channel !== null) {
+    //     this.channels_messages[this.active_channel.id.toString()].messages.push(
+    //       {
+    //         id: Date.now(),
+    //         message: message,
+    //         send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
+    //         user_id: user == null ? 0 : user.id,
+    //         sender_nickname: user == null ? '' : user.nickname,
+    //       }
+    //     );
+    //     this.scrollToBottom(true);
+    //   }
+    // },
 
-    fetchMessages(): void {
-      if (this.active_channel !== null) {
-        this.channels_messages[this.active_channel.id.toString()].messages.push(
-          ...dummyMessages
-        );
-      }
-    },
-    fetchChannels(): void {
-      this.channels = dummyChannels;
-      if (this.channels.length !== 0) {
-        this.setActiveChannel(this.channels[0]);
-      }
+    // fetchMessages(): void {
+    //   if (this.active_channel !== null) {
+    //     this.channels_messages[this.active_channel.id.toString()].messages.push(
+    //       ...dummyMessages
+    //     );
+    //   }
+    // },
+
+    async loadChannels() {
+      const channels = await channelService.fetchChannels()
+      this.channels = channels;
     },
 
     createNewChannel(
@@ -405,7 +195,7 @@ export const useChannelStore = defineStore('channelstore', {
             live_text: '',
           },
         ],
-        is_public: is_public,
+        type: is_public ? 'public' : 'private',
         admin: true,
       };
 
@@ -417,9 +207,7 @@ export const useChannelStore = defineStore('channelstore', {
       this.active_channel = channel;
       //ak nema v channel messages ešte svoje pole messages tak sa vytvorí
       if (!(channel.id.toString() in this.channels_messages)) {
-        this.channels_messages[channel.id.toString()] = {
-          messages: [],
-        };
+        this.channels_messages[channel.id.toString()] = []
       }
       this.scrollToBottom(false);
     },

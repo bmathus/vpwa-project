@@ -20,8 +20,8 @@
         <div class="q-ml-xs">{{ typingText }}</div>
       </div>
       <div class="text-box">
-        <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage($event)" />
-        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage($event)" />
+        <textarea placeholder="Message" v-model="messageText" @keyup.enter="send()" />
+        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="send()" />
       </div>
     </div>
   </div>
@@ -35,6 +35,7 @@ import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
 import { Member } from '../contracts';
 
+
 export default defineComponent({
   name: 'MessageField',
 
@@ -43,6 +44,16 @@ export default defineComponent({
     const userstore = useUserStore();
     const messageText = ref('')
     const $q = useQuasar();
+
+    //tutorial part 3
+    const aChannel = computed(() => {
+      return store.active !== null ? store.active : ''
+    })
+
+     async function send() {
+      await store.addMessage({channel: aChannel.value,message: messageText.value})
+      messageText.value = ''
+    }
 
 
     function confirm(msg: string, title: string) {
@@ -256,7 +267,8 @@ export default defineComponent({
         }
 
         else {
-          store.pushMessage(messageText.value,userstore.getUser)
+          // store.pushMessage(messageText.value,userstore.getUser)
+
 
         }
         messageText.value = ''
@@ -321,7 +333,8 @@ export default defineComponent({
       openLiveTyping,
       showLiveTyping,
       hideLiveTyping,
-      shownMember
+      shownMember,
+      send
     }
   }
 })

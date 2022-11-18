@@ -27,5 +27,5 @@ export default class Message extends BaseModel {
   public channel: BelongsTo<typeof Channel>;
 
   @column.dateTime({ autoCreate: true })
-  public sendAt: DateTime
+  public send_at: DateTime
 }

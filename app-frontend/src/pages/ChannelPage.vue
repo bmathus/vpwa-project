@@ -8,7 +8,7 @@
             <q-spinner-oval color="teal" size="lg" />
           </div>
         </template>
-        <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
+        <!-- <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
           v-for="message in store.getMessages" :key="message.id" :bg-color="userIsSender(message) ? '' : 'teal-3'">
           <template v-slot:name>{{ message.sender_nickname }}</template>
           <template v-slot:stamp>{{ message.send_at }}</template>
@@ -16,6 +16,22 @@
             <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
               style="height:35px; width:35px">
               <div class="text-body1 text-weight-medium">{{ message.sender_nickname[0].toUpperCase() }}</div>
+            </q-avatar>
+          </template>
+        </q-chat-message> -->
+        <q-chat-message
+          v-for="message in messages"
+          :text="[message.message]"
+          :sent="userIsSender(message)"
+          :key="message.id"
+          :bg-color="userIsSender(message) ? '' : 'teal-3'"
+          text-html>
+          <template v-slot:name>{{ message.user.nickname }}</template>
+          <template v-slot:stamp>{{ message.send_at }}</template>
+          <template v-slot:avatar>
+            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
+              style="height:35px; width:35px">
+              <div class="text-body1 text-weight-medium">{{ message.user.nickname[0].toUpperCase() }}</div>
             </q-avatar>
           </template>
         </q-chat-message>
@@ -29,10 +45,10 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useChannelStore } from '../stores/channelstore';
-import { Message } from '../contracts'
 import { useUserStore } from '../stores/userstore';
+import { SerializedMessage } from '../contracts';
 
 export default {
 
@@ -41,9 +57,20 @@ export default {
     const userstore = useUserStore();
     const infiniteScroll = ref()
     const scrolltobox = ref()
-    store.fetchMessages()
+    //store.fetchMessages()
+
+    //tutorial part 3
+    const messages = computed(()=>{
+      return store.currentMessages
+    })
+
+    function userIsSender(message: SerializedMessage): boolean {
+      return message.user.id === userstore.getUserId
+    }
 
     onMounted(() => {
+      infiniteScroll.value.stop() //added to test part 3
+
       store.$state.infiniteScroll = {
         stopOnLoad: () => infiniteScroll.value.stop(),
         resumeOnLoad: () => infiniteScroll.value.resume(),
@@ -57,14 +84,6 @@ export default {
       }
     })
 
-    function userIsSender(message: Message): boolean {
-      if (message.user_id === userstore.getUserId) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
     function messageClass(isSend: boolean): object {
       return reactive({
         'q-mb-xs': true,
@@ -75,7 +94,7 @@ export default {
 
     function onLoad(index: unknown, done: () => void) {
       setTimeout(() => {
-        store.fetchMessages()
+        //store.fetchMessages()
         done()
       }, 2000)
     }
@@ -102,7 +121,8 @@ export default {
       onLoad,
       userIsSender,
       highlightPing,
-      scrolltobox
+      scrolltobox,
+      messages,
     }
   }
 }
