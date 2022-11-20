@@ -20,31 +20,17 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 
-Route.get('/', async () => {
-  return 'hello'
-})
-
-//vrati všetky channels daneho usera
-Route.get('channels', 'ChannelsController.index')
-
-//join teda vytvorenie kanala alebo joinutie
-Route.post('channels', 'ChannelsController.join')
-
-//vratenie všetkych messages daneho kanala
-Route.get('channels/:id/messages','ChannelsController.index_messages')
-
-//ulozenie noveho message daneho kanala
-Route.post('channels/:id/messages','ChannelsController.store_message')
-
-//channel members
-Route.get('channels/:id/members','ChannelsController.index_members')
-
-//opustenie kanala, ak spravca tak zrušenie kanala, prikazy /quit /cancel
-Route.delete('channels/:id/leave','ChannelsController.leave')
-
 //všetky pozvanky ktore prisli použivatelovi na pridanie sa do kanalov
 Route.get('invitations','UsersController.index_invitations')
 
+Route.group(() => {
+  Route.get('/', 'ChannelsController.index').middleware('auth'); //vrati všetky channels daneho usera
+  Route.post('/', 'ChannelsController.join') //join teda vytvorenie kanala alebo joinutie
+  Route.get('/:id/messages','ChannelsController.index_messages') //vratenie všetkych messages daneho kanala
+  Route.post('/:id/messages','ChannelsController.store_message') //ulozenie noveho message daneho kanala
+  Route.get('/:id/members','ChannelsController.index_members') //channel members
+  Route.delete('/:id/leave','ChannelsController.leave') //opustenie kanala, ak spravca tak zrušenie kanala, prikazy /quit /cancel
+}).prefix('channels')
 
 Route.group(() => {
   Route.post('register', 'UsersController.register')

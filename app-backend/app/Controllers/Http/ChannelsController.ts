@@ -2,21 +2,17 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Channel from "App/Models/Channel";
 import Message from 'App/Models/Message';
 import User from "App/Models/User"
+import { inject } from '@adonisjs/core/build/standalone';
 
+// @ts-ignore
+import type { ChannelRepositoryContract } from '@ioc:Repositories/ChannelRepositoryContract';
+
+@inject(['Repositories/ChannelRepository'])
 export default class ChannelsController {
+  constructor(private chRepository: ChannelRepositoryContract) {}
 
-  public async index() {
-    const user = await User.query().preload('channels').first();
-
-    return user?.channels.map((ch)=>{
-      const channel = ch.serialize()
-      delete channel.deleted_at
-      channel.admin = ch.$extras.pivot_admin
-      channel.members = []
-      return channel
-    });
-
-
+  public async index({auth}: HttpContextContract) {
+    return this.chRepository.getAll(auth.user)
   }
 
   //treba dorobiť všetky edge cases

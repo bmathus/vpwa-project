@@ -1,3 +1,4 @@
+// @ts-ignore
 import type { MessageRepositoryContract, SerializedMessage } from '@ioc:Repositories/MessageRepository'
 import Channel from 'App/Models/Channel'
 

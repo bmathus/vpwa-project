@@ -8,8 +8,11 @@
         <user-settings></user-settings>
       </q-btn>
       <div class="text-subtitle2 text-weight-bolder">{{ userstore.getUserNickname }}</div>
-      <q-separator class="absolute-bottom"></q-separator>
+
+      <q-linear-progress query class="absolute-bottom" size="xs" color="teal" v-if="channelsLoading"/>
+      <q-separator v-else class="absolute-bottom"/>
     </div>
+
 
     <q-scroll-area style="height: calc(100% - 50px); margin-top: 50px;">
       <q-list dense>
@@ -29,35 +32,31 @@
           </template>
         </q-expansion-item>
 
-        <!-- <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
+        <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
           class="text-subtitle2">
-          <template v-for="channel in store.getPrivateChannels" :key="channel.id">
-            <q-item dense clickable v-ripple @click="store.setActiveChannel(channel)">
+          <template v-for="channel in privateChannels" :key="channel.id">
+            <q-item dense clickable v-ripple @click="setActiveChannel(channel.name)">
               <q-item-section class="text-subtitle2">
                 <div row>
-
                   <q-icon v-if="channel.admin" name="star" size="18px" />
                   <q-icon v-else class="material-icons-outlined" name="label" size="18px" />
                   {{ channel.name }}
                 </div>
               </q-item-section>
-
             </q-item>
           </template>
-        </q-expansion-item> -->
+        </q-expansion-item>
 
         <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
           class="text-subtitle2">
-          <template v-for=" channel in joinedChannels" :key="channel">
-            <q-item dense clickable v-ripple @click="setActiveChannel(channel)">
+          <template v-for=" channel in publicChannels" :key="channel">
+            <q-item dense clickable v-ripple @click="setActiveChannel(channel.name)">
               <q-item-section class="text-subtitle2">
                 <div row>
-
-                  <!-- <q-icon v-if="channel.admin" name="star" size="18px" />
-                  <q-icon v-else name="label" size="18px" /> -->
-                  {{ channel}}
+                  <q-icon v-if="channel.admin" name="star" size="18px" />
+                  <q-icon v-else name="label" size="18px" />
+                  {{ channel.name}}
                 </div>
-
               </q-item-section>
             </q-item>
           </template>
@@ -67,7 +66,7 @@
     </q-scroll-area>
 
     <div class="absolute-bottom bg-grey-3">
-      <q-separator />
+      <q-separator/>
       <q-item dense clickable v-ripple @click="showDialog">
         <q-item-section class="text-subtitle2">
           Create Channel
@@ -78,12 +77,13 @@
       </q-item>
     </div>
     <create-channel-dialog v-model="dialogIsOpen" @dialogVisibility="hideDialog" />
+
   </q-drawer>
 
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed} from 'vue';
 import ActivityBadge from './ActivityBadge.vue';
 import CreateChannelDialog from './CreateChannelDialog.vue';
 import { useChannelStore } from 'src/stores/channelstore';
@@ -104,19 +104,27 @@ export default defineComponent({
     const store = useChannelStore();
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
+    const channelsLoading = ref(false);
 
-    onMounted(async ()=>{
-      await store.loadChannels()
+    channelsLoading.value = true;
+    store.loadChannels().then(()=>{
+      channelsLoading.value = false;
       console.log(store.channels)
     })
+
+    const publicChannels = computed(()=> {
+      return store.getPublicChannels
+    })
+
+    const privateChannels = computed(()=> {
+      return store.getPrivateChannels
+    })
+
 
     const nicknameUpper = computed(() => {
       return userstore.getUserNickname[0] !== undefined ? userstore.getUserNickname[0].toUpperCase() : ' '
     })
 
-    const joinedChannels = computed((): string[] => {
-      return store.joinedChannels
-    })
 
     function setActiveChannel(name: string) {
       store.SetActive(name)
@@ -144,11 +152,12 @@ export default defineComponent({
       showDialog,
       hideDialog,
       dialogIsOpen,
-      store,
       userstore,
       nicknameUpper,
-      joinedChannels,
-      setActiveChannel
+      setActiveChannel,
+      channelsLoading,
+      publicChannels,
+      privateChannels
     }
   }
 

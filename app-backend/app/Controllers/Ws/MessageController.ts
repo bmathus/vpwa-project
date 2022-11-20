@@ -1,4 +1,5 @@
 import type { WsContextContract } from '@ioc:Ruby184/Socket.IO/WsContext'
+// @ts-ignore
 import type { MessageRepositoryContract } from '@ioc:Repositories/MessageRepository'
 import { inject } from '@adonisjs/core/build/standalone'
 

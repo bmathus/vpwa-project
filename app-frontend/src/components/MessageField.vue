@@ -99,7 +99,7 @@ export default defineComponent({
     })
 
     const channelIsPublic = computed(() => {
-      if (store.getActiveChannel !== null && store.getActiveChannel.is_public) {
+      if (store.getActiveChannel !== null && store.getActiveChannel.type == 'public') {
         return true;
       } else {
         return false;

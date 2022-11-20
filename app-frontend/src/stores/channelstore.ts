@@ -171,6 +171,7 @@ export const useChannelStore = defineStore('channelstore', {
     //   }
     // },
 
+    //called in LeftDrawer
     async loadChannels() {
       const channels = await channelService.fetchChannels()
       this.channels = channels;
