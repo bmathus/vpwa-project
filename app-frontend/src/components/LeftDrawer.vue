@@ -35,7 +35,7 @@
         <q-expansion-item dense dense-toggle expand-separator label="Private Channels" default-opened
           class="text-subtitle2">
           <template v-for="channel in privateChannels" :key="channel.id">
-            <q-item dense clickable v-ripple @click="setActiveChannel(channel.name)">
+            <q-item dense clickable v-ripple @click="setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 <div row>
                   <q-icon v-if="channel.admin" name="star" size="18px" />
@@ -50,7 +50,7 @@
         <q-expansion-item dense dense-toggle expand-separator label="Public Channels" default-opened
           class="text-subtitle2">
           <template v-for=" channel in publicChannels" :key="channel">
-            <q-item dense clickable v-ripple @click="setActiveChannel(channel.name)">
+            <q-item dense clickable v-ripple @click="setActiveChannel(channel)">
               <q-item-section class="text-subtitle2">
                 <div row>
                   <q-icon v-if="channel.admin" name="star" size="18px" />
@@ -90,6 +90,7 @@ import { useChannelStore } from 'src/stores/channelstore';
 import { useUserStore } from '../stores/userstore';
 import UserSettings from './UserSettings.vue';
 import AcceptInvitation from './AcceptInvitation.vue';
+import { Channel } from 'src/contracts';
 
 
 export default defineComponent({
@@ -126,8 +127,8 @@ export default defineComponent({
     })
 
 
-    function setActiveChannel(name: string) {
-      store.SetActive(name)
+    function setActiveChannel(channel: Channel) {
+      store.setActiveChannel(channel)
     }
 
     //dialog controll

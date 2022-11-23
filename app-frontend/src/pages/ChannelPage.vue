@@ -61,7 +61,7 @@ export default {
 
     //tutorial part 3
     const messages = computed(()=>{
-      return store.currentMessages
+      return store.getMessages
     })
 
     function userIsSender(message: SerializedMessage): boolean {

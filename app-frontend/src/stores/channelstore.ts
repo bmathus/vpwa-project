@@ -26,27 +26,21 @@ export const useChannelStore = defineStore('channelstore', {
     active_channel: null as Channel | null,
     loading: false as boolean,
     error: null as Error | null,
-    active:null as string | null,
 
-    //other state
     membersDialogOpen: false,
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
   }),
 
   getters: {
-    //getters from tutorial part 3
-    joinedChannels(): string[] {
+
+    getJoinedChannelsNames(): string[] {
       return Object.keys(this.channels_messages)
     },
-    currentMessages(): SerializedMessage[] {
-      return this.active !== null ? this.channels_messages[this.active] : []
-    },
 
-    //other
     getMessages(): SerializedMessage[] {
       if (this.active_channel !== null) {
-        return this.channels_messages[this.active_channel.id.toString()]
+        return this.channels_messages[this.active_channel.name]
       }
       return [];
     },
@@ -90,11 +84,11 @@ export const useChannelStore = defineStore('channelstore', {
       this.error = error;
     },
     ClearChannel(channel: string) {
-      this.active = null;
+      this.active_channel = null;
       delete this.channels_messages[channel]
     },
-    SetActive(channel: string) {
-      this.active = channel;
+    SetActiveChannel(channel: Channel) {
+      this.active_channel = channel;
     },
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
       this.channels_messages[channel].push(message);
@@ -113,7 +107,7 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
     async leave(channel: string | null) {
-      const leaving: string[] = channel !== null ? [channel] : this.joinedChannels
+      const leaving: string[] = channel !== null ? [channel] : this.getJoinedChannelsNames
 
       leaving.forEach((c) => {
         channelService.leave(c)
