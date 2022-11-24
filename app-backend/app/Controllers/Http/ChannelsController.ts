@@ -11,23 +11,8 @@ import type { ChannelRepositoryContract } from '@ioc:Repositories/ChannelReposit
 export default class ChannelsController {
   constructor(private chRepository: ChannelRepositoryContract) {}
 
-  public async index({auth}: HttpContextContract) {
+  public async loadChannels({auth}: HttpContextContract) {
     return this.chRepository.getAll(auth.user)
-  }
-
-  //treba dorobiť všetky edge cases
-  public async join({request}: HttpContextContract) {
-    const user = await User.first();
-    const channel_request = request.body()
-
-    const channel = await user?.related('channels').create({
-      name:channel_request.name,
-      type:channel_request.type
-    },{
-      admin:true
-    })
-
-    return channel?.serialize()
   }
 
   //prikaz /cancel a /quit pre spravcu

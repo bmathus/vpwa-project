@@ -28,21 +28,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, ref, computed } from 'vue'
 import { useChannelStore } from 'src/stores/channelstore';
-import { useUserStore } from '../stores/userstore';
 
 export default defineComponent({
   name: 'CreateChannelDialog',
   emits: ['dialogVisibility'],
   setup(props, ctx) {
     const store = useChannelStore()
-    const userstore = useUserStore()
     const name = ref('');
     const isPublic = ref(false);
 
+    const channelType = computed(()=> {
+      return isPublic.value ? 'public' : 'private'
+    })
+
     async function onSubmit() {
-      await store.createNewChannel(name.value,isPublic.value,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
+      await store.createChannel(name.value,channelType.value)
       ctx.emit('dialogVisibility');
       name.value = '';
     }

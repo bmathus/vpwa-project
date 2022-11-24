@@ -31,6 +31,10 @@ export interface Invitation {
   is_public: boolean;
 }
 
+export interface ErrorMessage {
+  message:string
+}
+
 
 export enum Status {
   online = 'online',

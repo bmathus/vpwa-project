@@ -128,7 +128,7 @@ export default defineComponent({
 
 
     function setActiveChannel(channel: Channel) {
-      store.setActiveChannel(channel)
+      store.SetActiveChannel(channel)
     }
 
     //dialog controll

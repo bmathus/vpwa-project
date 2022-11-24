@@ -3,14 +3,14 @@ import { defineStore } from 'pinia';
 import {
   Channel,
   ChannelsMessages,
-  Status,
   Member,
   SerializedMessage,
-  RawMessage
+  RawMessage,
+  ErrorMessage
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
-import { useUserStore } from './userstore';
+
 
 
 interface InfiniteScroll {
@@ -35,8 +35,10 @@ export const useChannelStore = defineStore('channelstore', {
 
   getters: {
 
-    getJoinedChannelsNames(): string[] {
-      return Object.keys(this.channels_messages)
+    getChannelsNames(): string[] {
+      return this.channels.map(({name})=>{
+        return name
+      })
     },
 
     getMessages(): SerializedMessage[] {
@@ -63,7 +65,7 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
     getActiveChannelMembers(): Member[] {
-      if (this.active_channel !== null) {
+      if (this.active_channel?.members !== undefined) {
         return this.active_channel.members;
       }
       return [];
@@ -90,16 +92,17 @@ export const useChannelStore = defineStore('channelstore', {
     },
     SetActiveChannel(channel: Channel) {
       this.active_channel = channel;
+      this.scrollToBottom(false);
     },
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
       this.channels_messages[channel].push(message);
     },
 
     //actions from tutorial part 3
-    async join(channel: string) {
+    async connectTo(channel: string) {
       try {
         this.LoadingStart();
-        const messages = await channelService.join(channel).loadMessages();
+        const messages = await channelService.startConnection(channel).loadMessages();
         this.LoadingSuccess({ channel, messages })
       } catch(err : any) {
         this.LoadingError(err)
@@ -107,11 +110,11 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    async leave(channel: string | null) {
-      const leaving: string[] = channel !== null ? [channel] : this.getJoinedChannelsNames
+    async disconnectFrom(channel: string | null) {
+      const leaving: string[] = channel !== null ? [channel] : this.getChannelsNames
 
       leaving.forEach((c) => {
-        channelService.leave(c)
+        channelService.disconnect(c)
         this.ClearChannel(c)
       })
     },
@@ -168,8 +171,14 @@ export const useChannelStore = defineStore('channelstore', {
 
     //called in LeftDrawer
     async loadChannels() {
-      const channels = await channelService.fetchChannels()
+      const channels = await channelService.loadChannels()
       this.channels = channels;
+      this.channels.forEach(async (channel)=>{
+        if(channel.name == 'general'){
+          this.SetActiveChannel(channel)
+        }
+        await this.connectTo(channel.name)
+      })
     },
 
     /*createNewChannel(
@@ -200,27 +209,23 @@ export const useChannelStore = defineStore('channelstore', {
       this.setActiveChannel(new_channel);
     },*/
 
-      async createNewChannel(channel_name: string, is_public: boolean, user_nickname:string, user_avatar_color:string, status: Status) {
-        const user = useUserStore().user
-        
-        channelService.join(channel_name)
-        const new_channel = await channelService.in(channel_name)?.joinChannel(channel_name, is_public, user_nickname, false)
-        if(new_channel != null)
-        {
-          this.channels.push(new_channel);
-          this.setActiveChannel(new_channel);
+      async createChannel(channel_name: string, type:'public'|'private') {
+
+        const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
+
+        if (new_channel as Channel) {
+          this.channels.push(new_channel as Channel)
+          this.SetActiveChannel(new_channel as Channel)
+          await this.connectTo((new_channel as Channel).name)
+
+        } else if (new_channel as ErrorMessage) {
+          console.log((new_channel as ErrorMessage).message)
+        } else {
+          console.log('error pri vytvarani kanala')
         }
-       
+
     },
 
-    setActiveChannel(channel: Channel): void {
-      this.active_channel = channel;
-      //ak nema v channel messages ešte svoje pole messages tak sa vytvorí
-      if (!(channel.id.toString() in this.channels_messages)) {
-        this.channels_messages[channel.id.toString()] = []
-      }
-      this.scrollToBottom(false);
-    },
 
     leaveChannel(id: number | null): void {
       this.q.notify({
@@ -239,7 +244,7 @@ export const useChannelStore = defineStore('channelstore', {
         this.active_channel = null;
       } else {
         //po livnuti kanala ak som clenom nejakych kanalov tak bude aktivny prvy v zozname kanalov
-        this.setActiveChannel(this.channels[0]);
+        this.SetActiveChannel(this.channels[0]);
       }
 
       delete this.channels_messages[id !== null ? id.toString() : ''];

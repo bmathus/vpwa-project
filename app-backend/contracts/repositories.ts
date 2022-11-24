@@ -28,8 +28,13 @@ declare module '@ioc:Repositories/MessageRepository' {
 
 // @ts-ignore
 declare module '@ioc:Repositories/ChannelRepository' {
+  export interface Error {
+    message: string
+  }
+
   export interface ChannelRepositoryContract {
     getAll(user: User): Promise<Channel[]>;
+    create(user: User,channel_name: string, type:'public'|'private' ): Promise<Channel|Error>;
   }
 
   const ChannelRepository: ChannelRepositoryContract;

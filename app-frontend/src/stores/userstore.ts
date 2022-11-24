@@ -88,11 +88,6 @@ export const useUserStore = defineStore('userstore', {
         this.AuthStart();
         const user = await authService.me();
         // join user to general channel - hardcoded for now
-
-        if(user?.id !== this.user?.id) {
-          await this.channelstore.join('general')
-        }
-
         this.AuthSuccess(user);
         return user !== null;
       } catch (err: any) {
@@ -117,7 +112,7 @@ export const useUserStore = defineStore('userstore', {
         const apiToken = await authService.login(credentials);
         this.AuthSuccess(null);
         authManager.setToken(apiToken.token);
-       
+
         return apiToken;
       } catch (err: any) {
         this.AuthError(err);
@@ -128,7 +123,7 @@ export const useUserStore = defineStore('userstore', {
       try {
         this.AuthStart();
         await authService.logout();
-        await this.channelstore.leave(null)
+        await this.channelstore.disconnectFrom(null)
         this.AuthSuccess(null);
         authManager.removeToken();
       } catch (err: any) {

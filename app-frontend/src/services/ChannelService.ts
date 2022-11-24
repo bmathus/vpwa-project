@@ -1,4 +1,4 @@
-import { RawMessage, SerializedMessage, Channel } from 'src/contracts'
+import { RawMessage, SerializedMessage, Channel,ErrorMessage } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import {useChannelStore} from '../stores/channelstore'
 import { api } from 'src/boot/axios';
@@ -24,18 +24,18 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('loadMessages')
   }
 
-  public joinChannel (channel: string, is_public: boolean, user_nickname: string, command: boolean): Promise<Channel> {
-    
-    return this.emitAsync('joinChannel', channel, command)
+  public createChannel (channel_name: string, type:'public'|'private'): Promise<Channel|ErrorMessage> {
+    return this.emitAsync('createChannel',channel_name,type)
   }
-} 
+
+}
 
 class ChannelService {
   private channels: Map<string, ChannelSocketManager> = new Map()
 
-  public join (name: string): ChannelSocketManager {
+  public startConnection (name: string): ChannelSocketManager {
     if (this.channels.has(name)) {
-      throw new Error(`User is already joined in channel "${name}"`)
+      throw new Error(`User is already connected in channel "${name}"`)
     }
 
     // connect to given channel namespace
@@ -44,7 +44,7 @@ class ChannelService {
     return channel
   }
 
-  public leave (name: string): boolean {
+  public disconnect (name: string): boolean {
     const channel = this.channels.get(name)
 
     if (!channel) {
@@ -60,10 +60,13 @@ class ChannelService {
     return this.channels.get(name)
   }
 
-  async fetchChannels(): Promise<Channel[]> {
+  async loadChannels(): Promise<Channel[]> {
     const response = await api.get<Channel[]>('/channels');
     return response.data;
+
   }
+
+
 
 
 }

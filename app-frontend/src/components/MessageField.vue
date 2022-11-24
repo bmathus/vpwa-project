@@ -129,7 +129,7 @@ export default defineComponent({
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    function sendMessage(event: any): void {
+    async function sendMessage(event: any): Promise<void> {
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
         if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
@@ -142,13 +142,12 @@ export default defineComponent({
           let duplicate = store.checkDuplicateChannel(channel_name)
 
           if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
-            let setpublic = true
-            store.createNewChannel(channel_name,setpublic,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
+
+            await store.createChannel(channel_name,'public')
             notify_event('Public channel ' + channel_name + ' was created')
           }
           else if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
-            let setpublic = false
-            store.createNewChannel(channel_name,setpublic,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
+            await store.createChannel(channel_name,'private')
             notify_event('Private channel ' + channel_name + ' was created')
           }
           else {

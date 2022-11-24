@@ -4,10 +4,6 @@ import Message from './Message'
 import User from './User'
 import Invite from './Invite'
 
-enum type {
-  public = "public",
-  private = "private"
-}
 
 export default class Channel extends BaseModel {
   @column({ isPrimary: true })
@@ -17,7 +13,7 @@ export default class Channel extends BaseModel {
   public name: string
 
   @column()
-  public type: type
+  public type: 'public'|'private'
 
   @hasMany(() => Message, {
     foreignKey: 'channel_id',

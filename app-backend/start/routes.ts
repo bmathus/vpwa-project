@@ -24,8 +24,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('invitations','UsersController.index_invitations')
 
 Route.group(() => {
-  Route.get('/', 'ChannelsController.index').middleware('auth'); //vrati všetky channels daneho usera
-  Route.post('/', 'ChannelsController.join') //join teda vytvorenie kanala alebo joinutie
+  Route.get('/', 'ChannelsController.loadChannels').middleware('auth'); //vrati všetky channels daneho usera
   Route.get('/:id/messages','ChannelsController.index_messages') //vratenie všetkych messages daneho kanala
   Route.post('/:id/messages','ChannelsController.store_message') //ulozenie noveho message daneho kanala
   Route.get('/:id/members','ChannelsController.index_members') //channel members
