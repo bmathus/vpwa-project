@@ -10,6 +10,7 @@ import {
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
+import { useUserStore } from './userstore';
 
 
 interface InfiniteScroll {
@@ -171,7 +172,7 @@ export const useChannelStore = defineStore('channelstore', {
       this.channels = channels;
     },
 
-    createNewChannel(
+    /*createNewChannel(
       channel_name: string,
       is_public: boolean,
       user_nickname:string,
@@ -193,9 +194,23 @@ export const useChannelStore = defineStore('channelstore', {
         type: is_public ? 'public' : 'private',
         admin: true,
       };
-
+      const m =  channelService.in('General')?.joinChannel()
+      console.log(m)
       this.channels.push(new_channel);
       this.setActiveChannel(new_channel);
+    },*/
+
+      async createNewChannel(channel_name: string, is_public: boolean, user_nickname:string, user_avatar_color:string, status: Status) {
+        const user = useUserStore().user
+        
+        channelService.join(channel_name)
+        const new_channel = await channelService.in(channel_name)?.joinChannel(channel_name, is_public, user_nickname, false)
+        if(new_channel != null)
+        {
+          this.channels.push(new_channel);
+          this.setActiveChannel(new_channel);
+        }
+       
     },
 
     setActiveChannel(channel: Channel): void {

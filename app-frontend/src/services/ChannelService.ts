@@ -23,7 +23,12 @@ class ChannelSocketManager extends SocketManager {
   public loadMessages (): Promise<SerializedMessage[]> {
     return this.emitAsync('loadMessages')
   }
-}
+
+  public joinChannel (channel: string, is_public: boolean, user_nickname: string, command: boolean): Promise<Channel> {
+    
+    return this.emitAsync('joinChannel', channel, command)
+  }
+} 
 
 class ChannelService {
   private channels: Map<string, ChannelSocketManager> = new Map()

@@ -117,10 +117,11 @@ export const useUserStore = defineStore('userstore', {
         const apiToken = await authService.login(credentials);
         this.AuthSuccess(null);
         authManager.setToken(apiToken.token);
+       
         return apiToken;
       } catch (err: any) {
         this.AuthError(err);
-        throw err;
+        return 'err'
       }
     },
     async logout() {

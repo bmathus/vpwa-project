@@ -41,8 +41,8 @@ export default defineComponent({
     const name = ref('');
     const isPublic = ref(false);
 
-    function onSubmit(): void {
-      store.createNewChannel(name.value,isPublic.value,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
+    async function onSubmit() {
+      await store.createNewChannel(name.value,isPublic.value,userstore.getUserNickname,userstore.getUserAvatarColor,userstore.getStatus)
       ctx.emit('dialogVisibility');
       name.value = '';
     }

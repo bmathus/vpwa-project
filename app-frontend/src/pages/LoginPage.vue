@@ -60,6 +60,7 @@ import { useQuasar } from 'quasar'
 import { computed, reactive, ref } from 'vue'
 import { useRoute, useRouter, RouteLocationRaw } from 'vue-router'
 import { useUserStore } from 'src/stores/userstore'
+import { ApiToken } from 'src/contracts'
 
 
 export default {
@@ -85,17 +86,24 @@ export default {
       return userstore.auth_status === 'pending';
     })
 
-    function onSubmit() {
-      userstore.login(credentials)
-        .then(() => {
-          $router.push({ name: 'home' })
+    async function onSubmit() {
+     
+      const s: string | ApiToken = await userstore.login(credentials)
+      
+      if( typeof s === 'string' && s == 'err')
+      {
+        alert('error')
+      }
+      else {
+        $router.push({ name: 'home' })
           $q.notify({
             color: 'teal',
             textColor: 'white',
             icon: 'cloud_done',
             message: 'Welcome back'
           })
-        })
+      }
+    
     }
 
     return {

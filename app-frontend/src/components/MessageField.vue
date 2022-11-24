@@ -47,11 +47,14 @@ export default defineComponent({
 
     //tutorial part 3
     const aChannel = computed(() => {
-      return store.active !== null ? store.active : ''
+      if (store.active_channel !== null){
+        return store.active_channel.name !== null ? store.active_channel.name : ''
+      }
+      return  ''
     })
 
      async function send() {
-      await store.addMessage({channel: aChannel.value,message: messageText.value})
+      await store.addMessage({channel: aChannel.value, message: messageText.value})
       messageText.value = ''
     }
 
