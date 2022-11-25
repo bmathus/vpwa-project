@@ -43,7 +43,7 @@ export const useChannelStore = defineStore('channelstore', {
 
     getMessages(): SerializedMessage[] {
       if (this.active_channel !== null) {
-        return this.channels_messages[this.active_channel.name]
+        return this.channels_messages[this.active_channel.name]?.messages
       }
       return [];
     },
@@ -78,10 +78,26 @@ export const useChannelStore = defineStore('channelstore', {
       this.loading = true;
       this.error = null;
     },
-    LoadingSuccess({channel, messages}: {channel:string, messages: SerializedMessage[]}) {
-      this.loading = false;
-      this.channels_messages[channel] = messages;
+
+    AppendMessages(channelName: string, messages: SerializedMessage[]) {
+      if(channelName in this.channels_messages) {
+        this.channels_messages[channelName].messages.splice(0,0,...messages)
+      } else {
+        this.channels_messages[channelName] = {
+          messages: messages,
+          page:0
+        }
+      }
     },
+
+    LoadingSuccess(channelName: string) {
+      this.loading = false;
+      this.channels_messages[channelName] = {
+        messages:[],
+        page:0
+      }
+    },
+
     LoadingError(error : Error | null) {
       this.loading = false;
       this.error = error;
@@ -92,18 +108,18 @@ export const useChannelStore = defineStore('channelstore', {
     },
     SetActiveChannel(channel: Channel) {
       this.active_channel = channel;
-      this.scrollToBottom(false);
+      //this.scrollToBottom(false);
     },
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
-      this.channels_messages[channel].push(message);
+      this.channels_messages[channel].messages.push(message);
     },
 
     //actions from tutorial part 3
     async connectTo(channel: string) {
       try {
         this.LoadingStart();
-        const messages = await channelService.startConnection(channel).loadMessages();
-        this.LoadingSuccess({ channel, messages })
+        await channelService.startConnection(channel)
+        this.LoadingSuccess(channel);
       } catch(err : any) {
         this.LoadingError(err)
         throw err;
@@ -135,7 +151,7 @@ export const useChannelStore = defineStore('channelstore', {
     scrollToBottom(smooth: boolean): void {
       setTimeout(() => {
         this.infiniteScroll.scrollBottom(smooth);
-      }, 1);
+      }, 0.001);
     },
     toogleMembersDialog(): void {
       this.stopMessagesLoading();
@@ -169,60 +185,48 @@ export const useChannelStore = defineStore('channelstore', {
     //   }
     // },
 
+    async loadMessages(page: number): Promise<'load_more' | 'no_messages'> {
+      if(this.active_channel !== null ) {
+        const messages = await channelService.in(this.active_channel.name)?.loadMessages(this.active_channel.id,page) as SerializedMessage[]
+        if(messages.length !== 0) {
+          this.AppendMessages(this.active_channel.name,messages)
+          return 'load_more'
+        } else {
+          return 'no_messages'
+        }
+      }
+      return 'no_messages'
+
+    },
+
     //called in LeftDrawer
     async loadChannels() {
       const channels = await channelService.loadChannels()
       this.channels = channels;
+
       this.channels.forEach(async (channel)=>{
+        await this.connectTo(channel.name)
         if(channel.name == 'general'){
           this.SetActiveChannel(channel)
         }
-        await this.connectTo(channel.name)
       })
     },
 
-    /*createNewChannel(
-      channel_name: string,
-      is_public: boolean,
-      user_nickname:string,
-      user_avatar_color:string,
-      status: Status
-    ): void {
-      const new_channel: Channel = {
-        id: Date.now(),
-        name: channel_name,
-        members: [
-          {
-            id: 87,
-            nickname: user_nickname,
-            avatar_color: user_avatar_color,
-            status: status,
-            live_text: '',
-          },
-        ],
-        type: is_public ? 'public' : 'private',
-        admin: true,
-      };
-      const m =  channelService.in('General')?.joinChannel()
-      console.log(m)
-      this.channels.push(new_channel);
-      this.setActiveChannel(new_channel);
-    },*/
 
-      async createChannel(channel_name: string, type:'public'|'private') {
+    async createChannel(channel_name: string, type:'public'|'private') {
 
-        const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
+      const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
 
-        if (new_channel as Channel) {
-          this.channels.push(new_channel as Channel)
-          this.SetActiveChannel(new_channel as Channel)
-          await this.connectTo((new_channel as Channel).name)
+      if (new_channel as Channel) {
+        this.channels.push(new_channel as Channel)
+        this.SetActiveChannel(new_channel as Channel)
+        await this.connectTo((new_channel as Channel).name)
 
-        } else if (new_channel as ErrorMessage) {
-          console.log((new_channel as ErrorMessage).message)
-        } else {
-          console.log('error pri vytvarani kanala')
-        }
+      } else if (new_channel as ErrorMessage) {
+        console.log((new_channel as ErrorMessage).message)
+      } else {
+        console.log('error pri vytvarani kanala')
+      }
 
     },
 

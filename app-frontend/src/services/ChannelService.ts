@@ -20,12 +20,12 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('addMessage', message)
   }
 
-  public loadMessages (): Promise<SerializedMessage[]> {
-    return this.emitAsync('loadMessages')
+  public loadMessages (channelId: number,page: number): Promise<SerializedMessage[]> {
+    return this.emitAsync('loadMessages', channelId,page)
   }
 
-  public createChannel (channel_name: string, type:'public'|'private'): Promise<Channel|ErrorMessage> {
-    return this.emitAsync('createChannel',channel_name,type)
+  public createChannel (channelName: string, type:'public'|'private'): Promise<Channel|ErrorMessage> {
+    return this.emitAsync('createChannel',channelName,type)
   }
 
 }

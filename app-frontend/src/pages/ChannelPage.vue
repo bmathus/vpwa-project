@@ -1,6 +1,6 @@
 
 <template>
-  <q-page class="column justify-center items-center">
+  <q-page class="column items-center justify-end" id="page">
     <div class="q-px-md messages-box">
       <q-infinite-scroll @load="onLoad" reverse :offset="50" ref="infiniteScroll" id="infinite">
         <template v-slot:loading>
@@ -8,17 +8,6 @@
             <q-spinner-oval color="teal" size="lg" />
           </div>
         </template>
-        <!-- <q-chat-message :text="[highlightPing(message.message)]" :sent="userIsSender(message)" text-html
-          v-for="message in store.getMessages" :key="message.id" :bg-color="userIsSender(message) ? '' : 'teal-3'">
-          <template v-slot:name>{{ message.sender_nickname }}</template>
-          <template v-slot:stamp>{{ message.send_at }}</template>
-          <template v-slot:avatar>
-            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
-              style="height:35px; width:35px">
-              <div class="text-body1 text-weight-medium">{{ message.sender_nickname[0].toUpperCase() }}</div>
-            </q-avatar>
-          </template>
-        </q-chat-message> -->
         <q-chat-message
           v-for="message in messages"
           :text="[message.message]"
@@ -45,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, ref, onMounted, computed } from 'vue'
+import { reactive, ref, onMounted, computed ,watch} from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
 import { SerializedMessage } from '../contracts';
@@ -57,9 +46,7 @@ export default {
     const userstore = useUserStore();
     const infiniteScroll = ref()
     const scrolltobox = ref()
-    //store.fetchMessages()
 
-    //tutorial part 3
     const messages = computed(()=>{
       return store.getMessages
     })
@@ -68,8 +55,10 @@ export default {
       return message.user.id === userstore.getUserId
     }
 
+
     onMounted(() => {
-      infiniteScroll.value.stop() //added to test part 3
+
+      infiniteScroll.value.stop() //started after channel is activated after
 
       store.$state.infiniteScroll = {
         stopOnLoad: () => infiniteScroll.value.stop(),
@@ -92,11 +81,37 @@ export default {
       })
     }
 
-    function onLoad(index: unknown, done: () => void) {
-      setTimeout(() => {
-        //store.fetchMessages()
-        done()
-      }, 2000)
+    const activeChannel = computed(()=> {
+      return store.getActiveChannel
+    })
+
+
+    watch(activeChannel,(newChannelValue) => {
+      if(newChannelValue != null) {
+        console.log('fungujem')
+        infiniteScroll.value.resume()
+
+      }
+    })
+
+    async function onLoad(index: number, done: (stop: boolean) => void) {
+      console.log('fetch',store.getActiveChannel !== null)
+
+      if(store.getActiveChannel !== null) {
+          console.log('az teraz',store.getActiveChannel !== null)
+
+          const result = await store.loadMessages(index);
+
+          if(result == 'load_more') {
+            done(false);
+          } else {
+            done(true);
+          }
+      }else {
+        infiniteScroll.value.reset()
+      }
+
+
     }
 
     function highlightPing(message: string): string {
@@ -133,6 +148,7 @@ export default {
 .messages-box {
   width: 100%;
   max-width: 1300px;
+
 }
 
 .ping {

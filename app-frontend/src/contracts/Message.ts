@@ -8,7 +8,10 @@ export interface Sender {
 }
 
 export interface ChannelsMessages {
-  [channel: string]: SerializedMessage[]
+  [channel: string]: {
+    messages: SerializedMessage[],
+    page: number
+  }
 }
 
 export interface SerializedMessage {

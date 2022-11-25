@@ -136,15 +136,16 @@ export const useUserStore = defineStore('userstore', {
     setStatus(status: Status) {
       this.status = status;
     },
+
     acceptInvitation(invitation: Invitation): void {
       //todo namiesto creatovania by sa mal joinuť kanal spravit si nejake na joinutie a metodu nato
-      this.channelstore.createNewChannel(
-        invitation.channel_name,
-        invitation.is_public,
-        this.getUserNickname,
-        this.getUserAvatarColor,
-        this.status
-      );
+      // this.channelstore.createNewChannel(
+      //   invitation.channel_name,
+      //   invitation.is_public,
+      //   this.getUserNickname,
+      //   this.getUserAvatarColor,
+      //   this.status
+      // );
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;
       });
