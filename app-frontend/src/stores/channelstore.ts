@@ -241,12 +241,22 @@ export const useChannelStore = defineStore('channelstore', {
         {
           alert('Odysiel si z kanala')
           channelService.disconnect(this.active_channel?.name)
+
+          this.channels = this.channels.filter((obj) => {
+            return obj.id !== channel_id;
+          });
+
           this.SetActiveChannel(this.channels[0])
         }
         else if(result == true )
         {
           alert('Vymazal si kanal')
           channelService.disconnect(this.active_channel?.name)
+
+          this.channels = this.channels.filter((obj) => {
+            return obj.id !== channel_id;
+          });
+
           this.SetActiveChannel(this.channels[0])
         }
         else(
@@ -256,31 +266,6 @@ export const useChannelStore = defineStore('channelstore', {
      
     },
 
-
-     /*leaveChannel(id: number | null): void {
-      console.log('cau kokot')
-     
-      this.q.notify({
-        type: 'info',
-        message: 'You left channel: ' + this.getActiveChannel?.name,
-        color: 'teal',
-        timeout: 2500,
-      });
-
-      this.channels = this.channels.filter((obj) => {
-        return obj.id !== id;
-      });
-
-      //nastavenie active kanala po tom ako leavneš kanal
-      if (this.channels.length === 0) {
-        this.active_channel = null;
-      } else {
-        //po livnuti kanala ak som clenom nejakych kanalov tak bude aktivny prvy v zozname kanalov
-        this.SetActiveChannel(this.channels[0]);
-      }
-
-      delete this.channels_messages[id !== null ? id.toString() : ''];
-    },*/
 
     makeRevoke(nickname: string): number {
       const len = this.active_channel?.members.length;
