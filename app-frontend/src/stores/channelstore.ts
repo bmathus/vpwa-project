@@ -230,8 +230,36 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
+    async leaveChannel(channel_id: number | null) {
 
-    leaveChannel(id: number | null): void {
+      console.log('cau kokot')
+      if(channel_id != null && this.active_channel != null){
+
+        const result = await channelService.in(this.active_channel?.name)?.leaveChannel(channel_id)
+        
+        if(result == false )
+        {
+          alert('Odysiel si z kanala')
+          channelService.disconnect(this.active_channel?.name)
+          this.SetActiveChannel(this.channels[0])
+        }
+        else if(result == true )
+        {
+          alert('Vymazal si kanal')
+          channelService.disconnect(this.active_channel?.name)
+          this.SetActiveChannel(this.channels[0])
+        }
+        else(
+          alert('Doslo ku chybe')
+        )
+      }
+     
+    },
+
+
+     /*leaveChannel(id: number | null): void {
+      console.log('cau kokot')
+     
       this.q.notify({
         type: 'info',
         message: 'You left channel: ' + this.getActiveChannel?.name,
@@ -252,7 +280,7 @@ export const useChannelStore = defineStore('channelstore', {
       }
 
       delete this.channels_messages[id !== null ? id.toString() : ''];
-    },
+    },*/
 
     makeRevoke(nickname: string): number {
       const len = this.active_channel?.members.length;

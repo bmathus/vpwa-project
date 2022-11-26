@@ -28,6 +28,10 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('createChannel',channelName,type)
   }
 
+  public leaveChannel (channel_id: number): Promise<boolean|ErrorMessage> {
+    return this.emitAsync('leaveChannel',channel_id)
+  }
+
 }
 
 class ChannelService {

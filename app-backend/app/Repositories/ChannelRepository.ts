@@ -3,6 +3,7 @@ import type { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelR
 import User from 'App/Models/User'
 import Channel from 'App/Models/Channel'
 
+
 export default class MessageRepository implements ChannelRepositoryContract {
   public async getAll(user: User): Promise<Channel[]> {
     await user.load('channels')
@@ -37,6 +38,46 @@ export default class MessageRepository implements ChannelRepositoryContract {
       }
 
     }
+  }
+
+  public async leave(user: User, channel_id: number): Promise<Boolean|Error> {
+    try {
+     
+
+      const channel = await Channel.findBy('id', channel_id)
+      const members = await channel?.related('users').query().select('*')
+      if(members != null)
+      {
+        let adm = members.find(i => i.$extras.pivot_admin === true);
+        
+
+        if(user.id == adm?.id)
+        {
+          console.log('Cau admin')
+          await channel?.related('messages').query().delete()
+          await channel?.related('users').query().delete()
+          
+          await channel?.delete()
+          return true
+        }
+        else{
+          console.log('Cau user')
+          await channel?.related('users').query().select('user_id').where('user_id', user.id).delete()
+          return false
+        }
+      }
+      
+  
+      
+    }
+    catch(error){
+      console.log('chyba')
+      return {
+        
+        message:'Channel already exists'
+      } as Error
+    }
+    
   }
 
 

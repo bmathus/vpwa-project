@@ -130,13 +130,18 @@ export default defineComponent({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async function sendMessage(event: any): Promise<void> {
+      
       if (!event.shiftKey && messageText.value.trim() !== '') {
-
+      
         if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
 
           let command = messageText.value.split(' ')
           let message_join = messageText.value.split(' ').slice(1)
-          message_join.splice(-1, 1)
+
+          if(message_join[-1] == '\[public\]\n' || message_join[-1] == '\[private\]\n'){ // TODO na join bez []
+            message_join.splice(-1, 1)
+          }
+         
 
           let channel_name = message_join.join(' ')
           let duplicate = store.checkDuplicateChannel(channel_name)
@@ -273,6 +278,8 @@ export default defineComponent({
 
 
         }
+
+        await store.addMessage({channel: aChannel.value, message: messageText.value})
         messageText.value = ''
       }
     }

@@ -32,8 +32,8 @@ const props = defineProps<{
 
 const store = useChannelStore();
 
-function leaveChannel(): void {
-  store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
+async function leaveChannel() {
+  await store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
 }
 
 </script>
