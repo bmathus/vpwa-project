@@ -33,7 +33,7 @@ export default class User extends BaseModel {
   @column()
   public rememberMeToken: string | null
 
-  @column({serializeAs: null})
+  @column()
   public status: status
 
   @column()

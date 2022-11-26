@@ -3,6 +3,7 @@ import type { MessageRepositoryContract, SerializedMessage } from '@ioc:Reposito
 import Channel from 'App/Models/Channel'
 import Message from 'App/Models/Message'
 
+
 export default class MessageRepository implements MessageRepositoryContract {
   public async getAll(channelId: number, page: number): Promise<SerializedMessage[]> {
 
@@ -19,7 +20,7 @@ export default class MessageRepository implements MessageRepositoryContract {
     const messages = await Message
       .query()
       .where('channel_id',channelId)
-      .orderBy('send_at','asc')
+      .orderBy('send_at','desc')
       .preload('user',(userQuery) => {
         userQuery.select('id','nickname','avatar_color')
       })
@@ -39,3 +40,4 @@ export default class MessageRepository implements MessageRepositoryContract {
 
   }
 }
+//red-4,pink-4,purple-4,indigo-5,primary,cyan-7,teal-5,lime-8,amber-7,brown-4

@@ -20,8 +20,8 @@
         <div class="q-ml-xs">{{ typingText }}</div>
       </div>
       <div class="text-box">
-        <textarea placeholder="Message" v-model="messageText" @keyup.enter="send()" />
-        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="send()" />
+        <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage" />
+        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage" />
       </div>
     </div>
   </div>
@@ -53,11 +53,6 @@ export default defineComponent({
       return  ''
     })
 
-     async function send() {
-      await store.addMessage({channel: aChannel.value, message: messageText.value})
-      messageText.value = ''
-    }
-
 
     function confirm(msg: string, title: string) {
       store.stopMessagesLoading()
@@ -75,8 +70,15 @@ export default defineComponent({
           flat: true
         },
         class: 'q-pa-sm'
-      }).onOk(() => {
-        store.leaveChannel(store.getActiveChannel === null ? null : store.getActiveChannel.id)
+      }).onOk(async () => {
+        const result = await store.leaveChannel()
+        $q.notify({
+          type: 'info',
+          message: result,
+          color: 'teal',
+          timeout: 2500,
+        });
+
         store.resumeMessagesLoading()
       }).onCancel(() => {
         store.resumeMessagesLoading()
@@ -130,9 +132,9 @@ export default defineComponent({
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async function sendMessage(event: any): Promise<void> {
-      
+
       if (!event.shiftKey && messageText.value.trim() !== '') {
-      
+
         if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
 
           let command = messageText.value.split(' ')
@@ -141,7 +143,7 @@ export default defineComponent({
           if(message_join[-1] == '\[public\]\n' || message_join[-1] == '\[private\]\n'){ // TODO na join bez []
             message_join.splice(-1, 1)
           }
-         
+
 
           let channel_name = message_join.join(' ')
           let duplicate = store.checkDuplicateChannel(channel_name)
@@ -203,6 +205,7 @@ export default defineComponent({
         }
 
         else if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
+
           if (messageText.value.length == 6)
             store.toogleMembersDialog()
           else {
@@ -272,14 +275,11 @@ export default defineComponent({
             notify_event('Incorrect command')
           }
         }
-
         else {
-          // store.pushMessage(messageText.value,userstore.getUser)
-
+          await store.addMessage({channel: aChannel.value, message: messageText.value})
 
         }
 
-        await store.addMessage({channel: aChannel.value, message: messageText.value})
         messageText.value = ''
       }
     }
@@ -295,10 +295,11 @@ export default defineComponent({
 
     const membersTyping = computed(() => {
       return store.getActiveChannelMembers.filter((member) => {
+
         //chceme zobrazit len memberov ktory maju prazdny live text string a niesom tam ani ja prihlaseny user
-        if (member.live_text.length !== 0 && member.id !== userstore.getUserId) {
-          return member
-        }
+        // if (member.live_text.length !== 0 && member.id !== userstore.getUserId) {
+        //   return member
+        // }
       })
     })
 
@@ -332,7 +333,6 @@ export default defineComponent({
     });
 
 
-
     return {
       messageText,
       sendMessage,
@@ -343,7 +343,6 @@ export default defineComponent({
       showLiveTyping,
       hideLiveTyping,
       shownMember,
-      send
     }
   }
 })

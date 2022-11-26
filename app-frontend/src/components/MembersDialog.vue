@@ -19,11 +19,9 @@
                 <activity-badge :status="member.status" />
               </q-avatar>
             </q-item-section>
-
             <q-item-section>
               {{member.nickname}}
             </q-item-section>
-
           </q-item>
         </q-list>
       </q-scroll-area>
@@ -46,7 +44,7 @@ export default defineComponent({
   setup() {
     const store = useChannelStore()
     return {
-      store
+      store,
     }
   }
 });

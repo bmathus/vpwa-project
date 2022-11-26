@@ -12,8 +12,11 @@ class ChannelSocketManager extends SocketManager {
     const channelstore = useChannelStore()
 
     this.socket.on('message', (message: SerializedMessage) => {
+      console.log(message)
       channelstore.NewMessage({channel,message})
     })
+
+
   }
 
   public addMessage (message: RawMessage): Promise<SerializedMessage> {

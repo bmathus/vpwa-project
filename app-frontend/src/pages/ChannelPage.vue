@@ -18,7 +18,7 @@
           <template v-slot:name>{{ message.user.nickname }}</template>
           <template v-slot:stamp>{{ message.send_at }}</template>
           <template v-slot:avatar>
-            <q-avatar rounded color="primary" text-color="dark" :class="messageClass(userIsSender(message))"
+            <q-avatar rounded :color="message.user.avatar_color" text-color="dark" :class="messageClass(userIsSender(message))"
               style="height:35px; width:35px">
               <div class="text-body1 text-weight-medium">{{ message.user.nickname[0].toUpperCase() }}</div>
             </q-avatar>
@@ -88,27 +88,23 @@ export default {
 
     watch(activeChannel,(newChannelValue) => {
       if(newChannelValue != null) {
-        console.log('fungujem')
+        //console.log('fungujem')
         infiniteScroll.value.resume()
 
       }
     })
 
     async function onLoad(index: number, done: (stop: boolean) => void) {
-      console.log('fetch',store.getActiveChannel !== null)
 
       if(store.getActiveChannel !== null) {
-          console.log('az teraz',store.getActiveChannel !== null)
-
-          const result = await store.loadMessages(index);
+          //console.log('az teraz',store.getActiveChannel !== null)
+          const result = await store.loadMessages();
 
           if(result == 'load_more') {
             done(false);
           } else {
             done(true);
           }
-      }else {
-        infiniteScroll.value.reset()
       }
 
 

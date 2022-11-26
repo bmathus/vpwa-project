@@ -82,10 +82,11 @@ export const useChannelStore = defineStore('channelstore', {
     AppendMessages(channelName: string, messages: SerializedMessage[]) {
       if(channelName in this.channels_messages) {
         this.channels_messages[channelName].messages.splice(0,0,...messages)
+        this.channels_messages[channelName].page++;
       } else {
         this.channels_messages[channelName] = {
           messages: messages,
-          page:0
+          page:1
         }
       }
     },
@@ -94,7 +95,7 @@ export const useChannelStore = defineStore('channelstore', {
       this.loading = false;
       this.channels_messages[channelName] = {
         messages:[],
-        page:0
+        page:1
       }
     },
 
@@ -102,11 +103,11 @@ export const useChannelStore = defineStore('channelstore', {
       this.loading = false;
       this.error = error;
     },
-    ClearChannel(channel: string) {
-      this.active_channel = null;
-      delete this.channels_messages[channel]
-    },
+
     SetActiveChannel(channel: Channel) {
+      //const numOfMessages = this.channels_messages[channel.name].messages.length
+      //this.channels_messages[channel.name].page = Math.floor(numOfMessages/8) + 1;
+
       this.active_channel = channel;
       //this.scrollToBottom(false);
     },
@@ -126,13 +127,30 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    async disconnectFrom(channel: string | null) {
-      const leaving: string[] = channel !== null ? [channel] : this.getChannelsNames
+    async disconnectFrom(channelName: string | null) {
 
-      leaving.forEach((c) => {
-        channelService.disconnect(c)
-        this.ClearChannel(c)
+      let leaving: string[] = []
+      if(channelName !== null) { //odpajame sa z daneho kanala
+        leaving = [channelName]
+
+        this.channels = this.channels.filter((channel) => {
+          return channel.name !== channelName;
+        });
+
+        this.SetActiveChannel(this.channels[0]) //general bude default
+
+      }else {// odpajame sa zo vsetkých -> použite pri loggount
+        leaving = this.getChannelsNames
+        this.active_channel = null;
+        this.channels = []
+      }
+
+      leaving.forEach((channelName) => {
+        channelService.disconnect(channelName)
+        delete this.channels_messages[channelName]
       })
+
+
     },
 
     async addMessage({ channel, message }: { channel: string, message: RawMessage }) {
@@ -185,9 +203,11 @@ export const useChannelStore = defineStore('channelstore', {
     //   }
     // },
 
-    async loadMessages(page: number): Promise<'load_more' | 'no_messages'> {
+    async loadMessages(): Promise<'load_more' | 'no_messages'> {
       if(this.active_channel !== null ) {
-        const messages = await channelService.in(this.active_channel.name)?.loadMessages(this.active_channel.id,page) as SerializedMessage[]
+        const id = this.active_channel.id;
+        const page = this.channels_messages[this.active_channel.name].page
+        const messages = await channelService.in(this.active_channel.name)?.loadMessages(id,page) as SerializedMessage[]
         if(messages.length !== 0) {
           this.AppendMessages(this.active_channel.name,messages)
           return 'load_more'
@@ -202,14 +222,14 @@ export const useChannelStore = defineStore('channelstore', {
     //called in LeftDrawer
     async loadChannels() {
       const channels = await channelService.loadChannels()
-      this.channels = channels;
-
-      this.channels.forEach(async (channel)=>{
+      await channels.forEach(async (channel)=>{
+        console.log(channel.members)
         await this.connectTo(channel.name)
         if(channel.name == 'general'){
           this.SetActiveChannel(channel)
         }
       })
+      this.channels = channels;
     },
 
 
@@ -230,40 +250,36 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-    async leaveChannel(channel_id: number | null) {
+    async leaveChannel():Promise<string> {
 
-      console.log('cau kokot')
-      if(channel_id != null && this.active_channel != null){
+      if(this.active_channel != null){
 
-        const result = await channelService.in(this.active_channel?.name)?.leaveChannel(channel_id)
-        
-        if(result == false )
-        {
-          alert('Odysiel si z kanala')
-          channelService.disconnect(this.active_channel?.name)
+        if(this.active_channel.name !== 'general') {
+          const result = await channelService.in(this.active_channel.name)?.leaveChannel(this.active_channel.id)
 
-          this.channels = this.channels.filter((obj) => {
-            return obj.id !== channel_id;
-          });
+          if(result == false )
+          {
+            await this.disconnectFrom(this.active_channel?.name)
+            return 'Channel left successfully';
 
-          this.SetActiveChannel(this.channels[0])
+          }
+          else if(result == true )
+          {
+            await this.disconnectFrom(this.active_channel?.name)
+            return 'Channel destroyed successfully';
+          }
+          else {
+            return 'Fail'
+          }
+
+        } else {
+          return 'You cannot leave general.'
         }
-        else if(result == true )
-        {
-          alert('Vymazal si kanal')
-          channelService.disconnect(this.active_channel?.name)
 
-          this.channels = this.channels.filter((obj) => {
-            return obj.id !== channel_id;
-          });
-
-          this.SetActiveChannel(this.channels[0])
-        }
-        else(
-          alert('Doslo ku chybe')
-        )
       }
-     
+
+      return 'Fail'
+
     },
 
 

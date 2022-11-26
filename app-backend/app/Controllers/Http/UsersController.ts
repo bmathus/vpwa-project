@@ -8,9 +8,11 @@ import Invite from 'App/Models/Invite';
 export default class UsersController {
   public async register({ request }: HttpContextContract) {
     // if invalid, exception
-    
+    const colorPallete = ['red-4','pink-4','purple-4','indigo-5','primary','cyan-7','teal-5','lime-8','amber-7','brown-4']
+    var randomnumber = Math.floor(Math.random() * (10));
+
     const data = await request.validate(RegisterUserValidator)
-    console.log(request)
+    data.avatar_color = colorPallete[randomnumber]
 
     const user = await User.create(data)
     // join user to general channel
