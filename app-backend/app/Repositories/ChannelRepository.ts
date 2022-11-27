@@ -2,6 +2,7 @@
 import type { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelRepository'
 import User from 'App/Models/User'
 import Channel from 'App/Models/Channel'
+import { Emitter } from '@japa/core'
 
 
 export default class MessageRepository implements ChannelRepositoryContract {
@@ -74,8 +75,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
         }
       }
 
-
-
     }
     catch(error){
       console.log('chyba')
@@ -87,5 +86,18 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
   }
 
+  public async addMembers(user_id: number): Promise<User|null> {
+
+    console.log('hello new member')
+    const user = await User.findBy('id', user_id)
+    return user
+  }
+
+  public async deleteMembers(user_id: number): Promise<User|Error> {
+    console.log('Goodbye former member')
+    
+    const user = await User.findBy('id', user_id)
+    return user
+  }
 
 }

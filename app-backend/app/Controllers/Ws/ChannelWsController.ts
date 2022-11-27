@@ -21,4 +21,17 @@ export default class ChannelControllerWs{
 
   }
 
+  public async updateMembers ({socket}: WsContextContract, user_id: number, action: string) {
+    console.log('from server:', action)
+    if (action == 'add'){
+      const user = await this.chRepository.addMembers(user_id)
+      socket.broadcast.emit('addMember', user)
+    }
+    else{
+      console.log('performing:', action)
+      const user = await this.chRepository.addMembers(user_id)
+      socket.broadcast.emit('deleteMember', user)
+    }
+  }
+
 }

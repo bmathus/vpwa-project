@@ -7,9 +7,11 @@ import {
   SerializedMessage,
   RawMessage,
   ErrorMessage
+
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
+import { useUserStore } from './userstore';
 
 
 
@@ -115,6 +117,7 @@ export const useChannelStore = defineStore('channelstore', {
       this.channels_messages[channel].messages.push(message);
     },
 
+  
     //actions from tutorial part 3
     async connectTo(channel: string) {
       try {
@@ -250,15 +253,23 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-    async leaveChannel():Promise<string> {
+    async UpdateMembers(user_id: number | undefined,  channel_name: string, action: string){
+      console.log('from store:',action)
+     
+      channelService.in(channel_name)?.updateMembers(user_id, action)
+    },
 
-      if(this.active_channel != null){
+
+    async leaveChannel():Promise<string> {
+     
+      if(this.active_channel != null ){
 
         if(this.active_channel.name !== 'general') {
           const result = await channelService.in(this.active_channel.name)?.leaveChannel(this.active_channel.id)
 
           if(result == false )
           {
+            await this.UpdateMembers( useUserStore().user?.id, this.active_channel.name, 'delete')
             await this.disconnectFrom(this.active_channel?.name)
             return 'Channel left successfully';
 
