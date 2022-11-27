@@ -87,12 +87,15 @@ export default {
     })
 
     async function onSubmit() {
-     
+
       const s: string | ApiToken = await userstore.login(credentials)
-      
-      if( typeof s === 'string' && s == 'err')
-      {
-        alert('error')
+
+      if( typeof s === 'string' && s == 'err'){
+        $q.notify({
+          type: 'info',
+          message: 'Wrong email or password.',
+          color: 'red-5',
+        });
       }
       else {
         $router.push({ name: 'home' })
@@ -103,7 +106,7 @@ export default {
             message: 'Welcome back'
           })
       }
-    
+
     }
 
     return {

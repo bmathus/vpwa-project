@@ -25,10 +25,6 @@ Route.get('invitations','UsersController.index_invitations')
 
 Route.group(() => {
   Route.get('/', 'ChannelsController.loadChannels').middleware('auth'); //vrati všetky channels daneho usera
-  Route.get('/:id/messages','ChannelsController.index_messages') //vratenie všetkych messages daneho kanala
-  Route.post('/:id/messages','ChannelsController.store_message') //ulozenie noveho message daneho kanala
-  Route.get('/:id/members','ChannelsController.index_members') //channel members
-  Route.delete('/:id/leave','ChannelsController.leave') //opustenie kanala, ak spravca tak zrušenie kanala, prikazy /quit /cancel
 }).prefix('channels')
 
 Route.group(() => {

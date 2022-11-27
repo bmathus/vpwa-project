@@ -10,7 +10,7 @@
         </template>
         <q-chat-message
           v-for="message in messages"
-          :text="[message.message]"
+          :text="[highlightPing(message.message)]"
           :sent="userIsSender(message)"
           :key="message.id"
           :bg-color="userIsSender(message) ? '' : 'teal-3'"

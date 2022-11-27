@@ -21,7 +21,8 @@
       </div>
       <div class="text-box">
         <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage" />
-        <q-btn flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage" />
+        <q-btn v-if="!sendLoading" flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage" />
+        <q-spinner v-else color="teal" size="sm" :thickness="6" class="send-loading"/>
       </div>
     </div>
   </div>
@@ -44,6 +45,7 @@ export default defineComponent({
     const userstore = useUserStore();
     const messageText = ref('')
     const $q = useQuasar();
+    const sendLoading = ref(false)
 
     //tutorial part 3
     const aChannel = computed(() => {
@@ -136,11 +138,14 @@ export default defineComponent({
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
         let command = messageText.value.split(' ')
-       
+        let text = messageText.value;
+        messageText.value = ''
+        sendLoading.value = true;
+
 
         if (command[0] == '/join' && myPermitions.value.includes('join')) {
 
-          let message_join = messageText.value.split(' ').slice(1)
+          let message_join = text.split(' ').slice(1)
 
           if(message_join[message_join.length - 1] == '\[public\]\n' || message_join[message_join.length - 1] == '\[private\]\n'){ // TODO na join bez []
             message_join.splice(-1, 1)
@@ -150,27 +155,27 @@ export default defineComponent({
           let channel_name = message_join.join(' ')
           let duplicate = store.checkDuplicateChannel(channel_name)
 
-          if (!channel_name.includes('/') && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
+          if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[public\]\n') {
 
-            const message = await store.createChannel(channel_name,'public')
-            if(message != null){
-              notify_event(message)
+            const responce = await store.createChannel(channel_name,'public')
+            if(responce !== 'Channel is created succesfully.'){
+              notify_event(responce)
             }
             else{
               notify_event('Public channel ' + channel_name + ' was created')
             }
-           
+
           }
 
-          else if (!channel_name.includes('/') && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
-            const message = await store.createChannel(channel_name,'private')
-            if(message != null){
-              notify_event(message)
+          else if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[private\]\n') {
+            const responce = await store.createChannel(channel_name,'private')
+            if(responce !== 'Channel is created succesfully.'){
+              notify_event(responce)
             }
             else{
               notify_event('Private channel ' + channel_name + ' was created')
             }
-            
+
           }
 
           else if(!channel_name.includes('/') && duplicate == 1 && channel_name.length <= 20){
@@ -201,9 +206,9 @@ export default defineComponent({
           }
 
         }
-        else if (command[0] == '/cancel' && myPermitions.value.includes('cancel')) {
+        else if (command[0] == '/cancel\n' && myPermitions.value.includes('cancel')) {
 
-          if (messageText.value.split(' ', 2).length > 1) {
+          if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
           else {
@@ -221,7 +226,7 @@ export default defineComponent({
 
         }
         else if (command[0] == '/quit\n' && myPermitions.value.includes('quit')) {
-          if (messageText.value.split(' ', 2).length > 1) {
+          if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
           else {
@@ -234,7 +239,7 @@ export default defineComponent({
 
         else if (command[0] == '/list\n' && myPermitions.value.includes('list')) {
 
-          if (messageText.value.length == 6)
+          if (text.length == 6)
             store.toogleMembersDialog()
           else {
             notify_event('Incorrect command')
@@ -242,7 +247,7 @@ export default defineComponent({
         }
         else if (command[0] == '/revoke' && myPermitions.value.includes('revoke')) {
 
-          let command = messageText.value.split(' ', 2)
+          let command = text.split(' ', 2)
 
           if (command[0] == '/revoke') {
 
@@ -265,8 +270,8 @@ export default defineComponent({
           }
 
         }
-        else if (messageText.value.includes('/kick') && myPermitions.value.includes('kick')) {
-          let command = messageText.value.split(' ', 2)
+        else if (text.includes('/kick') && myPermitions.value.includes('kick')) {
+          let command = text.split(' ', 2)
 
           if (command[0] == '/kick') {
 
@@ -292,8 +297,8 @@ export default defineComponent({
             notify_event('Incorrect command')
           }
         }
-        else if (messageText.value.includes('/invite') && myPermitions.value.includes('invite')) {
-          let command = messageText.value.split(' ', 2)
+        else if (text.includes('/invite') && myPermitions.value.includes('invite')) {
+          let command = text.split(' ', 2)
 
           if (command[0] == '/invite') {
             notify_event('You invited user X')
@@ -304,11 +309,10 @@ export default defineComponent({
           }
         }
         else {
-          await store.addMessage({channel: aChannel.value, message: messageText.value})
+          await store.addMessage({channel: aChannel.value, message: text})
 
         }
-
-        messageText.value = ''
+        sendLoading.value = false;
       }
     }
 
@@ -371,6 +375,7 @@ export default defineComponent({
       showLiveTyping,
       hideLiveTyping,
       shownMember,
+      sendLoading
     }
   }
 })
@@ -406,6 +411,11 @@ export default defineComponent({
   right: 4px;
 }
 
+.text-box .send-loading {
+  position: absolute;
+  bottom: 22px;
+  right: 22px;
+}
 
 /* live typing classes */
 .nowtyping-box,

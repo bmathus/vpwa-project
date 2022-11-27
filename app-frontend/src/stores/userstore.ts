@@ -123,7 +123,7 @@ export const useUserStore = defineStore('userstore', {
       try {
         this.AuthStart();
         await authService.logout();
-        await this.channelstore.disconnectFrom(null)
+        await this.channelstore.disconnectFrom(null,false)
         this.AuthSuccess(null);
         authManager.removeToken();
       } catch (err: any) {

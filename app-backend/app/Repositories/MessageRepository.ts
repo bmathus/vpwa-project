@@ -2,10 +2,11 @@
 import type { MessageRepositoryContract, SerializedMessage } from '@ioc:Repositories/MessageRepository'
 import Channel from 'App/Models/Channel'
 import Message from 'App/Models/Message'
+import { DateTime } from 'luxon'
 
 
 export default class MessageRepository implements MessageRepositoryContract {
-  public async getAll(channelId: number, page: number): Promise<SerializedMessage[]> {
+  public async getAll(channelId: number, page: number,fromMessageDateTime: string): Promise<SerializedMessage[]> {
 
     // const channel = await Channel.query()
     //   .where('name', channelName)
@@ -19,7 +20,10 @@ export default class MessageRepository implements MessageRepositoryContract {
 
     const messages = await Message
       .query()
-      .where('channel_id',channelId)
+      .where((query) => {
+        query.where('channel_id',channelId)
+        .where('send_at','<',fromMessageDateTime === 'now' ? DateTime.now().toISO() : fromMessageDateTime)
+      })
       .orderBy('send_at','desc')
       .preload('user',(userQuery) => {
         userQuery.select('id','nickname','avatar_color')

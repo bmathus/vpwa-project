@@ -11,9 +11,6 @@ import {
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
-import { useUserStore } from './userstore';
-
-
 
 interface InfiniteScroll {
   stopOnLoad: () => void;
@@ -88,7 +85,8 @@ export const useChannelStore = defineStore('channelstore', {
       } else {
         this.channels_messages[channelName] = {
           messages: messages,
-          page:1
+          page:1,
+          firstReceivedDateTime:'now'
         }
       }
     },
@@ -97,7 +95,8 @@ export const useChannelStore = defineStore('channelstore', {
       this.loading = false;
       this.channels_messages[channelName] = {
         messages:[],
-        page:1
+        page:1,
+        firstReceivedDateTime:'now'
       }
     },
 
@@ -115,9 +114,12 @@ export const useChannelStore = defineStore('channelstore', {
     },
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
       this.channels_messages[channel].messages.push(message);
+      if(this.active_channel?.name == channel) {
+        this.scrollToBottom(true)
+      }
+
     },
 
-  
     //actions from tutorial part 3
     async connectTo(channel: string) {
       try {
@@ -130,7 +132,7 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    async disconnectFrom(channelName: string | null) {
+    async disconnectFrom(channelName: string | null,setGeneral: boolean) {
 
       let leaving: string[] = []
       if(channelName !== null) { //odpajame sa z daneho kanala
@@ -140,7 +142,9 @@ export const useChannelStore = defineStore('channelstore', {
           return channel.name !== channelName;
         });
 
-        this.SetActiveChannel(this.channels[0]) //general bude default
+        if(setGeneral) {
+          this.SetActiveChannel(this.channels[0]) //general bude default
+        }
 
       }else {// odpajame sa zo vsetkých -> použite pri loggount
         leaving = this.getChannelsNames
@@ -153,13 +157,14 @@ export const useChannelStore = defineStore('channelstore', {
         delete this.channels_messages[channelName]
       })
 
-
     },
 
     async addMessage({ channel, message }: { channel: string, message: RawMessage }) {
       const newMessage = await channelService.in(channel)?.addMessage(message) as SerializedMessage
+      if(this.channels_messages[channel].firstReceivedDateTime === 'now') {
+        this.channels_messages[channel].firstReceivedDateTime = newMessage.send_at;
+      }
       this.NewMessage({channel,message: newMessage})
-      this.scrollToBottom(true);
     },
 
     //template controll actions
@@ -210,7 +215,9 @@ export const useChannelStore = defineStore('channelstore', {
       if(this.active_channel !== null ) {
         const id = this.active_channel.id;
         const page = this.channels_messages[this.active_channel.name].page
-        const messages = await channelService.in(this.active_channel.name)?.loadMessages(id,page) as SerializedMessage[]
+        const firstReceivedDateTime = this.channels_messages[this.active_channel.name].firstReceivedDateTime
+
+        const messages = await channelService.in(this.active_channel.name)?.loadMessages(id,page,firstReceivedDateTime) as SerializedMessage[]
         if(messages.length !== 0) {
           this.AppendMessages(this.active_channel.name,messages)
           return 'load_more'
@@ -236,21 +243,21 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
 
-    async createChannel(channel_name: string, type:'public'|'private'): Promise<string|null> {
-
+    async createChannel(channel_name: string, type:'public'|'private'): Promise<string> {
       const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
 
-      if (new_channel as Channel) {
+      if (new_channel !== 'Channel already exists.') {
         this.channels.push(new_channel as Channel)
-        this.SetActiveChannel(new_channel as Channel)
         await this.connectTo((new_channel as Channel).name)
-        return null
-      } else if (new_channel as ErrorMessage) {
-        console.log((new_channel as ErrorMessage).message)
-        return (new_channel as ErrorMessage).message
+        this.SetActiveChannel(new_channel as Channel)
+        return 'Channel is created succesfully.'
+
+      } else if (new_channel === 'Channel already exists.') { //channel exists
+
+        return new_channel
       } else {
-        console.log('error pri vytvarani kanala')
-        return 'error pri vytvarani kanala'
+
+        return 'Error when creating channel.'
       }
 
     },
@@ -261,8 +268,8 @@ export const useChannelStore = defineStore('channelstore', {
 
       if (new_channel as Channel) {
         this.channels.push(new_channel as Channel)
-        this.SetActiveChannel(new_channel as Channel)
         await this.connectTo((new_channel as Channel).name)
+        this.SetActiveChannel(new_channel as Channel)
 
       } else if (new_channel as ErrorMessage) {
         console.log((new_channel as ErrorMessage).message)
@@ -272,15 +279,15 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-    async UpdateMembers(user_id: number | undefined,  channel_name: string, action: string){
-      console.log('from store:',action)
-     
-      channelService.in(channel_name)?.updateMembers(user_id, action)
-    },
+    // async UpdateMembers(user_id: number | undefined,  channel_name: string, action: string){
+    //   console.log('from store:',action)
+
+
+    // },
 
 
     async leaveChannel():Promise<string> {
-     
+
       if(this.active_channel != null ){
 
         if(this.active_channel.name !== 'general') {
@@ -288,14 +295,14 @@ export const useChannelStore = defineStore('channelstore', {
 
           if(result == false )
           {
-            await this.UpdateMembers( useUserStore().user?.id, this.active_channel.name, 'delete')
-            await this.disconnectFrom(this.active_channel?.name)
+            await channelService.in(this.active_channel.name)?.updateMembers('deleteMember',this.active_channel.members,this.active_channel.id)
+            await this.disconnectFrom(this.active_channel?.name,true)
             return 'Channel left successfully';
 
           }
           else if(result == true )
           {
-            await this.disconnectFrom(this.active_channel?.name)
+            await this.disconnectFrom(this.active_channel?.name,true)
             return 'Channel destroyed successfully';
           }
           else {
