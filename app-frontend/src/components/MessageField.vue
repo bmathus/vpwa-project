@@ -135,12 +135,14 @@ export default defineComponent({
 
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
-        if (messageText.value.includes('/join') && myPermitions.value.includes('join')) {
+        let command = messageText.value.split(' ')
+       
 
-          let command = messageText.value.split(' ')
+        if (command[0] == '/join' && myPermitions.value.includes('join')) {
+
           let message_join = messageText.value.split(' ').slice(1)
 
-          if(message_join[-1] == '\[public\]\n' || message_join[-1] == '\[private\]\n'){ // TODO na join bez []
+          if(message_join[message_join.length - 1] == '\[public\]\n' || message_join[message_join.length - 1] == '\[private\]\n'){ // TODO na join bez []
             message_join.splice(-1, 1)
           }
 
@@ -148,15 +150,41 @@ export default defineComponent({
           let channel_name = message_join.join(' ')
           let duplicate = store.checkDuplicateChannel(channel_name)
 
-          if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
+          if (!channel_name.includes('/') && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[public\]\n') {
 
-            await store.createChannel(channel_name,'public')
-            notify_event('Public channel ' + channel_name + ' was created')
+            const message = await store.createChannel(channel_name,'public')
+            if(message != null){
+              notify_event(message)
+            }
+            else{
+              notify_event('Public channel ' + channel_name + ' was created')
+            }
+           
           }
-          else if (!channel_name.includes('/') && duplicate == 1 && command[0] == '/join' && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
-            await store.createChannel(channel_name,'private')
-            notify_event('Private channel ' + channel_name + ' was created')
+
+          else if (!channel_name.includes('/') && channel_name.length <= 20 && messageText.value.split(' ').pop() == '\[private\]\n') {
+            const message = await store.createChannel(channel_name,'private')
+            if(message != null){
+              notify_event(message)
+            }
+            else{
+              notify_event('Private channel ' + channel_name + ' was created')
+            }
+            
           }
+
+          else if(!channel_name.includes('/') && duplicate == 1 && channel_name.length <= 20){
+            const message = await store.joinChannel(channel_name)
+
+            if(message != null){
+              notify_event(message)
+            }
+            else{
+              notify_event('You have joined ' + channel_name)
+            }
+
+          }
+
           else {
 
             if (channel_name.includes('/')) {
@@ -173,7 +201,7 @@ export default defineComponent({
           }
 
         }
-        else if (messageText.value.includes('/cancel') && myPermitions.value.includes('cancel')) {
+        else if (command[0] == '/cancel' && myPermitions.value.includes('cancel')) {
 
           if (messageText.value.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
@@ -192,7 +220,7 @@ export default defineComponent({
 
 
         }
-        else if (messageText.value.includes('/quit') && myPermitions.value.includes('quit')) {
+        else if (command[0] == '/quit\n' && myPermitions.value.includes('quit')) {
           if (messageText.value.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
@@ -204,7 +232,7 @@ export default defineComponent({
 
         }
 
-        else if (messageText.value.includes('/list') && myPermitions.value.includes('list')) {
+        else if (command[0] == '/list\n' && myPermitions.value.includes('list')) {
 
           if (messageText.value.length == 6)
             store.toogleMembersDialog()
@@ -212,7 +240,7 @@ export default defineComponent({
             notify_event('Incorrect command')
           }
         }
-        else if (messageText.value.includes('/revoke') && myPermitions.value.includes('revoke')) {
+        else if (command[0] == '/revoke' && myPermitions.value.includes('revoke')) {
 
           let command = messageText.value.split(' ', 2)
 

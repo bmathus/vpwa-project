@@ -1,5 +1,5 @@
 // @ts-ignore
-import type { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelRepository'
+import { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelRepository'
 import User from 'App/Models/User'
 import Channel from 'App/Models/Channel'
 import { Emitter } from '@japa/core'
@@ -47,6 +47,41 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     }
   }
+
+  public async join(user: User, channel_name:string): Promise<Channel|Error> {
+
+    const channel = await Channel.findBy('name', channel_name)
+    let members = await channel?.related('users').query().select('id')
+    
+    if (channel == null) {
+      return {
+        
+        message:'This channel doesnt exist'
+      } as Error
+    }
+    else if (channel?.type == 'private') {
+      return {
+        
+        message:'Cannot join private channels'
+      } as Error
+      
+    }
+    else if ( members != undefined && members.find(i => i.id == user.id) != undefined) {
+      return {
+        
+        message:'You are already a member of this channel'
+      } as Error
+      
+    }
+    else {
+
+      //members = await channel.related('users').attach({user}) TODO
+
+      return
+      
+    }
+  }
+
 
   public async leave(user: User, channel_id: number): Promise<Boolean|Error> {
     try {

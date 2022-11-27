@@ -49,6 +49,10 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('createChannel',channelName,type)
   }
 
+  public joinChannel (channelName: string): Promise<Channel|ErrorMessage> {
+    return this.emitAsync('joinChannel',channelName)
+  }
+
   public leaveChannel (channel_id: number): Promise<boolean|ErrorMessage> {
     return this.emitAsync('leaveChannel',channel_id)
   }

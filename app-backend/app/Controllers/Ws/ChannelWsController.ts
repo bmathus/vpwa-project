@@ -15,6 +15,12 @@ export default class ChannelControllerWs{
 
   }
 
+  public async joinChannel ({auth}: WsContextContract, channel_name: string) {
+    const channel = await this.chRepository.join(auth.user,channel_name);
+    return channel
+
+  }
+
   public async leaveChannel ({auth}: WsContextContract, channel_id: number) {
     const result = await this.chRepository.leave(auth.user, channel_id);
     return result

@@ -236,9 +236,28 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
 
-    async createChannel(channel_name: string, type:'public'|'private') {
+    async createChannel(channel_name: string, type:'public'|'private'): Promise<string|null> {
 
       const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
+
+      if (new_channel as Channel) {
+        this.channels.push(new_channel as Channel)
+        this.SetActiveChannel(new_channel as Channel)
+        await this.connectTo((new_channel as Channel).name)
+        return null
+      } else if (new_channel as ErrorMessage) {
+        console.log((new_channel as ErrorMessage).message)
+        return (new_channel as ErrorMessage).message
+      } else {
+        console.log('error pri vytvarani kanala')
+        return 'error pri vytvarani kanala'
+      }
+
+    },
+
+    async joinChannel(channel_name: string) {
+
+      const new_channel = await channelService.in('general')?.joinChannel(channel_name)
 
       if (new_channel as Channel) {
         this.channels.push(new_channel as Channel)
