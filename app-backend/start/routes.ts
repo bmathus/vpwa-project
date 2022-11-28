@@ -21,7 +21,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 //všetky pozvanky ktore prisli použivatelovi na pridanie sa do kanalov
-Route.get('invitations','UsersController.index_invitations')
+Route.get('invitations','UsersController.loadInvitations').middleware('auth')
 
 Route.group(() => {
   Route.get('/', 'ChannelsController.loadChannels').middleware('auth'); //vrati všetky channels daneho usera

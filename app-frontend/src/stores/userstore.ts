@@ -2,24 +2,7 @@
 import { defineStore } from 'pinia';
 import { Invitation, User, Status, RegisterData, LoginCredentials } from '../contracts';
 import { useChannelStore } from './channelstore';
-import { authManager, authService } from 'src/services';
-
-const dummyInvitations: Invitation[] = [
-  {
-    id: 1,
-    channel_id: 23438,
-    admin_id: 72,
-    channel_name: 'Channel 78',
-    is_public: false,
-  },
-  {
-    id: 2,
-    channel_id: 23438,
-    admin_id: 72,
-    channel_name: 'Channel 78',
-    is_public: true,
-  },
-];
+import { authManager, authService, channelService } from 'src/services';
 
 // const defaultUser: User = {
 //   id: 2,
@@ -30,6 +13,7 @@ const dummyInvitations: Invitation[] = [
 //   avatar_color: 'primary',
 // };
 
+
 export const useUserStore = defineStore('userstore', {
   state: () => ({
     user: null as User | null,
@@ -37,7 +21,7 @@ export const useUserStore = defineStore('userstore', {
     auth_status: 'pending' as 'pending' | 'success' | 'error',
     errors: [] as { message: string; field?: string }[],
 
-    invitations: dummyInvitations as Invitation[],
+    invitations: [] as Invitation[],
     channelstore: useChannelStore(),
   }),
 
@@ -130,6 +114,27 @@ export const useUserStore = defineStore('userstore', {
         this.AuthError(err);
         throw err;
       }
+    },
+
+    async loadInvitations(){
+      const invitations = await channelService.loadInvitations()
+      
+      for(let i=0; i<invitations.length;i++)
+      {
+        console.log('channel',invitations[i].channel)
+        const inv: Invitation = {id: invitations[i].id, channel_id:  invitations[i].channel_id,
+           admin_id: 0, channel_name: invitations[i].channel.name, is_public: invitations[i].type}
+        this.invitations.push(inv)
+      }
+     
+      console.log('invatations:', this.invitations)
+      
+    },
+
+    async inviteUser(user: number, channel: number, target_user: string){
+
+      channelService.in('general')?.inviteUser(user, channel, target_user)
+      
     },
 
     ////////

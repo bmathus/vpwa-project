@@ -82,4 +82,12 @@ export default class ChannelControllerWs{
     }
   }
 
+  public async inviteUser ({socket}: WsContextContract, user_id: number, channel_id: number, targetuser: string) {
+
+    console.log('hello')
+
+    const invitation = await this.chRepository.invite(user_id, channel_id, targetuser)
+
+  }
+
 }

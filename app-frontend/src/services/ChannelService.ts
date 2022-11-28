@@ -95,6 +95,10 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('updateChannelMembers',action,members,channelId)
   }
 
+  public inviteUser (user_id: number, channel_id: number, targetname: string) {
+    return this.emitAsync('inviteUser', user_id, channel_id, targetname)
+  }
+
 }
 
 class ChannelService {
@@ -133,8 +137,12 @@ class ChannelService {
 
   }
 
+  async loadInvitations(): Promise<any[]> {
+    const response = await api.get<any[]>('/invitations');
+   
+    return response.data;
 
-
+  }
 
 }
 

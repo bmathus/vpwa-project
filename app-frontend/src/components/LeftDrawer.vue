@@ -108,6 +108,9 @@ export default defineComponent({
     const channelsLoading = ref(false);
 
     channelsLoading.value = true;
+
+    userstore.loadInvitations() // toto je zodpovedne za nacitanie Invitation cez http
+
     store.loadChannels().then(()=>{
       channelsLoading.value = false;
       console.log(store.channels)

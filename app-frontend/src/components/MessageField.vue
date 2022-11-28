@@ -270,7 +270,7 @@ export default defineComponent({
           }
 
         }
-        else if (text.includes('/kick') && myPermitions.value.includes('kick')) {
+        else if (command[0] == '/kick' && myPermitions.value.includes('kick')) {
           let command = text.split(' ', 2)
 
           if (command[0] == '/kick') {
@@ -297,10 +297,12 @@ export default defineComponent({
             notify_event('Incorrect command')
           }
         }
-        else if (text.includes('/invite') && myPermitions.value.includes('invite')) {
+        else if (command[0] == '/invite' && myPermitions.value.includes('invite')) {
           let command = text.split(' ', 2)
 
-          if (command[0] == '/invite') {
+          if (command[0] == '/invite' && command.length == 2 && userstore.user != null && store.active_channel != null) {
+            command[1] = command[1].replace(/(\r\n|\n|\r)/gm, '')
+            userstore.inviteUser(userstore.user.id, store.active_channel.id, command[1])
             notify_event('You invited user X')
 
           }

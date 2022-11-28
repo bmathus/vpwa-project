@@ -2,6 +2,8 @@
 import { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelRepository'
 import User from 'App/Models/User'
 import Channel from 'App/Models/Channel'
+import Invite from 'App/Models/Invite'
+import { DateTime } from 'luxon/src/datetime'
 
 export default class MessageRepository implements ChannelRepositoryContract {
   public async getAll(user: User): Promise<Channel[]> {
@@ -22,7 +24,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
     }) as Channel[];
     return channels
   }
-
 
   public async create(user: User, channel_name:string, type: 'public'|'private' ): Promise<Channel | string> {
 
@@ -78,5 +79,19 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     }
   }
+
+  public async invite(user_id: number, channel_id: number, target_name: string): Promise<Channel|Error> {
+
+    const user = await User.findBy('nickname', target_name)
+    if(user != null){
+
+      const invite = await Invite.create({ channel_id:  channel_id, sender_id: user_id, user_id: user.id})
+    }
+   
+
+  }
+
+
+
 
 }

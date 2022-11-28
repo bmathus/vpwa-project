@@ -38,7 +38,7 @@ export default class UsersController {
     return auth.user
   }
 
-  public async index_invitations() {
+  /*public async index_invitations() {
       const user_id = 2 //id usera ktory bude prihlaseny
 
       const invites = await Invite.query().where('user_id',user_id)
@@ -48,5 +48,25 @@ export default class UsersController {
           query.select('id','nickname')
       })
       return invites
+  }*/
+
+  
+  public async loadInvitations({auth}: HttpContextContract) {
+   
+    if(auth.user != undefined)
+    {
+      const invites = await Invite.query().where('user_id',auth.user.id)
+      .preload('channel',(query)=>{
+          query.select('id','name')
+      }).preload('sender',(query)=>{
+          query.select('id','nickname')
+      })
+      return invites
+     
+    }
+   
+    
   }
+
+  
 }
