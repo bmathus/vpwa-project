@@ -72,7 +72,6 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
-    //mustations from tutorial part 3
     LoadingStart() {
       this.loading = true;
       this.error = null;
@@ -106,9 +105,6 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
     SetActiveChannel(channel: Channel) {
-      //const numOfMessages = this.channels_messages[channel.name].messages.length
-      //this.channels_messages[channel.name].page = Math.floor(numOfMessages/8) + 1;
-
       this.active_channel = channel;
       //this.scrollToBottom(false);
     },
@@ -166,50 +162,6 @@ export const useChannelStore = defineStore('channelstore', {
       }
       this.NewMessage({channel,message: newMessage})
     },
-
-    //template controll actions
-    stopMessagesLoading(): void {
-      this.infiniteScroll.stopOnLoad();
-    },
-    resumeMessagesLoading(): void {
-      this.infiniteScroll.resumeOnLoad();
-    },
-    scrollToBottom(smooth: boolean): void {
-      setTimeout(() => {
-        this.infiniteScroll.scrollBottom(smooth);
-      }, 0.001);
-    },
-    toogleMembersDialog(): void {
-      this.stopMessagesLoading();
-
-      setTimeout(() => {
-        this.membersDialogOpen = !this.membersDialogOpen;
-      }, 20);
-    },
-
-    // pushMessage(message: string, user: User | null): void {
-    //   const date = new Date();
-    //   if (this.active_channel !== null) {
-    //     this.channels_messages[this.active_channel.id.toString()].messages.push(
-    //       {
-    //         id: Date.now(),
-    //         message: message,
-    //         send_at: `${date.getDate()}-${date.getMonth()}-${date.getFullYear()} ${date.getHours()}:${date.getMinutes()}`,
-    //         user_id: user == null ? 0 : user.id,
-    //         sender_nickname: user == null ? '' : user.nickname,
-    //       }
-    //     );
-    //     this.scrollToBottom(true);
-    //   }
-    // },
-
-    // fetchMessages(): void {
-    //   if (this.active_channel !== null) {
-    //     this.channels_messages[this.active_channel.id.toString()].messages.push(
-    //       ...dummyMessages
-    //     );
-    //   }
-    // },
 
     async loadMessages(): Promise<'load_more' | 'no_messages'> {
       if(this.active_channel !== null ) {
@@ -279,13 +231,6 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-    // async UpdateMembers(user_id: number | undefined,  channel_name: string, action: string){
-    //   console.log('from store:',action)
-
-
-    // },
-
-
     async leaveChannel():Promise<string> {
 
       if(this.active_channel != null ){
@@ -318,6 +263,8 @@ export const useChannelStore = defineStore('channelstore', {
       return 'Fail'
 
     },
+
+
 
 
     makeRevoke(nickname: string): number {
@@ -366,6 +313,26 @@ export const useChannelStore = defineStore('channelstore', {
         }
       }
       return 1;
+    },
+
+    //template controll actions
+    stopMessagesLoading(): void {
+      this.infiniteScroll.stopOnLoad();
+    },
+    resumeMessagesLoading(): void {
+      this.infiniteScroll.resumeOnLoad();
+    },
+    scrollToBottom(smooth: boolean): void {
+      setTimeout(() => {
+        this.infiniteScroll.scrollBottom(smooth);
+      }, 0.001);
+    },
+    toogleMembersDialog(): void {
+      this.stopMessagesLoading();
+
+      setTimeout(() => {
+        this.membersDialogOpen = !this.membersDialogOpen;
+      }, 20);
     },
   },
 });

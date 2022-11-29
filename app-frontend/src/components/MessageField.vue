@@ -302,7 +302,7 @@ export default defineComponent({
 
           if (command[0] == '/invite' && command.length == 2 && userstore.user != null && store.active_channel != null) {
             command[1] = command[1].replace(/(\r\n|\n|\r)/gm, '')
-            userstore.inviteUser(userstore.user.id, store.active_channel.id, command[1])
+            await userstore.inviteUser(command[1])
             notify_event('You invited user X')
 
           }

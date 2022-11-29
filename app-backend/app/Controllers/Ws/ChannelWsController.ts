@@ -4,6 +4,7 @@ import type { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelR
 import Channel from 'App/Models/Channel';
 import { WsContextContract } from '@ioc:Ruby184/Socket.IO/WsContext';
 import User from 'App/Models/User';
+import Invite from 'App/Models/Invite';
 
 
 export interface Member {
@@ -82,11 +83,68 @@ export default class ChannelControllerWs{
     }
   }
 
-  public async inviteUser ({socket}: WsContextContract, user_id: number, channel_id: number, targetuser: string) {
+  public async inviteUser ({socket,auth}: WsContextContract,targetUserNickname: string,channelId: number,channelName: string) {
 
-    console.log('hello')
 
-    const invitation = await this.chRepository.invite(user_id, channel_id, targetuser)
+    const targetUser = await User.query().where('nickname',targetUserNickname).first()
+    await targetUser?.load('channels',(query)=> {
+      query.where('channels.id',channelId)
+    })
+
+    if(targetUser?.channels.length === 0) {
+
+      await targetUser?.load('invites',(query) => {
+        query.where('channel_id',channelId)
+      })
+
+      if(targetUser?.invites.length === 0) {
+
+        const invite = await Invite.create({
+          user_id:targetUser.id,
+          sender_id:auth.user?.id,
+          channel_id:channelId
+        })
+
+        const newInvite = {
+          id: invite.id,
+          user_id: targetUser.id,
+          sender: {
+            id: auth.user?.id,
+            nickname: auth.user?.nickname
+          },
+          channel: {
+            id:channelId,
+            name: channelName
+          }
+        }
+
+        socket.broadcast.emit('invite', newInvite)
+
+        return 'Invited.'
+
+
+      } else {
+        return 'User is already invited to this channel.'
+      }
+
+
+    } else {
+      return 'User is already member of this channel.'
+    }
+
+    // const userInChannel = await User.query().whereHas('channels',(channelQuery) => {
+    //   channelQuery.where('name',channelName)
+    // }).where('nickname',targetUserNickname)
+
+
+
+    //check ci targer user uz nieje v kanaly already
+    //check ci target user uz nema nahodou invite do tohto kanala aby nebol spamovany rovnakymi
+
+
+    //console.log(channelName + ' ' + targetUserNickname)
+    //console.log(channelId + ' ' + targetUserNickname)
+    //const invitation = await this.chRepository.invite(user_id, channel_id, targetuser)
 
   }
 

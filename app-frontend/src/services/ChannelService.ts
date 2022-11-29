@@ -1,8 +1,9 @@
-import { RawMessage, SerializedMessage, Channel,ErrorMessage,Member } from 'src/contracts'
+import { RawMessage, SerializedMessage, Channel,ErrorMessage,Member, Invitation } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import {useChannelStore} from '../stores/channelstore'
 import { api } from 'src/boot/axios';
 import { useQuasar } from 'quasar';
+import { useUserStore } from 'src/stores/userstore';
 
 // creating instance of this class automatically connects to given socket.io namespace
 // subscribe is called with boot params, so you can use it to dispatch actions for socket events
@@ -11,6 +12,8 @@ class ChannelSocketManager extends SocketManager {
   public subscribe (): void {
     const channel = this.namespace.split('/').pop() as string
     const channelstore = useChannelStore()
+    const userstore = useUserStore()
+
 
     this.socket.on('message', (message: SerializedMessage) => {
       console.log(message)
@@ -69,6 +72,12 @@ class ChannelSocketManager extends SocketManager {
 
     })
 
+    this.socket.on('invite',(newInvite: Invitation) => {
+      if(newInvite.user_id === userstore.getUserId) {
+        userstore.addReceivedInvitation(newInvite)
+      }
+    })
+
   }
 
   public addMessage (message: RawMessage): Promise<SerializedMessage> {
@@ -95,8 +104,8 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('updateChannelMembers',action,members,channelId)
   }
 
-  public inviteUser (user_id: number, channel_id: number, targetname: string) {
-    return this.emitAsync('inviteUser', user_id, channel_id, targetname)
+  public inviteUser (targetUserNickname: string,channelId: number, channelName: string) {
+    return this.emitAsync('inviteUser', targetUserNickname,channelId,channelName)
   }
 
 }
@@ -137,11 +146,9 @@ class ChannelService {
 
   }
 
-  async loadInvitations(): Promise<any[]> {
-    const response = await api.get<any[]>('/invitations');
-   
+  async loadInvitations(): Promise<Invitation[]> {
+    const response = await api.get<Invitation[]>('/invitations');
     return response.data;
-
   }
 
 }

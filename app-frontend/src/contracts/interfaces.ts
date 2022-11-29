@@ -25,10 +25,15 @@ export interface Member {
 
 export interface Invitation {
   id: number;
-  channel_id: number;
-  admin_id: number;
-  channel_name: string;
-  is_public: boolean;
+  user_id: number,
+  sender: {
+    id: number,
+    nickname: string
+  }
+  channel: {
+    id: number
+    name: string,
+  }
 }
 
 export interface ErrorMessage {

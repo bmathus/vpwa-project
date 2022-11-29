@@ -16,7 +16,7 @@
           :bg-color="userIsSender(message) ? '' : 'teal-3'"
           text-html>
           <template v-slot:name>{{ message.user.nickname }}</template>
-          <template v-slot:stamp>{{ message.send_at }}</template>
+          <template v-slot:stamp>{{ formatDateTime(message.send_at) }}</template>
           <template v-slot:avatar>
             <q-avatar rounded :color="message.user.avatar_color" text-color="dark" :class="messageClass(userIsSender(message))"
               style="height:35px; width:35px">
@@ -53,6 +53,10 @@ export default {
 
     function userIsSender(message: SerializedMessage): boolean {
       return message.user.id === userstore.getUserId
+    }
+
+    function formatDateTime(sendAt: string) {
+      return sendAt.slice(11,19) + ' ' + sendAt.slice(0,10)
     }
 
 
@@ -134,6 +138,7 @@ export default {
       highlightPing,
       scrolltobox,
       messages,
+      formatDateTime
     }
   }
 }

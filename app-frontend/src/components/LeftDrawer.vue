@@ -9,7 +9,7 @@
       </q-btn>
       <div class="text-subtitle2 text-weight-bolder">{{ userstore.getUserNickname }}</div>
 
-      <q-linear-progress query class="absolute-bottom" size="xs" color="teal" v-if="channelsLoading"/>
+      <q-linear-progress query class="absolute-bottom" size="xs" color="teal" v-if="contentLoading"/>
       <q-separator v-else class="absolute-bottom"/>
     </div>
 
@@ -18,13 +18,13 @@
       <q-list dense>
 
         <q-expansion-item dense dense-toggle expand-separator label="Invitations" default-opened class="text-subtitle2">
-          <template v-for="invite in userstore.getInvitations" :key="invite.id">
+          <template v-for="invite in invitations" :key="invite.id">
             <q-item dense clickable>
               <q-item-section :channel_id="invite.id" class="text-subtitle2">
                 <div row>
 
                   <q-icon name="mail" size="18px" />
-                  {{ invite.channel_name }}
+                  {{ invite.channel.name}}
                 </div>
               </q-item-section>
               <accept-invitation :invitation="invite" />
@@ -105,15 +105,19 @@ export default defineComponent({
     const store = useChannelStore();
     const userstore = useUserStore();
     const dialogIsOpen = ref(false);
-    const channelsLoading = ref(false);
+    const contentLoading = ref(false);
 
-    channelsLoading.value = true;
+    initialContentLoad()
 
-    userstore.loadInvitations() // toto je zodpovedne za nacitanie Invitation cez http
+    async function initialContentLoad() {
+      contentLoading.value = true;
+      await store.loadChannels();
+      await userstore.loadInvitations();
+      contentLoading.value = false;
+    }
 
-    store.loadChannels().then(()=>{
-      channelsLoading.value = false;
-      console.log(store.channels)
+    const invitations = computed(()=> {
+      return userstore.getInvitations
     })
 
     const publicChannels = computed(()=> {
@@ -132,6 +136,7 @@ export default defineComponent({
 
     function setActiveChannel(channel: Channel) {
       store.SetActiveChannel(channel)
+      store.infiniteScroll.scrollBottom(true)
     }
 
     //dialog controll
@@ -159,9 +164,10 @@ export default defineComponent({
       userstore,
       nicknameUpper,
       setActiveChannel,
-      channelsLoading,
+      contentLoading,
       publicChannels,
-      privateChannels
+      privateChannels,
+      invitations
     }
   }
 
