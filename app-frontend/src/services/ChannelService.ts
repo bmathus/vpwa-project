@@ -37,23 +37,17 @@ class ChannelSocketManager extends SocketManager {
 
     })
 
-    this.socket.on('deleteMember', (members: Member[],channelId: number) => {
-      console.log('emitnem sa')
-      const chIndex = channelstore.channels.findIndex((channel) => channel.id === channelId)
+    this.socket.on('deleteMember', (userId: number) => {
+      const chIndex = channelstore.channels.findIndex((ch) => ch.name === channel)
 
       if(chIndex !== -1) {
-        channelstore.channels[chIndex].members = members;
+        channelstore.channels[chIndex].members = channelstore.channels[chIndex].members.filter(
+          (member) => member.id !== userId
+        );
       }
 
-      // if(channelstore.active_channel != null)
-      // {
-      //   channelstore.active_channel.members = channelstore.active_channel?.members.filter(
-      //     (member) => member.id !== user.id
-      //   );
-      //   console.log(user)
-      // }
-
     })
+
     this.socket.on('channelCanceled',(channelName: string) => {
       const $q = useQuasar()
       if(channelstore.getActiveChannel?.name == channelName) {
@@ -104,7 +98,7 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('updateChannelMembers',action,members,channelId)
   }
 
-  public inviteUser (targetUserNickname: string,channelId: number, channelName: string) {
+  public inviteUser (targetUserNickname: string,channelId: number, channelName: string): Promise<string> {
     return this.emitAsync('inviteUser', targetUserNickname,channelId,channelName)
   }
 

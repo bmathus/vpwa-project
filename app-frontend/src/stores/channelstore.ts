@@ -240,7 +240,7 @@ export const useChannelStore = defineStore('channelstore', {
 
           if(result == false )
           {
-            await channelService.in(this.active_channel.name)?.updateMembers('deleteMember',this.active_channel.members,this.active_channel.id)
+            //await channelService.in(this.active_channel.name)?.updateMembers('deleteMember',this.active_channel.members,this.active_channel.id)
             await this.disconnectFrom(this.active_channel?.name,true)
             return 'Channel left successfully';
 

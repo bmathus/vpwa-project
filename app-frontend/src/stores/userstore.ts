@@ -111,18 +111,19 @@ export const useUserStore = defineStore('userstore', {
       this.invitations = invitations;
     },
 
-    async inviteUser(targetUserNickname: string){
+    async inviteUser(targetUserNickname: string): Promise<string>{
       const activeChannel = this.channelstore.getActiveChannel;
       if(activeChannel !== null) {
-        await channelService.in('general')?.inviteUser(targetUserNickname,activeChannel.id,activeChannel.name);
+        const responce = await channelService.in('general')?.inviteUser(targetUserNickname,activeChannel.id,activeChannel.name);
+        return responce !== undefined ? responce : 'Error when inviting user'
       }
+      return 'Error when inviting user'
     },
 
     addReceivedInvitation(invitation: Invitation) {
       this.invitations.push(invitation)
     },
 
-    ////////
     setStatus(status: Status) {
       this.status = status;
     },

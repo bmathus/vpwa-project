@@ -12,8 +12,11 @@
       <q-card-section>
         <div class="row items-center justify-between">
           <div class="text-subtitle2">Set Status:</div>
-          <q-select dense outlined v-model="option" :options="options" class="status-select"
-            :color="setStatusAndColor" />
+          <div class="row items-center">
+            <q-spinner v-if="statusLoading" color="teal" size="xs" :thickness="6"/>
+            <q-select dense outlined :disable="statusLoading" v-model="option" :options="options" class="status-select q-ml-sm" :color="setStatusAndColor"/>
+          </div>
+
         </div>
         <div class="q-mt-sm row items-center justify-between">
           <div class="text-subtitle2">Notifications:</div>
@@ -48,6 +51,7 @@ export default defineComponent({
     const notifications = ref(true);
     const option = ref(userstore.getStatus);
     const $router = useRouter();
+    const statusLoading = ref(false)
 
     const options = [
       'online', 'DND', 'offline'
@@ -77,7 +81,7 @@ export default defineComponent({
 
     }
     return {
-      option, options, setStatusAndColor, notifications, userstore,logout,loading
+      option, options, setStatusAndColor, notifications, userstore,logout,loading, statusLoading
     }
   }
 })

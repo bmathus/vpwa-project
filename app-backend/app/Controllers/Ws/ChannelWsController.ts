@@ -45,8 +45,7 @@ export default class ChannelControllerWs{
 
         if(user.id == adm?.id) //ak som admin
         {
-          console.log('Cau admin')
-          await socket.broadcast.emit('channelCanceled', channel.name)
+          socket.broadcast.emit('channelCanceled', channel.name)
 
           await channel?.related('messages').query().delete()
           await channel?.related('users').query().delete()
@@ -55,7 +54,8 @@ export default class ChannelControllerWs{
           return true
         }
         else{ //ak som  user
-          console.log('Cau user')
+          socket.broadcast.emit('deleteMember',user.id)
+
           await channel?.related('users').query().select('user_id').where('user_id', user.id).delete()
           return false
         }
@@ -77,10 +77,7 @@ export default class ChannelControllerWs{
     if (action == 'addMember'){
       socket.broadcast.emit('addMember', members,channelId)
     }
-    else if(action == 'deleteMember'){
-      const updatedMembers = members.filter((member)=> member.id !== auth.user?.id)
-      socket.broadcast.emit('deleteMember', updatedMembers,channelId)
-    }
+
   }
 
   public async inviteUser ({socket,auth}: WsContextContract,targetUserNickname: string,channelId: number,channelName: string) {
@@ -120,7 +117,7 @@ export default class ChannelControllerWs{
 
         socket.broadcast.emit('invite', newInvite)
 
-        return 'Invited.'
+        return `Invite send.`
 
 
       } else {
