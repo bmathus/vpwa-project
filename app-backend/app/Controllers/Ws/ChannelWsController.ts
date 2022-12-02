@@ -77,8 +77,8 @@ export default class ChannelControllerWs{
     if (action == 'addMember'){
       socket.broadcast.emit('addMember', members,channelId)
     }
-
   }
+
 
   public async inviteUser ({socket,auth}: WsContextContract,targetUserNickname: string,channelId: number,channelName: string) {
 

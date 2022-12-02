@@ -125,6 +125,7 @@ export const useUserStore = defineStore('userstore', {
     },
 
     setStatus(status: Status) {
+
       this.status = status;
     },
 

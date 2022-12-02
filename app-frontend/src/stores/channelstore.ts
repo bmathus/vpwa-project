@@ -117,10 +117,10 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
     //actions from tutorial part 3
-    async connectTo(channel: string) {
+    connectTo(channel: string) {
       try {
         this.LoadingStart();
-        await channelService.startConnection(channel)
+        channelService.startConnection(channel)
         this.LoadingSuccess(channel);
       } catch(err : any) {
         this.LoadingError(err)
@@ -184,14 +184,16 @@ export const useChannelStore = defineStore('channelstore', {
     //called in LeftDrawer
     async loadChannels() {
       const channels = await channelService.loadChannels()
-      await channels.forEach(async (channel)=>{
-        console.log(channel.members)
-        await this.connectTo(channel.name)
-        if(channel.name == 'general'){
-          this.SetActiveChannel(channel)
+
+      channels.forEach(async (channel) => {
+        console.log(channel.members);
+        this.connectTo(channel.name);
+        if (channel.name == 'general') {
+          this.SetActiveChannel(channel);
         }
       })
       this.channels = channels;
+      console.log('kanaly ulozene')
     },
 
 
