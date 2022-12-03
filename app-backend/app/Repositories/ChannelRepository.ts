@@ -12,6 +12,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
         userQuery.select('id','nickname','avatar_color','status')
       })
     })
+    console.log("loadol som channels")
 
     const channels = user.channels.map((ch)=>{
       const channel = ch.serialize()
@@ -60,15 +61,15 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     const channel = await Channel.findBy('name', channel_name)
     let members = await channel?.related('users').query().select('id')
-    
+
 
     if (channel == null) {
       return {
-        
+
         message:'This channel doesnt exist'
       } as Error
     }
-    else if (channel?.type == 'private') {   
+    else if (channel?.type == 'private') {
       return {
 
         message:'Cannot join private channels'
@@ -77,7 +78,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
     }
     else if ( members != undefined && members.find(i => i.id == user.id) != undefined) {
       return {
-        
+
         message:'You are already a member of this channel'
       } as Error
 

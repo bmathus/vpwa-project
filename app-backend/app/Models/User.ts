@@ -5,12 +5,6 @@ import Message from './Message'
 import Channel from './Channel'
 import Invite from './Invite'
 
-enum status {
-  online = 'online',
-  DND = 'DND',
-  offline = 'offline'
-}
-
 export default class User extends BaseModel {
   @column({ isPrimary: true })
   public id: number
@@ -34,7 +28,7 @@ export default class User extends BaseModel {
   public rememberMeToken: string | null
 
   @column()
-  public status: status
+  public status: 'online'|'offline'|'DND'
 
   @column()
   public avatarColor: string

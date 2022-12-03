@@ -96,10 +96,10 @@ export const useUserStore = defineStore('userstore', {
     async logout() {
       try {
         this.AuthStart();
-        await authService.logout();
         await this.channelstore.disconnectFrom(null,false)
-        this.AuthSuccess(null);
+        await authService.logout();
         authManager.removeToken();
+        this.AuthSuccess(null);
       } catch (err: any) {
         this.AuthError(err);
         throw err;

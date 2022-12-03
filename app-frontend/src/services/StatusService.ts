@@ -1,26 +1,33 @@
-import { User } from 'src/contracts'
 import { authManager } from '.'
 import { SocketManager } from './SocketManager'
+import { Status } from '../contracts'
+import { useChannelStore } from 'src/stores/channelstore'
 
 class StatusSocketManager extends SocketManager {
   public subscribe (): void {
-    this.socket.on('user:list', (onlineUsers: User[]) => {
-      console.log('Online users list', onlineUsers)
-    })
+    const channelstore = useChannelStore()
 
-    this.socket.on('user:online', (user: User) => {
-      console.log('User is online', user)
-    })
+    this.socket.on('statusChange', (userId: number, status: Status ) => {
+      console.log('User changed status', userId,status)
 
-    this.socket.on('user:offline', (user: User) => {
-      console.log('User is offline', user)
+      if(channelstore.channels.length !== 0) {
+        channelstore.channels.forEach((channel) => {
+          const mindex = channel.members.findIndex((member) => member.id === userId)
+          if(mindex !== -1) {
+            channel.members[mindex].status = status
+          }
+        })
+      }
+
     })
 
     authManager.onChange((token) => {
       if (token) {
         this.socket.connect()
+        console.log('connectnull som sa')
       } else {
         this.socket.disconnect()
+        console.log('disconectnul som sa')
       }
     })
   }
