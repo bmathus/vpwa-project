@@ -60,14 +60,15 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     const channel = await Channel.findBy('name', channel_name)
     let members = await channel?.related('users').query().select('id')
+    
 
     if (channel == null) {
       return {
-
+        
         message:'This channel doesnt exist'
       } as Error
     }
-    else if (channel?.type == 'private') {
+    else if (channel?.type == 'private') {   
       return {
 
         message:'Cannot join private channels'
@@ -76,14 +77,14 @@ export default class MessageRepository implements ChannelRepositoryContract {
     }
     else if ( members != undefined && members.find(i => i.id == user.id) != undefined) {
       return {
-
+        
         message:'You are already a member of this channel'
       } as Error
 
     }
     else {
-
-      //members = await channel.related('users').attach({user}) TODO
+      console.log('cau join')
+      await channel.related('users').attach([user.id])
 
       return
 

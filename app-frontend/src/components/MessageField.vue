@@ -137,8 +137,8 @@ export default defineComponent({
 
       if (!event.shiftKey && messageText.value.trim() !== '') {
 
-        let command = messageText.value.split(' ')
-        let text = messageText.value;
+        let command = messageText.value.replace('\n', '').split(' ')
+        let text = messageText.value.replace('\n', '')
         messageText.value = ''
         sendLoading.value = true;
 
@@ -147,7 +147,7 @@ export default defineComponent({
 
           let message_join = text.split(' ').slice(1)
 
-          if(message_join[message_join.length - 1] == '\[public\]\n' || message_join[message_join.length - 1] == '\[private\]\n'){ // TODO na join bez []
+          if(message_join[message_join.length - 1] == '\[public\]' || message_join[message_join.length - 1] == '\[private\]'){ // TODO na join bez []
             message_join.splice(-1, 1)
           }
 
@@ -155,8 +155,7 @@ export default defineComponent({
           let channel_name = message_join.join(' ')
           let duplicate = store.checkDuplicateChannel(channel_name)
 
-          if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[public\]\n') {
-
+          if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[public\]') {
             const responce = await store.createChannel(channel_name,'public')
             if(responce !== 'Channel is created succesfully.'){
               notify_event(responce)
@@ -167,7 +166,7 @@ export default defineComponent({
 
           }
 
-          else if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[private\]\n') {
+          else if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[private\]') {
             const responce = await store.createChannel(channel_name,'private')
             if(responce !== 'Channel is created succesfully.'){
               notify_event(responce)
@@ -179,6 +178,7 @@ export default defineComponent({
           }
 
           else if(!channel_name.includes('/') && duplicate == 1 && channel_name.length <= 20){
+
             const message = await store.joinChannel(channel_name)
 
             if(message != null){
@@ -206,7 +206,7 @@ export default defineComponent({
           }
 
         }
-        else if (command[0] == '/cancel\n' && myPermitions.value.includes('cancel')) {
+        else if (command[0] == '/cancel' && myPermitions.value.includes('cancel')) {
 
           if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
@@ -225,7 +225,7 @@ export default defineComponent({
 
 
         }
-        else if (command[0] == '/quit\n' && myPermitions.value.includes('quit')) {
+        else if (command[0] == '/quit' && myPermitions.value.includes('quit')) {
           if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
@@ -237,9 +237,9 @@ export default defineComponent({
 
         }
 
-        else if (command[0] == '/list\n' && myPermitions.value.includes('list')) {
+        else if (command[0] == '/list' && myPermitions.value.includes('list')) {
 
-          if (text.length == 6)
+          if (text.length == 5)
             store.toogleMembersDialog()
           else {
             notify_event('Incorrect command')
@@ -251,12 +251,12 @@ export default defineComponent({
 
           if (command[0] == '/revoke') {
 
-            if (command[1].replace('\n', '') == userstore.getUserNickname) {
+            if (command[1] == userstore.getUserNickname) {
               notify_event('You cannot throw yourself out of the channel')
             }
 
             else {
-              const status = store.makeRevoke(command[1].replace('\n', ''))
+              const status = store.makeRevoke(command[1])
 
               if (status == 2) {
                 notify_event('Such user doesnt exist in this channel')
@@ -275,12 +275,12 @@ export default defineComponent({
 
           if (command[0] == '/kick') {
 
-            if (command[1].replace('\n', '') == userstore.getUserNickname) {
+            if (command[1] == userstore.getUserNickname) {
               notify_event('You cannot kick yourself out of the channel')
             }
 
             else {
-              const status = store.makeRevoke(command[1].replace('\n', ''))
+              const status = store.makeRevoke(command[1])
 
               if (status == 1) {
                 notify_event('You kicked member ' + command[1])
@@ -301,7 +301,6 @@ export default defineComponent({
           let command = text.split(' ', 2)
 
           if (command[0] == '/invite' && command.length == 2 && userstore.user != null && store.active_channel != null) {
-            command[1] = command[1].replace(/(\r\n|\n|\r)/gm, '')
             const responce = await userstore.inviteUser(command[1])
             notify_event(responce)
 
