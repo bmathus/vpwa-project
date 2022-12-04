@@ -57,29 +57,34 @@ export default class MessageRepository implements ChannelRepositoryContract {
     }
   }
 
-  public async join(user: User, channel_name:string): Promise<Channel|Error> {
+  public async join(user: User, channel_name:string, inviter: number | null): Promise<Channel|string> {
 
     const channel = await Channel.findBy('name', channel_name)
     let members = await channel?.related('users').query().select('id')
+    let is_admin: boolean = false
+
+    if(members != null && inviter != null){
+      for(let i = 0; i < members.length;){
+        if(members[i].$extras.pivot_admin == true && members[i].$extras.pivot_user_id == inviter) {
+          is_admin = true
+          break
+        }
+       
+        
+      }
+    }
+  
 
     if (channel == null) {
-      return {
-
-        message:'This channel doesnt exist'
-      } as Error
+      return 'This channel doesnt exist'
+    
     }
-    else if (channel?.type == 'private') {
-      return {
-
-        message:'Cannot join private channels'
-      } as Error
+    else if (channel?.type == 'private' && is_admin == false) {
+      return 'Cannot join private channels'
 
     }
     else if ( members != undefined && members.find(i => i.id == user.id) != undefined) {
-      return {
-
-        message:'You are already a member of this channel'
-      } as Error
+      return 'You are already a member of this channel'
 
     }
     else {

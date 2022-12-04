@@ -86,7 +86,7 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('createChannel',channelName,type)
   }
 
-  public joinChannel (channelName: string, sender: number | null): Promise<Channel|ErrorMessage> {
+  public joinChannel (channelName: string, sender: number | null): Promise<Channel|string> {
     return this.emitAsync('joinChannel',channelName, sender)
   }
 
@@ -100,6 +100,10 @@ class ChannelSocketManager extends SocketManager {
 
   public deleteInvitation (id: number): Promise<string> {
     return this.emitAsync('deleteInvitation', id)
+  }
+
+  public addKick (nickname: string, channel_id: number): Promise<number> {
+    return this.emitAsync('addKick', nickname, channel_id)
   }
 
 }

@@ -220,17 +220,18 @@ export const useChannelStore = defineStore('channelstore', {
 
       const new_channel = await channelService.in('general')?.joinChannel(channel_name, sender)
 
-      if (new_channel as Channel) {
+      if (typeof new_channel !== 'string') {
+        console.log(new_channel)
         this.channels.push(new_channel as Channel)
         await this.connectTo((new_channel as Channel).name)
         this.SetActiveChannel(new_channel as Channel)
-        
         return null
 
-      } else if (new_channel as ErrorMessage) {
+      } else if (typeof new_channel === 'string') {
     
-        console.log((new_channel as ErrorMessage).message)
-        return (new_channel as ErrorMessage).message
+        console.log(new_channel)
+        return new_channel
+
       } else {
         console.log('error pri vytvarani kanala')
         return (new_channel as ErrorMessage).message
@@ -271,8 +272,6 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
 
-
-
     makeRevoke(nickname: string): number {
       const len = this.active_channel?.members.length;
 
@@ -292,32 +291,10 @@ export const useChannelStore = defineStore('channelstore', {
       return 1;
     },
 
-    checkDuplicateChannel(name: string): number {
-      const new_channel = this.channels?.filter(
-        (channel) => channel.name === name
-      );
 
-      if (new_channel.length == 0) {
-        return 1;
-      } else {
-        return 2;
-      }
-
-      return 0;
-    },
-
-    addKick(nickname: string): number {
-      const len = this.active_channel?.members.length;
-
-      const new_members = this.active_channel?.members.filter(
-        (member) => member.nickname !== nickname
-      );
-
-      if (new_members != undefined) {
-        if (len == this.active_channel?.members.length) {
-          return 2;
-        }
-      }
+    async addKick(nickname: string): Promise<number> {
+      if(this.active_channel != undefined)
+      await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
       return 1;
     },
 

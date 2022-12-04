@@ -153,7 +153,6 @@ export default defineComponent({
 
 
           let channel_name = message_join.join(' ')
-          let duplicate = store.checkDuplicateChannel(channel_name)
 
           if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[public\]') {
             const responce = await store.createChannel(channel_name,'public')
@@ -177,7 +176,7 @@ export default defineComponent({
 
           }
 
-          else if(!channel_name.includes('/') && duplicate == 1 && channel_name.length <= 20){
+          else if(!channel_name.includes('/') && channel_name.length <= 20){
 
             const message = await store.joinChannel(channel_name, null)
            
@@ -196,9 +195,6 @@ export default defineComponent({
               notify_event('Cannot create channel with special characters')
             }
 
-            else if (duplicate == 2) {
-              notify_event('Cannot create channel that already exists')
-            }
             else {
               notify_event('Incorrect command')
             }
@@ -223,15 +219,15 @@ export default defineComponent({
           }
 
 
-
         }
         else if (command[0] == '/quit' && myPermitions.value.includes('quit')) {
+          
           if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
           else {
-            let message = 'Do you really want to leave this channel? Channel will be deleted'
-            confirm(message, 'Quit channel')
+            const message = 'Do you really want to quit this channel? Channel will be deleted'
+            confirm(message, 'Leave channel')
           }
 
 
@@ -279,8 +275,8 @@ export default defineComponent({
               notify_event('You cannot kick yourself out of the channel')
             }
 
-            else {
-              const status = store.makeRevoke(command[1])
+            else{
+              const status = await store.addKick(command[1])
 
               if (status == 1) {
                 notify_event('You kicked member ' + command[1])

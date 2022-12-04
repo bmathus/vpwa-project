@@ -25,10 +25,10 @@ export default class ChannelControllerWs{
 
   }
 
-  public async joinChannel ({auth, socket}: WsContextContract, channel_name: string, sender: number) {
+  public async joinChannel ({auth, socket}: WsContextContract, channel_name: string, sender: number | null) {
     let channel = await this.chRepository.join(auth.user, channel_name, sender);
 
-    if(channel instanceof Channel){
+    if(channel instanceof Channel){ //todo aby pri joinuti nebol members prazdny
       /*channel.members = channel.members.map((ch)=>{
         const channel = ch.serialize()
         delete channel.deleted_at
@@ -162,9 +162,16 @@ export default class ChannelControllerWs{
 
   }
 
-  public async deleteInvitation ({socket}: WsContextContract, id: number) {
+  public async deleteInvitation ( id: number) {
 
     const invite = await Invite.findBy('id', id)
     await invite?.delete()
+  }
+
+
+  public async addKick ({auth}: WsContextContract, nickname: string, channel_id: number) {
+    
+    return 1
+
   }
 }
