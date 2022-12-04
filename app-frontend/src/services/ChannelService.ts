@@ -98,6 +98,10 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('inviteUser', targetUserNickname,channelId,channelName)
   }
 
+  public deleteInvitation (id: number): Promise<string> {
+    return this.emitAsync('deleteInvitation', id)
+  }
+
 }
 
 class ChannelService {

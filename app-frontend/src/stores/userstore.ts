@@ -129,7 +129,7 @@ export const useUserStore = defineStore('userstore', {
       this.status = status;
     },
 
-    acceptInvitation(invitation: Invitation): void {
+    async acceptInvitation(invitation: Invitation) {
       //todo namiesto creatovania by sa mal joinuť kanal spravit si nejake na joinutie a metodu nato
       // this.channelstore.createNewChannel(
       //   invitation.channel_name,
@@ -138,13 +138,16 @@ export const useUserStore = defineStore('userstore', {
       //   this.getUserAvatarColor,
       //   this.status
       // );
-      this.channelstore.joinChannel(invitation.channel.name, invitation.sender.id)//todo
-
+      await this.channelstore.joinChannel(invitation.channel.name, invitation.sender.id)//todo
+      await channelService.in('general')?.deleteInvitation(invitation.id)
+  
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;
       });
     },
-    declineInvitation(invitation_id: number): void {
+    async declineInvitation(invitation_id: number) {
+
+      await channelService.in('general')?.deleteInvitation(invitation_id)
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation_id;
       });

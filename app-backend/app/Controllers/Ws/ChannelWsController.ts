@@ -49,11 +49,8 @@ export default class ChannelControllerWs{
     socket.broadcast.emit('addMember', member, channel.id)
 
     }
-    
 
-    
     return channel
-
   }
 
   public async leaveChannel ({auth,socket}: WsContextContract, channel_id: number) {
@@ -74,6 +71,7 @@ export default class ChannelControllerWs{
 
           await channel?.related('messages').query().delete()
           await channel?.related('users').query().delete()
+          await channel?.related('invites').query().delete()
 
           await channel?.delete()
           return true
@@ -164,4 +162,9 @@ export default class ChannelControllerWs{
 
   }
 
+  public async deleteInvitation ({socket}: WsContextContract, id: number) {
+
+    const invite = await Invite.findBy('id', id)
+    await invite?.delete()
+  }
 }

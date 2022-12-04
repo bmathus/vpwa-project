@@ -23,12 +23,12 @@ const props = defineProps<{
 
 const userstore = useUserStore()
 
-function acceptInvitation(): void {
-  userstore.acceptInvitation(props.invitation)
+async function acceptInvitation() {
+  await userstore.acceptInvitation(props.invitation)
 }
 
-function declineInvitation(): void {
-  userstore.declineInvitation(props.invitation.id)
+async function declineInvitation() {
+  await userstore.declineInvitation(props.invitation.id)
 }
 
 </script>
