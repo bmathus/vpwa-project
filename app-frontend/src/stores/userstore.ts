@@ -138,6 +138,8 @@ export const useUserStore = defineStore('userstore', {
       //   this.getUserAvatarColor,
       //   this.status
       // );
+      this.channelstore.joinChannel(invitation.channel.name, invitation.sender.id)//todo
+
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;
       });

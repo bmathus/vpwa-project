@@ -216,21 +216,26 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-    async joinChannel(channel_name: string) {
+    async joinChannel(channel_name: string,  sender: number | null):Promise<string | null> {
 
-      const new_channel = await channelService.in('general')?.joinChannel(channel_name)
+      const new_channel = await channelService.in('general')?.joinChannel(channel_name, sender)
 
       if (new_channel as Channel) {
         this.channels.push(new_channel as Channel)
         await this.connectTo((new_channel as Channel).name)
         this.SetActiveChannel(new_channel as Channel)
+        
+        return null
 
       } else if (new_channel as ErrorMessage) {
+    
         console.log((new_channel as ErrorMessage).message)
+        return (new_channel as ErrorMessage).message
       } else {
         console.log('error pri vytvarani kanala')
+        return (new_channel as ErrorMessage).message
       }
-
+     
     },
 
     async leaveChannel():Promise<string> {
@@ -242,7 +247,6 @@ export const useChannelStore = defineStore('channelstore', {
 
           if(result == false )
           {
-            //await channelService.in(this.active_channel.name)?.updateMembers('deleteMember',this.active_channel.members,this.active_channel.id)
             await this.disconnectFrom(this.active_channel?.name,true)
             return 'Channel left successfully';
 

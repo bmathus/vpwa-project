@@ -25,11 +25,11 @@ class ChannelSocketManager extends SocketManager {
       channelstore.NewMessage({channel,message})
     })
 
-    this.socket.on('addMember', (members: Member[],channelId: number) => {
+    this.socket.on('addMember', (member: Member,channelId: number) => {
       const chIndex = channelstore.channels.findIndex((channel) => channel.id === channelId)
 
       if(chIndex !== -1) {
-        channelstore.channels[chIndex].members = members;
+        channelstore.channels[chIndex].members.push(member);
       }
 
       // channelstore.active_channel?.members.push({id: user.id, nickname: user.nickname, avatar_color: user.avatar_color, status: Status.online})
@@ -86,16 +86,12 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('createChannel',channelName,type)
   }
 
-  public joinChannel (channelName: string): Promise<Channel|ErrorMessage> {
-    return this.emitAsync('joinChannel',channelName)
+  public joinChannel (channelName: string, sender: number | null): Promise<Channel|ErrorMessage> {
+    return this.emitAsync('joinChannel',channelName, sender)
   }
 
   public leaveChannel (channel_id: number): Promise<boolean|ErrorMessage> {
     return this.emitAsync('leaveChannel',channel_id)
-  }
-
-  public updateMembers (action: string,members: Member[],channelId: number) {
-    return this.emitAsync('updateChannelMembers',action,members,channelId)
   }
 
   public inviteUser (targetUserNickname: string,channelId: number, channelName: string): Promise<string> {

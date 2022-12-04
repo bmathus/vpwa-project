@@ -25,8 +25,33 @@ export default class ChannelControllerWs{
 
   }
 
-  public async joinChannel ({auth}: WsContextContract, channel_name: string) {
-    const channel = await this.chRepository.join(auth.user,channel_name);
+  public async joinChannel ({auth, socket}: WsContextContract, channel_name: string, sender: number) {
+    let channel = await this.chRepository.join(auth.user, channel_name, sender);
+
+    if(channel instanceof Channel){
+      /*channel.members = channel.members.map((ch)=>{
+        const channel = ch.serialize()
+        delete channel.deleted_at
+        channel.admin = ch.$extras.pivot_admin
+        channel.members = channel.users
+        delete channel.users
+        return channel
+      }) ;*/
+
+      const user = await User.findBy('id', auth.user?.id)// kvoli avatarColor
+      const member = {
+        id: user?.id,
+        nickname: user?.nickname,
+        avatar_color:user?.avatarColor,
+        status: 'online',
+      }
+
+    socket.broadcast.emit('addMember', member, channel.id)
+
+    }
+    
+
+    
     return channel
 
   }
@@ -72,18 +97,12 @@ export default class ChannelControllerWs{
 
   }
 
-  public async updateMembers ({socket,auth}: WsContextContract, action: string,members: Member[],channelId: number) {
-
-    if (action == 'addMember'){
-      socket.broadcast.emit('addMember', members,channelId)
-    }
-  }
-
-
-  public async inviteUser ({socket,auth}: WsContextContract,targetUserNickname: string,channelId: number,channelName: string) {
-
+  public async inviteUser ({socket,auth}: WsContextContract,targetUserNickname: string, channelId: number, channelName: string) {
 
     const targetUser = await User.query().where('nickname',targetUserNickname).first()
+
+    if(targetUser == null) return `Such user doesnt exist`
+    
     await targetUser?.load('channels',(query)=> {
       query.where('channels.id',channelId)
     })

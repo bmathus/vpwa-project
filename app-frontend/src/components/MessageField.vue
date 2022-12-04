@@ -179,8 +179,8 @@ export default defineComponent({
 
           else if(!channel_name.includes('/') && duplicate == 1 && channel_name.length <= 20){
 
-            const message = await store.joinChannel(channel_name)
-
+            const message = await store.joinChannel(channel_name, null)
+           
             if(message != null){
               notify_event(message)
             }

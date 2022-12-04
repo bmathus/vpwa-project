@@ -62,7 +62,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
     const channel = await Channel.findBy('name', channel_name)
     let members = await channel?.related('users').query().select('id')
 
-
     if (channel == null) {
       return {
 
@@ -84,10 +83,8 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     }
     else {
-      console.log('cau join')
       await channel.related('users').attach([user.id])
-
-      return
+      return channel
 
     }
   }
