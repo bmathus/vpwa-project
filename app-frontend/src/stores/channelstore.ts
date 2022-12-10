@@ -293,9 +293,13 @@ export const useChannelStore = defineStore('channelstore', {
 
 
     async addKick(nickname: string): Promise<number> {
-      if(this.active_channel != undefined)
-      await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
-      return 1;
+
+      if(this.active_channel != undefined){
+        const status = await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
+        if (status != undefined) return status
+      }
+      
+      return 0
     },
 
     //template controll actions

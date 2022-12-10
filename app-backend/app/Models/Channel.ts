@@ -25,6 +25,7 @@ export default class Channel extends BaseModel {
   })
   public invites: HasMany<typeof Invite>;
 
+ 
   @manyToMany(() => User, {
     pivotTable: 'members',
     pivotForeignKey: 'channel_id',

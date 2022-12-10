@@ -101,9 +101,33 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
       //const invite = await Invite.create({ channel_id:  channel_id, sender_id: user_id, user_id: user.id})
     }
-
-
   }
+
+  public async kick(user_id: number, nickname: string, channel_id: number): Promise<number> {
+
+    const channel = await Channel.findBy('id', channel_id)
+    const members = await channel?.related('users').query().select('nickname')
+    
+    console.log(members)
+
+    if( members != null)
+    {
+      const user = members.find((obj) => {
+        return obj.nickname == nickname;
+      });
+
+      if(user == undefined) return 3
+
+    }
+    return 1
+    
+  }
+
+
+  public async revokekick(user_id: number, nickname: string, channel_id: number): Promise<number> {
+    return 1
+  }
+
 
 
 

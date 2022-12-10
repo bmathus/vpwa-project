@@ -170,8 +170,9 @@ export default class ChannelControllerWs{
 
 
   public async addKick ({auth}: WsContextContract, nickname: string, channel_id: number) {
-    
-    return 1
+
+    const status =  await this.chRepository.kick(auth.user?.id, nickname, channel_id)
+    return status
 
   }
 }

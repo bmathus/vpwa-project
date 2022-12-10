@@ -268,8 +268,8 @@ export default defineComponent({
         }
         else if (command[0] == '/kick' && myPermitions.value.includes('kick')) {
           let command = text.split(' ', 2)
-
-          if (command[0] == '/kick') {
+         
+          if (command[0] == '/kick' && command.length >= 2) {
 
             if (command[1] == userstore.getUserNickname) {
               notify_event('You cannot kick yourself out of the channel')
@@ -282,7 +282,11 @@ export default defineComponent({
                 notify_event('You kicked member ' + command[1])
               }
 
-              if (status == 2) {
+              else if (status == 2) {
+                notify_event('Cannont kick the same user twice')
+              }
+
+              else if (status == 3) {
                 notify_event('Such user doesnt exist in this channel')
               }
 
