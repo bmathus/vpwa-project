@@ -53,6 +53,16 @@ export default class User extends BaseModel {
   })
   public channels: ManyToMany<typeof Channel>
 
+  @manyToMany(() => Channel, {
+    pivotTable: 'kicks',
+    localKey: 'id',
+    pivotForeignKey: 'kicked_by',
+    relatedKey: 'id',
+    pivotRelatedForeignKey: 'channel_id',
+    pivotColumns: ['kicked_user_id'],
+  })
+  public chkicks: ManyToMany<typeof Channel>
+
   @column.dateTime({ autoCreate: true,serializeAs:null })
   public createdAt: DateTime
 

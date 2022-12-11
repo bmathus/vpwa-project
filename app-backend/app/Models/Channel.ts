@@ -34,6 +34,14 @@ export default class Channel extends BaseModel {
   })
   public users: ManyToMany<typeof User>;
 
+  @manyToMany(() => User, {
+    pivotTable: 'kicks',
+    pivotForeignKey: 'channel_id',
+    pivotRelatedForeignKey: 'kicked_by',
+    pivotColumns: ['kicked_user_id'],
+  })
+  public kicks: ManyToMany<typeof User>;
+
   @column.dateTime()
   public deletedAt: DateTime
 

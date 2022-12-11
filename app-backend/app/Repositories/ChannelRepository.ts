@@ -68,9 +68,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
         if(members[i].$extras.pivot_admin == true && members[i].$extras.pivot_user_id == inviter) {
           is_admin = true
           break
-        }
-       
-        
+        }  
       }
     }
   
@@ -117,6 +115,10 @@ export default class MessageRepository implements ChannelRepositoryContract {
       });
 
       if(user == undefined) return 3
+
+      await channel?.related('kicks').attach([user.id, user_id, channel_id])
+      const chkicks = await channel?.related('kicks').query().select('*')
+      console.log('->',chkicks)
 
     }
     return 1
