@@ -131,7 +131,7 @@ export const useChannelStore = defineStore('channelstore', {
     async disconnectFrom(channelName: string | null,setGeneral: boolean) {
 
       let leaving: string[] = []
-      if(channelName !== null) { //odpajame sa z daneho kanala
+      if(channelName !== null) {  //odpajame sa z daneho kanala
         leaving = [channelName]
 
         this.channels = this.channels.filter((channel) => {
@@ -186,14 +186,14 @@ export const useChannelStore = defineStore('channelstore', {
       const channels = await channelService.loadChannels()
 
       channels.forEach(async (channel) => {
-        console.log(channel.members);
+
         this.connectTo(channel.name);
         if (channel.name == 'general') {
           this.SetActiveChannel(channel);
         }
       })
       this.channels = channels;
-      console.log('kanaly ulozene')
+
     },
 
 
@@ -228,7 +228,7 @@ export const useChannelStore = defineStore('channelstore', {
         return null
 
       } else if (typeof new_channel === 'string') {
-    
+
         console.log(new_channel)
         return new_channel
 
@@ -236,7 +236,7 @@ export const useChannelStore = defineStore('channelstore', {
         console.log('error pri vytvarani kanala')
         return (new_channel as ErrorMessage).message
       }
-     
+
     },
 
     async leaveChannel():Promise<string> {
@@ -298,7 +298,7 @@ export const useChannelStore = defineStore('channelstore', {
         const status = await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
         if (status != undefined) return status
       }
-      
+
       return 0
     },
 

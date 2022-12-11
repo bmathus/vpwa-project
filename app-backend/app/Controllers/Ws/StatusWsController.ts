@@ -7,6 +7,7 @@ export default class ActivityController {
   }
 
   public async onConnected({ socket, auth}: WsContextContract) {
+    console.log('conectnul som sa ')
 
     // all connections for the same authenticated user will be in the room
     const room = this.getUserRoom(auth.user!)
@@ -30,15 +31,24 @@ export default class ActivityController {
   public async onDisconnected({ socket, auth}: WsContextContract) {
     const room = this.getUserRoom(auth.user!)
     const userSockets = await socket.in(room).allSockets()
+    console.log('disconectnul som sa ')
 
     // user is disconnected
     if (userSockets.size === 0) {
+
       (auth.user as User).status = 'offline'
       await auth.user?.save()
       // notify other users
       socket.broadcast.emit('statusChange', auth.user?.id,'offline')
     }
 
+  }
 
+  public async changeStatus({socket, auth}: WsContextContract, status: 'online' | 'offline' | 'DND') {
+    (auth.user as User).status = status;
+    await auth.user?.save()
+
+    socket.nsp.emit('statusChange',auth.user?.id, status);
+    return status
   }
 }

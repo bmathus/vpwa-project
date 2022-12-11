@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia';
 import { Invitation, User, Status, RegisterData, LoginCredentials } from '../contracts';
 import { useChannelStore } from './channelstore';
-import { authManager, authService, channelService } from 'src/services';
+import { authManager, authService, channelService, statusService } from 'src/services';
 
 export const useUserStore = defineStore('userstore', {
   state: () => ({
@@ -124,9 +124,9 @@ export const useUserStore = defineStore('userstore', {
       this.invitations.push(invitation)
     },
 
-    setStatus(status: Status) {
-
-      this.status = status;
+    async setStatus(status: Status) {
+      const changed_status = await statusService.changeStatus(status)
+      this.status = changed_status;
     },
 
     async acceptInvitation(invitation: Invitation) {
@@ -140,7 +140,7 @@ export const useUserStore = defineStore('userstore', {
       // );
       await this.channelstore.joinChannel(invitation.channel.name, invitation.sender.id)//todo
       await channelService.in('general')?.deleteInvitation(invitation.id)
-  
+
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;
       });

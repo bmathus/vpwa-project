@@ -18,18 +18,21 @@ class StatusSocketManager extends SocketManager {
           }
         })
       }
-
     })
 
     authManager.onChange((token) => {
+      console.log('vykonavaj')
       if (token) {
         this.socket.connect()
-        console.log('connectnull som sa')
       } else {
         this.socket.disconnect()
-        console.log('disconectnul som sa')
+
       }
     })
+  }
+
+  public changeStatus (status: Status): Promise<Status> {
+    return this.emitAsync('changeStatus', status)
   }
 }
 

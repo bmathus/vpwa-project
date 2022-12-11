@@ -14,7 +14,7 @@
           <div class="text-subtitle2">Set Status:</div>
           <div class="row items-center">
             <q-spinner v-if="statusLoading" color="teal" size="xs" :thickness="6"/>
-            <q-select dense outlined :disable="statusLoading" v-model="option" :options="options" class="status-select q-ml-sm" :color="setStatusAndColor"/>
+            <q-select dense outlined :disable="statusLoading" v-model="selectedStatus" :options="options" class="status-select q-ml-sm" :color="setStatusAndColor"/>
           </div>
 
         </div>
@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useUserStore } from '../stores/userstore';
 import { Status } from '../contracts'
 import { useRouter } from 'vue-router';
@@ -49,24 +49,28 @@ export default defineComponent({
   setup() {
     const userstore = useUserStore()
     const notifications = ref(true);
-    const option = ref(userstore.getStatus);
+    const selectedStatus = ref(userstore.getStatus);
     const $router = useRouter();
     const statusLoading = ref(false)
 
     const options = [
       'online', 'DND', 'offline'
     ];
+
     const setStatusAndColor = computed(() => {
-      if (option.value === 'online') {
-        userstore.setStatus(Status.online)
+      if (selectedStatus.value === 'online') {
         return 'teal';
-      } else if (option.value === 'offline') {
-        userstore.setStatus(Status.offline)
+      } else if (selectedStatus.value === 'offline') {
         return 'red-4';
       } else {
-        userstore.setStatus(Status.DND)
         return 'grey';
       }
+    })
+
+    watch(selectedStatus,async (newStatus) => {
+      statusLoading.value = true
+      await userstore.setStatus(newStatus)
+      statusLoading.value = false
     })
 
     const loading = computed((): boolean => {
@@ -81,7 +85,7 @@ export default defineComponent({
 
     }
     return {
-      option, options, setStatusAndColor, notifications, userstore,logout,loading, statusLoading
+      selectedStatus, options, setStatusAndColor, notifications, userstore,logout,loading, statusLoading
     }
   }
 })

@@ -2,7 +2,7 @@
 import { ChannelRepositoryContract,Error } from '@ioc:Repositories/ChannelRepository'
 import User from 'App/Models/User'
 import Channel from 'App/Models/Channel'
-import Invite from 'App/Models/Invite'
+
 
 export default class MessageRepository implements ChannelRepositoryContract {
   public async getAll(user: User): Promise<Channel[]> {
@@ -12,7 +12,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
         userQuery.select('id','nickname','avatar_color','status')
       })
     })
-    console.log("loadol som channels")
 
     const channels = user.channels.map((ch)=>{
       const channel = ch.serialize()
@@ -68,14 +67,14 @@ export default class MessageRepository implements ChannelRepositoryContract {
         if(members[i].$extras.pivot_admin == true && members[i].$extras.pivot_user_id == inviter) {
           is_admin = true
           break
-        }  
+        }
       }
     }
-  
+
 
     if (channel == null) {
       return 'This channel doesnt exist'
-    
+
     }
     else if (channel?.type == 'private' && is_admin == false) {
       return 'Cannot join private channels'
@@ -105,7 +104,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     const channel = await Channel.findBy('id', channel_id)
     const members = await channel?.related('users').query().select('nickname')
-    
+
     console.log(members)
 
     if( members != null)
@@ -122,7 +121,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     }
     return 1
-    
+
   }
 
 

@@ -12,6 +12,7 @@ import Ws from '@ioc:Ruby184/Socket.IO/Ws'
 Ws.namespace('/')
   .connected('StatusWsController.onConnected')
   .disconnected('StatusWsController.onDisconnected')
+  .on('changeStatus','StatusWsController.changeStatus')
 
 // this is dynamic namespace, in controller methods we can use params.name
 Ws.namespace('channels/:name')

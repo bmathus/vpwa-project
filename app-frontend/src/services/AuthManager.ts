@@ -66,10 +66,9 @@ class AuthManager {
   }
 
   public removeToken(): void {
-
+    console.log('removol som token')
     LocalStorage.remove(this.storageKey);
     this.notifyListeners();
-    console.log('vymyzal sa token')
   }
 
   // this is just an alias for removing the token from storage
