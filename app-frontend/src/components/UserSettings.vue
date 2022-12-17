@@ -20,8 +20,8 @@
         </div>
         <div class="q-mt-sm row items-center justify-between">
           <div class="text-subtitle2">Notifications:</div>
-          <q-toggle v-model="notifications" color="teal" keep-color left-label
-            :label="notifications ? 'All' :'Only for me' " />
+          <q-toggle v-model="notifySetting" color="teal" keep-color left-label
+            :label="notifySetting ? 'Only for me' :'All' " />
         </div>
       </q-card-section>
 
@@ -41,14 +41,13 @@
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useUserStore } from '../stores/userstore';
-import { Status } from '../contracts'
 import { useRouter } from 'vue-router';
 
 export default defineComponent({
   name: 'UserSettings',
   setup() {
     const userstore = useUserStore()
-    const notifications = ref(true);
+    const notifySetting = ref(userstore.notifyOnlyForMe);
     const selectedStatus = ref(userstore.getStatus);
     const $router = useRouter();
     const statusLoading = ref(false)
@@ -65,6 +64,10 @@ export default defineComponent({
       } else {
         return 'grey';
       }
+    })
+
+    watch(notifySetting,(newVal) => {
+      userstore.notifyOnlyForMe = newVal
     })
 
     watch(selectedStatus,async (newStatus) => {
@@ -85,8 +88,9 @@ export default defineComponent({
 
     }
     return {
-      selectedStatus, options, setStatusAndColor, notifications, userstore,logout,loading, statusLoading
+      selectedStatus, options, setStatusAndColor, notifySetting, userstore,logout,loading, statusLoading
     }
+
   }
 })
 </script>

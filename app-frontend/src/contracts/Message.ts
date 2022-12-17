@@ -1,18 +1,22 @@
 
 export type RawMessage = string
 
-export interface Sender {
-  id: number,
-  nickname: string,
-  avatar_color: string
-}
 
 export interface ChannelsMessages {
   [channel: string]: {
     messages: SerializedMessage[],
     page: number,
-    firstReceivedDateTime: string
+    firstReceivedDateTime: string,
+    liveMessages: {
+      [senderNickname: string]: string
+    }
   }
+}
+
+export interface Sender {
+  id: number,
+  nickname: string,
+  avatar_color: string
 }
 
 export interface SerializedMessage {

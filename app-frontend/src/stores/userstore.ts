@@ -8,6 +8,7 @@ export const useUserStore = defineStore('userstore', {
   state: () => ({
     user: null as User | null,
     status: Status.online as Status,
+    notifyOnlyForMe: false,
     auth_status: 'pending' as 'pending' | 'success' | 'error',
     errors: [] as { message: string; field?: string }[],
 

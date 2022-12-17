@@ -1,26 +1,9 @@
 <template>
-  <div class="aligh-box column justify-center items-center">
+  <div class="align-box column justify-center items-center">
     <div class="max-width-box">
-      <div v-if="openLiveTyping && shownMember"
-        class="livetyping-box text-black q-mx-md text-dark text-caption bg-teal-1 q-pb-sm">
-        <div class="inner-box q-px-sm">
-          <div class="close-badge bg-white" @click="hideLiveTyping">
-            <q-icon class="row" name="close" color="teal" />
-          </div>
-          <span class="text-weight-medium">{{ shownMember.nickname + ':' }}</span>
-          {{ shownMember.live_text }}
-        </div>
-      </div>
-
-      <div class="nowtyping-box q-mx-md q-pb-xs q-px-xs text-dark bg-white text-weight-medium text-caption"
-        v-if="membersTyping.length !== 0">
-        <button v-for="member in membersTyping" :key="member.id" @click="showLiveTyping(member)">
-          {{ prepareButtonLabel(member.nickname) }}
-        </button>
-        <div class="q-ml-xs">{{ typingText }}</div>
-      </div>
+      <live-typing></live-typing>
       <div class="text-box">
-        <textarea placeholder="Message" v-model="messageText" @keyup.enter="sendMessage" />
+        <textarea placeholder="Message" v-model="messageText" @keydown.enter.prevent="sendMessage" />
         <q-btn v-if="!sendLoading" flat icon="send" color="teal" padding="xs" class="send-btn" @click="sendMessage" />
         <q-spinner v-else color="teal" size="sm" :thickness="6" class="send-loading"/>
       </div>
@@ -34,18 +17,23 @@ import { useQuasar } from 'quasar';
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
-import { Member } from '../contracts';
+import LiveTyping from './LiveTyping.vue';
 
 
 export default defineComponent({
   name: 'MessageField',
-
+  components: {
+    LiveTyping
+  },
   setup() {
     const store = useChannelStore();
     const userstore = useUserStore();
     const messageText = ref('')
     const $q = useQuasar();
     const sendLoading = ref(false)
+
+
+
 
     //tutorial part 3
     const aChannel = computed(() => {
@@ -133,9 +121,10 @@ export default defineComponent({
     })
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    async function sendMessage(event: any): Promise<void> {
+    async function sendMessage(): Promise<void> {
 
-      if (!event.shiftKey && messageText.value.trim() !== '') {
+      if (messageText.value.trim() !== '') {
+
 
         let command = messageText.value.replace('\n', '').split(' ')
         let text = messageText.value.replace('\n', '')
@@ -179,7 +168,7 @@ export default defineComponent({
           else if(!channel_name.includes('/') && channel_name.length <= 20){
 
             const message = await store.joinChannel(channel_name, null)
-           
+
             if(message != null){
               notify_event(message)
             }
@@ -221,7 +210,7 @@ export default defineComponent({
 
         }
         else if (command[0] == '/quit' && myPermitions.value.includes('quit')) {
-          
+
           if (text.split(' ', 2).length > 1) {
             notify_event('Incorrect command')
           }
@@ -268,7 +257,7 @@ export default defineComponent({
         }
         else if (command[0] == '/kick' && myPermitions.value.includes('kick')) {
           let command = text.split(' ', 2)
-         
+
           if (command[0] == '/kick' && command.length >= 2) {
 
             if (command[1] == userstore.getUserNickname) {
@@ -317,65 +306,21 @@ export default defineComponent({
       }
     }
 
-    //live typing code
-    const openLiveTyping = ref(false);
-    const shownMember = ref();
-
-    const activeChannel = computed(() => {
-      return store.getActiveChannel;
-    })
-
-
-    const membersTyping = computed(() => {
-      return store.getActiveChannelMembers.filter((member) => {
-
-        //chceme zobrazit len memberov ktory maju prazdny live text string a niesom tam ani ja prihlaseny user
-        // if (member.live_text.length !== 0 && member.id !== userstore.getUserId) {
-        //   return member
-        // }
-      })
-    })
-
-    function prepareButtonLabel(nickname: string): string {
-      if (nickname !== membersTyping.value[membersTyping.value.length - 1].nickname) {
-        return nickname + ', '
+    watch(messageText,(liveMessageText) => {
+      if(liveMessageText.trim() === '') {
+        if(liveMessageText.length === 0) {
+          store.addLiveMessage(liveMessageText)
+        }
       } else {
-        return nickname
+        store.addLiveMessage(liveMessageText)
       }
-    }
-    const typingText = computed(() => {
-      if (membersTyping.value.length > 1) {
-        return 'are typing...'
-      } else {
-        return 'is typing...'
-      }
+
+      //
     })
-
-    function showLiveTyping(member: Member): void {
-      shownMember.value = member;
-      openLiveTyping.value = true;
-    }
-
-    function hideLiveTyping(): void {
-      openLiveTyping.value = false;
-    }
-
-    //keby prepnem channel tak aby sa zatvoril live typing box
-    watch(activeChannel, () => {
-      hideLiveTyping()
-    });
-
 
     return {
       messageText,
       sendMessage,
-      membersTyping,
-      prepareButtonLabel,
-      typingText,
-      openLiveTyping,
-      showLiveTyping,
-      hideLiveTyping,
-      shownMember,
       sendLoading
     }
   }
@@ -418,63 +363,6 @@ export default defineComponent({
   right: 22px;
 }
 
-/* live typing classes */
-.nowtyping-box,
-.livetyping-box {
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-}
-
-.nowtyping-box {
-  border: solid 2px teal;
-  margin-top: -10px;
-}
-
-.nowtyping-box button {
-  border: none;
-  background-color: transparent;
-  padding: 0px;
-  cursor: pointer;
-  transition: all 0.1s ease-in;
-}
-
-.nowtyping-box button:hover {
-  color: teal;
-}
-
-.nowtyping-box button:active {
-  transform: translateY(2px);
-}
-
-.nowtyping-box div {
-  display: inline-block;
-}
-
-.livetyping-box {
-  border: solid 2px teal;
-}
-
-.close-badge {
-  cursor: pointer;
-  position: absolute;
-  right: 1px;
-  top: 1px;
-  display: inline-block;
-  border-radius: 8px;
-  padding: 1px;
-  border: solid 1px teal;
-  transition: all 0.1s ease-in;
-}
-
-.inner-box {
-  max-height: 200px;
-  overflow: auto;
-  position: relative;
-}
-
-.close-badge:active {
-  transform: translateY(1px);
-}
 
 .max-width-box {
   max-width: 1300px;

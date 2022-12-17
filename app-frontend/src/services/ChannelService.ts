@@ -2,8 +2,9 @@ import { RawMessage, SerializedMessage, Channel,ErrorMessage,Member, Invitation 
 import { SocketManager } from './SocketManager'
 import {useChannelStore} from '../stores/channelstore'
 import { api } from 'src/boot/axios';
-import { useQuasar } from 'quasar';
+import { useQuasar,AppVisibility } from 'quasar';
 import { useUserStore } from 'src/stores/userstore';
+
 
 // creating instance of this class automatically connects to given socket.io namespace
 // subscribe is called with boot params, so you can use it to dispatch actions for socket events
@@ -16,13 +17,15 @@ class ChannelSocketManager extends SocketManager {
 
 
     this.socket.on('message', (message: SerializedMessage) => {
-      console.log(message)
-
       if(channelstore.channels_messages[channel].firstReceivedDateTime === 'now') {
         channelstore.channels_messages[channel].firstReceivedDateTime = message.send_at;
       }
-
       channelstore.NewMessage({channel,message})
+
+      if(!AppVisibility.appVisible) {
+        this.showNotification(message,channel,userstore.getUserNickname,userstore.notifyOnlyForMe)
+      }
+
     })
 
     this.socket.on('addMember', (member: Member,channelId: number) => {
@@ -72,6 +75,10 @@ class ChannelSocketManager extends SocketManager {
       }
     })
 
+    this.socket.on('liveMessage',(senderNickname: string, message: string) => {
+      channelstore.NewLiveMessage(channel,senderNickname,message)
+    })
+
   }
 
   public addMessage (message: RawMessage): Promise<SerializedMessage> {
@@ -104,6 +111,38 @@ class ChannelSocketManager extends SocketManager {
 
   public addKick (nickname: string, channel_id: number): Promise<number> {
     return this.emitAsync('addKick', nickname, channel_id)
+  }
+
+  public addLiveMessage(message: string): Promise<string> {
+    return this.emitAsync('addLiveMessage',message)
+  }
+
+  private showNotification(message: SerializedMessage, channelName: string, myUserName: string,notifyOnlyForMe: boolean ) {
+
+    let notificationText = message.message.trim()
+    const imAdresor = (notificationText.startsWith(`@${myUserName}`) ||
+                      notificationText.includes(` @${myUserName}`)) ? true : false
+
+    if(notifyOnlyForMe && !imAdresor) return
+
+    notificationText = `Channel: ${channelName}\n${message.user.nickname}: ${notificationText.length > 25 ? notificationText.slice(0,25) + '...': notificationText}`
+
+    if (!('Notification' in window)) {
+      alert('This browser does not support system notifications');
+    } else if(Notification.permission === 'granted') {
+      new Notification('Slack App',{
+        body: notificationText
+      })
+    } else if (Notification.permission !== 'denied') {
+      Notification.requestPermission().then(function (permission) {
+        if (permission === 'granted') {
+          new Notification('Slack app', {
+            body: notificationText
+          });
+        }
+      });
+    }
+
   }
 
 }

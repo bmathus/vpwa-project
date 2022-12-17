@@ -6,11 +6,12 @@ import {
   Member,
   SerializedMessage,
   RawMessage,
-  ErrorMessage
+  ErrorMessage,
 
 } from '../contracts';
 import { useQuasar } from 'quasar';
 import { channelService } from 'src/services';
+
 
 interface InfiniteScroll {
   stopOnLoad: () => void;
@@ -85,7 +86,8 @@ export const useChannelStore = defineStore('channelstore', {
         this.channels_messages[channelName] = {
           messages: messages,
           page:1,
-          firstReceivedDateTime:'now'
+          firstReceivedDateTime:'now',
+          liveMessages:{}
         }
       }
     },
@@ -95,7 +97,8 @@ export const useChannelStore = defineStore('channelstore', {
       this.channels_messages[channelName] = {
         messages:[],
         page:1,
-        firstReceivedDateTime:'now'
+        firstReceivedDateTime:'now',
+        liveMessages: {}
       }
     },
 
@@ -115,6 +118,23 @@ export const useChannelStore = defineStore('channelstore', {
       }
 
     },
+
+    NewLiveMessage(channelName: string,senderNickname: string,message: string) {
+      if (channelName in this.channels_messages) {
+        if (message === '') {
+          delete this.channels_messages[channelName].liveMessages[senderNickname]
+        } else {
+          this.channels_messages[channelName].liveMessages[senderNickname] = message
+        }
+      }
+    },
+
+    async addLiveMessage(liveMessage: string) {
+      if(this.active_channel !== null) {
+        await channelService.in(this.active_channel.name)?.addLiveMessage(liveMessage)
+      }
+    },
+
 
     //actions from tutorial part 3
     connectTo(channel: string) {

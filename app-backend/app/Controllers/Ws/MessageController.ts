@@ -25,4 +25,8 @@ export default class MessageController {
     // return message to sender
     return message
   }
+
+  public async addLiveMessage({ auth,socket }: WsContextContract, message: string) {
+    socket.broadcast.emit('liveMessage', auth.user?.nickname,message)
+  }
 }
