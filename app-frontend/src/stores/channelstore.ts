@@ -28,6 +28,7 @@ export const useChannelStore = defineStore('channelstore', {
     loading: false as boolean,
     error: null as Error | null,
 
+    inAppNotification: '' as string,
     membersDialogOpen: false,
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
@@ -73,6 +74,9 @@ export const useChannelStore = defineStore('channelstore', {
   },
 
   actions: {
+    addNotification(notification: string) {
+      this.inAppNotification = notification
+    },
     LoadingStart() {
       this.loading = true;
       this.error = null;
@@ -111,6 +115,8 @@ export const useChannelStore = defineStore('channelstore', {
       this.active_channel = channel;
       //this.scrollToBottom(false);
     },
+
+
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
       this.channels_messages[channel].messages.push(message);
       if(this.active_channel?.name == channel) {
@@ -129,12 +135,17 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
+    NewChannel(channel: Channel): void {
+      this.channels.push(channel)
+      this.connectTo(channel.name)
+      this.SetActiveChannel(channel)
+    },
+
     async addLiveMessage(liveMessage: string) {
       if(this.active_channel !== null) {
         await channelService.in(this.active_channel.name)?.addLiveMessage(liveMessage)
       }
     },
-
 
     //actions from tutorial part 3
     connectTo(channel: string) {
@@ -217,44 +228,28 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
 
-    async createChannel(channel_name: string, type:'public'|'private'): Promise<string> {
-      const new_channel = await channelService.in('general')?.createChannel(channel_name,type)
 
-      if (new_channel !== 'Channel already exists.') {
-        this.channels.push(new_channel as Channel)
-        await this.connectTo((new_channel as Channel).name)
-        this.SetActiveChannel(new_channel as Channel)
-        return 'Channel is created succesfully.'
+    async joinChannel(channelName: string,type: 'public' | 'private',creating: boolean):Promise<string> {
 
-      } else if (new_channel === 'Channel already exists.') { //channel exists
+      const responce = await channelService.in('general')?.joinChannel(channelName,type,creating)
 
-        return new_channel
-      } else {
+      if(typeof responce !== 'string' && responce !== undefined) { //kanal sa vytvoril alebo joinol uspesne
 
-        return 'Error when creating channel.'
-      }
+        this.NewChannel(responce)
 
-    },
+        if((responce as Channel).members.length == 1) {//ak sa vytváral
+          return 'Channel created succesfully.'
 
-    async joinChannel(channel_name: string,  sender: number | null):Promise<string | null> {
+        } else {// ak sa joinoval
+          return 'Channel joined succesfully.'
+        }
 
-      const new_channel = await channelService.in('general')?.joinChannel(channel_name, sender)
-
-      if (typeof new_channel !== 'string') {
-        console.log(new_channel)
-        this.channels.push(new_channel as Channel)
-        await this.connectTo((new_channel as Channel).name)
-        this.SetActiveChannel(new_channel as Channel)
-        return null
-
-      } else if (typeof new_channel === 'string') {
-
-        console.log(new_channel)
-        return new_channel
+      } else if(typeof responce === 'string' && responce !== undefined) {//nejake erorrs
+        return responce
 
       } else {
-        console.log('error pri vytvarani kanala')
-        return (new_channel as ErrorMessage).message
+        return 'Error when creating/joining channel.'
+
       }
 
     },

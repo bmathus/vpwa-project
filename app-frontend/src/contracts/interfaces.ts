@@ -20,7 +20,6 @@ export interface Member {
   nickname: string;
   avatar_color: string;
   status: Status;
-  //live_text: string;
 }
 
 export interface Invitation {

@@ -167,7 +167,7 @@ export default defineComponent({
       contentLoading,
       publicChannels,
       privateChannels,
-      invitations
+      invitations,
     }
   }
 

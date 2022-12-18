@@ -38,6 +38,7 @@ import { reactive, ref, onMounted, computed ,watch} from 'vue'
 import { useChannelStore } from '../stores/channelstore';
 import { useUserStore } from '../stores/userstore';
 import { SerializedMessage } from '../contracts';
+import { useQuasar } from 'quasar';
 
 export default {
 
@@ -46,6 +47,7 @@ export default {
     const userstore = useUserStore();
     const infiniteScroll = ref()
     const scrolltobox = ref()
+    const $q = useQuasar()
 
     const messages = computed(()=>{
       return store.getMessages
@@ -89,6 +91,10 @@ export default {
       return store.getActiveChannel
     })
 
+    const notification = computed(()=> {
+      return store.inAppNotification
+    })
+
 
     watch(activeChannel,(newChannelValue) => {
       if(newChannelValue != null) {
@@ -96,6 +102,15 @@ export default {
         infiniteScroll.value.resume()
 
       }
+    })
+
+    watch(notification,(newNotification) => {
+      $q.notify({
+        type: 'info',
+        message: newNotification,
+        color: 'teal',
+        timeout: 2500,
+      });
     })
 
     async function onLoad(index: number, done: (stop: boolean) => void) {

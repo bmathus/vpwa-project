@@ -21,6 +21,7 @@ export default class MessageRepository implements ChannelRepositoryContract {
       delete channel.users
       return channel
     }) as Channel[];
+    console.log(channels)
     return channels
   }
 
@@ -33,7 +34,9 @@ export default class MessageRepository implements ChannelRepositoryContract {
       },{
         admin:true
       })
+
       const serializedChannel = channel.serialize()
+
       serializedChannel.members = [
         {
           id:user.id,
@@ -48,47 +51,31 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     } catch (error) {
 
-      if(error.constraint === 'channels_name_unique') {
-        return 'Channel already exists.'
-      }
       return 'Error when creating channel'
 
     }
   }
 
-  public async join(user: User, channel_name:string, inviter: number | null): Promise<Channel|string> {
+  public async join(user: User, channelToJoin: Channel): Promise<Channel|string> {
 
-    const channel = await Channel.findBy('name', channel_name)
-    let members = await channel?.related('users').query().select('id')
-    let is_admin: boolean = false
+    await channelToJoin.load('users',(userQuery) => {
+      userQuery.select('id','nickname','avatar_color','status')
+    })
 
-    if(members != null && inviter != null){
-      for(let i = 0; i < members.length;){
-        if(members[i].$extras.pivot_admin == true && members[i].$extras.pivot_user_id == inviter) {
-          is_admin = true
-          break
-        }
-      }
-    }
-
-
-    if (channel == null) {
-      return 'This channel doesnt exist'
-
-    }
-    else if (channel?.type == 'private' && is_admin == false) {
-      return 'Cannot join private channels'
-
-    }
-    else if ( members != undefined && members.find(i => i.id == user.id) != undefined) {
+    if(channelToJoin.users.find(member => member.id === user.id) !== undefined) {
       return 'You are already a member of this channel'
-
     }
-    else {
-      await channel.related('users').attach([user.id])
-      return channel
 
-    }
+    channelToJoin.related('users').attach([user.id])
+
+    const serializedChannel = channelToJoin.serialize()
+    delete serializedChannel.deleted_at
+    serializedChannel.admin = false
+    serializedChannel.members = serializedChannel.users
+    delete serializedChannel.users
+
+
+    return serializedChannel as Channel
   }
 
   public async invite(user_id: number, channel_id: number, target_name: string): Promise<Channel|Error> {

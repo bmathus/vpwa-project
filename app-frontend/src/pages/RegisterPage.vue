@@ -10,7 +10,7 @@
                   v-model="form.name"
                   label="Enter name *"
                   lazy-rules
-                  :rules="[val => val && val.length != '' || 'Please type something',val => val && val.length <= 20 || 'Too many characters',val => val && validate_input(val) || 'No special characters']"
+                  :rules="[val => val && val.length != '' || 'Please type something',val => val && val.length <= 20 || 'Too many characters',val => val && validate_input(val) || 'No special characters or spaces']"
                 />
 
                 <q-input dense
@@ -19,7 +19,7 @@
                   v-model="form.surname"
                   label="Enter surname *"
                   lazy-rules
-                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters',val => val && validate_input(val) || 'No special characters']"
+                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters',val => val && validate_input(val) || 'No special characters or spaces']"
                 />
 
                 <q-input dense
@@ -28,7 +28,7 @@
                   v-model="form.nickname"
                   label="Enter nickname *"
                   lazy-rules
-                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && !val.includes('/') || 'No special characters']"
+                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length <= 20 || 'Too many characters', val => val && validate_input(val) || 'No special characters or spaces']"
                 />
 
                 <q-input dense

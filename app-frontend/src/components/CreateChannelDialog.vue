@@ -56,7 +56,7 @@ export default defineComponent({
     }
 
     async function onSubmit() {
-      const responce = await store.createChannel(name.value,channelType.value)
+      const responce = await store.joinChannel(name.value,channelType.value,true)
       notify(responce)
 
       ctx.emit('dialogVisibility');

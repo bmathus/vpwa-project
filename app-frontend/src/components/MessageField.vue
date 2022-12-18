@@ -109,13 +109,13 @@ export default defineComponent({
         return ['join', 'list', 'cancel']
       }
       if (!iamAdmin.value && channelIsPublic.value) {
-        return ['join', 'list', 'invite', 'kick', 'cancel']
+        return ['join', 'list', 'cancel', 'invite', 'kick',]
       }
       if (iamAdmin.value && !channelIsPublic.value) {
-        return ['join', 'list', 'invite', 'revoke', 'kick', 'quit', 'cancel'];
+        return ['join', 'list', 'cancel', 'invite', 'revoke', 'kick', 'quit' ];
       }
       if (iamAdmin.value && channelIsPublic.value) {
-        return ['join', 'list', 'invite', 'kick', 'quit', 'cancel'];
+        return ['join', 'list', 'cancel', 'invite', 'kick', 'quit',];
       }
       return []
     })
@@ -123,187 +123,158 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async function sendMessage(): Promise<void> {
 
-      if (messageText.value.trim() !== '') {
+      if (messageText.value.trim() ==='')  return
 
 
-        let command = messageText.value.replace('\n', '').split(' ')
-        let text = messageText.value.replace('\n', '')
-        messageText.value = ''
-        sendLoading.value = true;
+      let command = messageText.value.replace('\n', '').trim().split(' ')
+      let command_text = messageText.value.replace('\n', '').trim()
+      messageText.value = ''
+      sendLoading.value = true;
 
 
-        if (command[0] == '/join' && myPermitions.value.includes('join')) {
+      if (command[0] == '/join' && myPermitions.value.includes('join')) {
 
-          let message_join = text.split(' ').slice(1)
+        let message_join = command_text.split(' ').slice(1) //ged rid of /join
 
-          if(message_join[message_join.length - 1] == '\[public\]' || message_join[message_join.length - 1] == '\[private\]'){ // TODO na join bez []
-            message_join.splice(-1, 1)
-          }
-
-
-          let channel_name = message_join.join(' ')
-
-          if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[public\]') {
-            const responce = await store.createChannel(channel_name,'public')
-            if(responce !== 'Channel is created succesfully.'){
-              notify_event(responce)
-            }
-            else{
-              notify_event('Public channel ' + channel_name + ' was created')
-            }
-
-          }
-
-          else if (!channel_name.includes('/') && channel_name.length <= 20 && text.split(' ').pop() == '\[private\]') {
-            const responce = await store.createChannel(channel_name,'private')
-            if(responce !== 'Channel is created succesfully.'){
-              notify_event(responce)
-            }
-            else{
-              notify_event('Private channel ' + channel_name + ' was created')
-            }
-
-          }
-
-          else if(!channel_name.includes('/') && channel_name.length <= 20){
-
-            const message = await store.joinChannel(channel_name, null)
-
-            if(message != null){
-              notify_event(message)
-            }
-            else{
-              notify_event('You have joined ' + channel_name)
-            }
-
-          }
-
-          else {
-
-            if (channel_name.includes('/')) {
-              notify_event('Cannot create channel with special characters')
-            }
-
-            else {
-              notify_event('Incorrect command')
-            }
-
-          }
-
-        }
-        else if (command[0] == '/cancel' && myPermitions.value.includes('cancel')) {
-
-          if (text.split(' ', 2).length > 1) {
-            notify_event('Incorrect command')
-          }
-          else {
-            let message = ''
-            if (iamAdmin.value) {
-              message = 'Do you really want to leave this channel? Channel will be deleted'
-            }
-            else {
-              message = 'Do you really want to leave this channel?'
-            }
-            confirm(message, 'Leave channel')
-          }
-
-
-        }
-        else if (command[0] == '/quit' && myPermitions.value.includes('quit')) {
-
-          if (text.split(' ', 2).length > 1) {
-            notify_event('Incorrect command')
-          }
-          else {
-            const message = 'Do you really want to quit this channel? Channel will be deleted'
-            confirm(message, 'Leave channel')
-          }
-
-
+        if(message_join[message_join.length - 1] == '\[private\]'){ //ged rid of [private]
+          message_join.splice(-1, 1)
         }
 
-        else if (command[0] == '/list' && myPermitions.value.includes('list')) {
+        let channel_name = message_join.join(' ').trim()
 
-          if (text.length == 5)
-            store.toogleMembersDialog()
-          else {
-            notify_event('Incorrect command')
-          }
+        if (channel_name.length !== 0 && channel_name.length <= 20 && command_text.split(' ').pop() == '\[private\]') {
+          const responce = await store.joinChannel(channel_name,'private',false)
+          notify_event(responce)
+
+        } else if(channel_name.length !== 0 && channel_name.length <= 20){
+          const responce = await store.joinChannel(channel_name,'public',false)
+          notify_event(responce)
+
+        }else {
+          notify_event('Incorrect command')
         }
-        else if (command[0] == '/revoke' && myPermitions.value.includes('revoke')) {
 
-          let command = text.split(' ', 2)
+      }
+      else if (command[0] == '/cancel' && myPermitions.value.includes('cancel')) {
 
-          if (command[0] == '/revoke') {
-
-            if (command[1] == userstore.getUserNickname) {
-              notify_event('You cannot throw yourself out of the channel')
-            }
-
-            else {
-              const status = store.makeRevoke(command[1])
-
-              if (status == 2) {
-                notify_event('Such user doesnt exist in this channel')
-              }
-            }
-
-
-          }
-          else {
-            notify_event('Incorrect command')
-          }
-
-        }
-        else if (command[0] == '/kick' && myPermitions.value.includes('kick')) {
-          let command = text.split(' ', 2)
-
-          if (command[0] == '/kick' && command.length >= 2) {
-
-            if (command[1] == userstore.getUserNickname) {
-              notify_event('You cannot kick yourself out of the channel')
-            }
-
-            else{
-              const status = await store.addKick(command[1])
-
-              if (status == 1) {
-                notify_event('You kicked member ' + command[1])
-              }
-
-              else if (status == 2) {
-                notify_event('Cannont kick the same user twice')
-              }
-
-              else if (status == 3) {
-                notify_event('Such user doesnt exist in this channel')
-              }
-
-            }
-
-          }
-          else {
-            notify_event('Incorrect command')
-          }
-        }
-        else if (command[0] == '/invite' && myPermitions.value.includes('invite')) {
-          let command = text.split(' ', 2)
-
-          if (command[0] == '/invite' && command.length == 2 && userstore.user != null && store.active_channel != null) {
-            const responce = await userstore.inviteUser(command[1])
-            notify_event(responce)
-
-          }
-          else {
-            notify_event('Incorrect command')
-          }
+        if (command_text.split(' ', 2).length > 1) {
+          notify_event('Incorrect command')
         }
         else {
-          await store.addMessage({channel: aChannel.value, message: text})
+          let message = ''
+          if (iamAdmin.value) {
+            message = 'Do you really want to leave this channel? Channel will be deleted'
+          }
+          else {
+            message = 'Do you really want to leave this channel?'
+          }
+          confirm(message, 'Leave channel')
+        }
+
+
+      }
+      else if (command[0] == '/quit' && myPermitions.value.includes('quit')) {
+
+        if (command_text.split(' ', 2).length > 1) {
+          notify_event('Incorrect command')
+        }
+        else {
+          const message = 'Do you really want to quit this channel? Channel will be deleted'
+          confirm(message, 'Leave channel')
+        }
+
+
+      }
+
+      else if (command[0] == '/list' && myPermitions.value.includes('list')) {
+
+        if (command_text.length == 5)
+          store.toogleMembersDialog()
+        else {
+          notify_event('Incorrect command')
+        }
+      }
+      else if (command[0] == '/revoke' && myPermitions.value.includes('revoke')) {
+
+        let command = command_text.split(' ', 2)
+
+        if (command[0] == '/revoke') {
+
+          if (command[1] == userstore.getUserNickname) {
+            notify_event('You cannot throw yourself out of the channel')
+          }
+
+          else {
+            const status = store.makeRevoke(command[1])
+
+            if (status == 2) {
+              notify_event('Such user doesnt exist in this channel')
+            }
+          }
+
 
         }
-        sendLoading.value = false;
+        else {
+          notify_event('Incorrect command')
+        }
+
       }
+      else if (command[0] == '/kick' && myPermitions.value.includes('kick')) {
+        let command = command_text.split(' ', 2)
+
+        if (command[0] == '/kick' && command.length >= 2) {
+
+          if (command[1] == userstore.getUserNickname) {
+            notify_event('You cannot kick yourself out of the channel')
+          }
+
+          else{
+            const status = await store.addKick(command[1])
+
+            if (status == 1) {
+              notify_event('You kicked member ' + command[1])
+            }
+
+            else if (status == 2) {
+              notify_event('Cannont kick the same user twice')
+            }
+
+            else if (status == 3) {
+              notify_event('Such user doesnt exist in this channel')
+            }
+
+          }
+
+        }
+        else {
+          notify_event('Incorrect command')
+        }
+      }
+      else if (command[0] == '/invite' && myPermitions.value.includes('invite')) {
+        let command = command_text.split(' ')
+        const username = command[command.length -1]
+        const between = command.slice(1,command.length -1)
+
+        if (username !== '/invite' && between.join(' ').trim().length === 0 && userstore.user != null && store.active_channel != null) {
+          console.log('good')
+          const responce = await userstore.inviteUser(username)
+          notify_event(responce)
+
+        }
+        else {
+          notify_event('Incorrect command')
+        }
+
+      }else if(command[0].includes('/')) {
+        notify_event('Incorrect command')
+
+      }else {
+
+        await store.addMessage({channel: aChannel.value, message: command_text})
+
+      }
+      sendLoading.value = false;
+
     }
 
     watch(messageText,(liveMessageText) => {

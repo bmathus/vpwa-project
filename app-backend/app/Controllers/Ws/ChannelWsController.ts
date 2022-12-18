@@ -19,38 +19,42 @@ export interface Member {
 export default class ChannelControllerWs{
   constructor(private chRepository: ChannelRepositoryContract) {}
 
-  public async createChannel ({auth}: WsContextContract, channel_name: string, type:'public'|'private') {
-    const channel = await this.chRepository.create(auth.user,channel_name,type);
-    return channel
+  public async joinChannel ({auth, socket}: WsContextContract, channelName: string, type: 'public'|'private', creating: boolean) {
 
-  }
+    const foundchannel = await Channel.findBy('name',channelName)
 
-  public async joinChannel ({auth, socket}: WsContextContract, channel_name: string, sender: number | null) {
-    let channel = await this.chRepository.join(auth.user, channel_name, sender);
+    if(foundchannel !== null) { //kanal s daným meno existuje
 
-    if(channel instanceof Channel){ //todo aby pri joinuti nebol members prazdny
-      /*channel.members = channel.members.map((ch)=>{
-        const channel = ch.serialize()
-        delete channel.deleted_at
-        channel.admin = ch.$extras.pivot_admin
-        channel.members = channel.users
-        delete channel.users
-        return channel
-      }) ;*/
-
-      const user = await User.findBy('id', auth.user?.id)// kvoli avatarColor
-      const member = {
-        id: user?.id,
-        nickname: user?.nickname,
-        avatar_color:user?.avatarColor,
-        status: 'online',
+      if(creating) { //info pre create channel dialog
+        return 'Channel already exists.'
       }
 
-    socket.broadcast.emit('addMember', member, channel.id)
+      if(type === 'private' || foundchannel.type === 'private') { //nemožeme joinovať private kanal
+        return 'You cannot join private channel. You need invitation that you need to accept.'
+      }
 
+      //ideme joinovať public kanal ktorý exituje
+      const result  = await this.chRepository.join(auth.user,foundchannel)
+      if (typeof result === 'string') return result
+
+      const newMember = {
+        id: auth.user?.id,
+        nickname: auth.user?.nickname,
+        avatar_color: auth.user?.avatarColor,
+        status: auth.user?.status,
+      }
+      result.members.push(newMember)
+
+      socket.broadcast.emit('addMember', newMember, result.id)
+
+      return result
+
+
+    } else { //kanal s daným menom neexistuje ide sa vytvarat kanal bud public alebo private
+      const channel = await this.chRepository.create(auth.user,channelName,type);
+      return channel
     }
 
-    return channel
   }
 
   public async leaveChannel ({auth,socket}: WsContextContract, channel_id: number) {
@@ -99,75 +103,84 @@ export default class ChannelControllerWs{
 
     const targetUser = await User.query().where('nickname',targetUserNickname).first()
 
-    if(targetUser == null) return `Such user doesnt exist`
-    
+    if(targetUser == null) return `Such user doesnt exist.`
+
     await targetUser?.load('channels',(query)=> {
       query.where('channels.id',channelId)
     })
 
-    if(targetUser?.channels.length === 0) {
-
-      await targetUser?.load('invites',(query) => {
-        query.where('channel_id',channelId)
-      })
-
-      if(targetUser?.invites.length === 0) {
-
-        const invite = await Invite.create({
-          user_id:targetUser.id,
-          sender_id:auth.user?.id,
-          channel_id:channelId
-        })
-
-        const newInvite = {
-          id: invite.id,
-          user_id: targetUser.id,
-          sender: {
-            id: auth.user?.id,
-            nickname: auth.user?.nickname
-          },
-          channel: {
-            id:channelId,
-            name: channelName
-          }
-        }
-
-        socket.broadcast.emit('invite', newInvite)
-
-        return `Invite send.`
-
-
-      } else {
-        return 'User is already invited to this channel.'
-      }
-
-
-    } else {
+    if(targetUser?.channels.length !== 0) {
       return 'User is already member of this channel.'
     }
 
-    // const userInChannel = await User.query().whereHas('channels',(channelQuery) => {
-    //   channelQuery.where('name',channelName)
-    // }).where('nickname',targetUserNickname)
+    await targetUser?.load('invites',(query) => {
+      query.where('channel_id',channelId)
+    })
 
+    if(targetUser?.invites.length !== 0) {
+      return 'User is already invited to this channel.'
+    }
 
+    const invite = await Invite.create({
+      user_id:targetUser.id,
+      sender_id:auth.user?.id,
+      channel_id:channelId
+    })
 
-    //check ci targer user uz nieje v kanaly already
-    //check ci target user uz nema nahodou invite do tohto kanala aby nebol spamovany rovnakymi
+    const newInvite = {
+      id: invite.id,
+      user_id: targetUser.id,
+      sender: {
+        id: auth.user?.id,
+        nickname: auth.user?.nickname
+      },
+      channel: {
+        id:channelId,
+        name: channelName
+      }
+    }
 
+    socket.broadcast.emit('invite', newInvite)
 
-    //console.log(channelName + ' ' + targetUserNickname)
-    //console.log(channelId + ' ' + targetUserNickname)
-    //const invitation = await this.chRepository.invite(user_id, channel_id, targetuser)
-
+    return `Invite send.`
   }
 
-  public async deleteInvitation ( id: number) {
+  public async resolveInvitation({socket,auth}: WsContextContract,invitationId: number, channelId: number, action: 'accept'|'decline') {
+    if(action == 'accept') {
+      //user is already member of channel
+      //channel doesnt exist
+      //ci niesom kicked
 
-    const invite = await Invite.findBy('id', id)
-    await invite?.delete()
+      const foundchannel = await Channel.findBy('id',channelId)
+
+      if(foundchannel === null) return 'Channel no longer exist.'
+
+      const joinresult  = await this.chRepository.join(auth.user,foundchannel)
+      if (typeof joinresult === 'string') return joinresult
+
+      const invite = await Invite.findBy('id', invitationId)
+      await invite?.delete()
+
+      const newMember = {
+        id: auth.user?.id,
+        nickname: auth.user?.nickname,
+        avatar_color: auth.user?.avatarColor,
+        status: auth.user?.status,
+      }
+      joinresult.members.push(newMember)
+
+      socket.broadcast.emit('addMember', newMember, joinresult.id)
+
+      return joinresult
+
+    } else {
+      const invite = await Invite.findBy('id', invitationId)
+      await invite?.delete()
+
+      return 'Invitation declined.'
+    }
+
   }
-
 
   public async addKick ({auth}: WsContextContract, nickname: string, channel_id: number) {
 

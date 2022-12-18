@@ -52,6 +52,9 @@ export const useUserStore = defineStore('userstore', {
     AuthSuccess(user: User | null) {
       this.auth_status = 'success';
       this.user = user;
+      if(user != null) {
+        this.status = Status.online
+      }
     },
     AuthError(errors: { message: string; field?: string | undefined }[]) {
       this.auth_status = 'error';
@@ -121,37 +124,44 @@ export const useUserStore = defineStore('userstore', {
       return 'Error when inviting user'
     },
 
-    addReceivedInvitation(invitation: Invitation) {
+    addReceivedInvitation(invitation: Invitation): void {
       this.invitations.push(invitation)
     },
 
     async setStatus(status: Status) {
+      const channelstore = useChannelStore()
       const changed_status = await statusService.changeStatus(status)
+
+      if(changed_status === Status.offline) {
+        channelstore.channels.forEach((channel) => {
+          channelService.in(channel.name)?.unsubscribeMessages()
+        })
+
+      } else if (changed_status === Status.online) {
+        channelstore.channels.forEach((channel) => {
+          channelService.in(channel.name)?.subscribeMessages()
+        })
+
+      }
       this.status = changed_status;
     },
 
-    async acceptInvitation(invitation: Invitation) {
-      //todo namiesto creatovania by sa mal joinuť kanal spravit si nejake na joinutie a metodu nato
-      // this.channelstore.createNewChannel(
-      //   invitation.channel_name,
-      //   invitation.is_public,
-      //   this.getUserNickname,
-      //   this.getUserAvatarColor,
-      //   this.status
-      // );
-      await this.channelstore.joinChannel(invitation.channel.name, invitation.sender.id)//todo
-      await channelService.in('general')?.deleteInvitation(invitation.id)
+    async resolveInvitation(invitation: Invitation, action: 'accept'|'decline') {
+      const result = await channelService.in('general')?.resolveInvitation(invitation.id,invitation.channel.id,action)
+      if(typeof result !== 'string' && result !== undefined) {
+        this.channelstore.NewChannel(result)
+        this.channelstore.addNotification('Channel joined succesfully.')
+      } else if(typeof result === 'string' && result !== undefined) {//nejake erorrs
+        this.channelstore.addNotification(result)
+      } else {
+        this.channelstore.addNotification('Error when accepting invite.')
+        return
+      }
 
       this.invitations = this.invitations.filter((obj) => {
         return obj.id !== invitation.id;
       });
     },
-    async declineInvitation(invitation_id: number) {
 
-      await channelService.in('general')?.deleteInvitation(invitation_id)
-      this.invitations = this.invitations.filter((obj) => {
-        return obj.id !== invitation_id;
-      });
-    },
   },
 });

@@ -21,7 +21,6 @@ class StatusSocketManager extends SocketManager {
     })
 
     authManager.onChange((token) => {
-      console.log('vykonavaj')
       if (token) {
         this.socket.connect()
       } else {

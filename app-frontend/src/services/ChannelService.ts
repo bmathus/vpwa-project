@@ -1,4 +1,4 @@
-import { RawMessage, SerializedMessage, Channel,ErrorMessage,Member, Invitation } from 'src/contracts'
+import { RawMessage, SerializedMessage, Channel,ErrorMessage,Member, Invitation,Status } from 'src/contracts'
 import { SocketManager } from './SocketManager'
 import {useChannelStore} from '../stores/channelstore'
 import { api } from 'src/boot/axios';
@@ -10,11 +10,11 @@ import { useUserStore } from 'src/stores/userstore';
 // subscribe is called with boot params, so you can use it to dispatch actions for socket events
 // you have access to socket.io socket using this.socket
 class ChannelSocketManager extends SocketManager {
-  public subscribe (): void {
+
+  public subscribeMessages(): void {
     const channel = this.namespace.split('/').pop() as string
     const channelstore = useChannelStore()
     const userstore = useUserStore()
-
 
     this.socket.on('message', (message: SerializedMessage) => {
       if(channelstore.channels_messages[channel].firstReceivedDateTime === 'now') {
@@ -22,11 +22,24 @@ class ChannelSocketManager extends SocketManager {
       }
       channelstore.NewMessage({channel,message})
 
-      if(!AppVisibility.appVisible) {
+      if(!AppVisibility.appVisible && userstore.getStatus !== Status.DND) {
         this.showNotification(message,channel,userstore.getUserNickname,userstore.notifyOnlyForMe)
       }
 
     })
+
+  }
+
+  public unsubscribeMessages(): void {
+    this.socket.off('message')
+  }
+
+  public subscribe (): void {
+    const channel = this.namespace.split('/').pop() as string
+    const channelstore = useChannelStore()
+    const userstore = useUserStore()
+    this.subscribeMessages()
+
 
     this.socket.on('addMember', (member: Member,channelId: number) => {
       const chIndex = channelstore.channels.findIndex((channel) => channel.id === channelId)
@@ -52,20 +65,11 @@ class ChannelSocketManager extends SocketManager {
     })
 
     this.socket.on('channelCanceled',(channelName: string) => {
-      const $q = useQuasar()
       if(channelstore.getActiveChannel?.name == channelName) {
         channelstore.disconnectFrom(channelName,true)
       } else {
         channelstore.disconnectFrom(channelName,false)
       }
-
-      //nefunguje ten notify odtialto neviem prečo
-      $q.notify({
-        type: 'info',
-        message: 'Channel '+channelName+' was removed by his admin.',
-        color: 'teal',
-        timeout: 2500,
-      });
 
     })
 
@@ -81,6 +85,7 @@ class ChannelSocketManager extends SocketManager {
 
   }
 
+
   public addMessage (message: RawMessage): Promise<SerializedMessage> {
     return this.emitAsync('addMessage', message)
   }
@@ -89,12 +94,8 @@ class ChannelSocketManager extends SocketManager {
     return this.emitAsync('loadMessages', channelId,page,firstReceivedDateTime)
   }
 
-  public createChannel (channelName: string, type:'public'|'private'): Promise<Channel| string> {
-    return this.emitAsync('createChannel',channelName,type)
-  }
-
-  public joinChannel (channelName: string, sender: number | null): Promise<Channel|string> {
-    return this.emitAsync('joinChannel',channelName, sender)
+  public joinChannel (channelName: string, type: 'public'| 'private', creating: boolean): Promise<Channel|string> {
+    return this.emitAsync('joinChannel',channelName, type, creating)
   }
 
   public leaveChannel (channel_id: number): Promise<boolean|ErrorMessage> {
@@ -104,9 +105,8 @@ class ChannelSocketManager extends SocketManager {
   public inviteUser (targetUserNickname: string,channelId: number, channelName: string): Promise<string> {
     return this.emitAsync('inviteUser', targetUserNickname,channelId,channelName)
   }
-
-  public deleteInvitation (id: number): Promise<string> {
-    return this.emitAsync('deleteInvitation', id)
+  public resolveInvitation(invitationId: number,channelId: number, action: 'accept'|'decline'): Promise<Channel|string> {
+    return this.emitAsync('resolveInvitation', invitationId,channelId,action)
   }
 
   public addKick (nickname: string, channel_id: number): Promise<number> {
