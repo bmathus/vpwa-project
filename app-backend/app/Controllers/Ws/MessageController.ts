@@ -13,7 +13,7 @@ import { inject } from '@adonisjs/core/build/standalone'
 export default class MessageController {
   constructor (private messageRepository: MessageRepositoryContract) {}
 
-  public async loadMessages({ auth }: WsContextContract,channelId: number,page: number,fromMessageDateTime: string) {
+  public async loadMessages({}: WsContextContract,channelId: number,page: number,fromMessageDateTime: string) {
     return this.messageRepository.getAll(channelId, page,fromMessageDateTime)
   }
 

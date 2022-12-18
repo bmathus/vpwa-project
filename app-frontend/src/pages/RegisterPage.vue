@@ -49,7 +49,7 @@
                   v-model="form.password"
                   label="Password *"
                   lazy-rules
-                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length < 64 || 'Too many characters']"
+                  :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length < 64 || 'Too many characters', val => val && val.length >= 8|| 'Password mus have at least 8 chars']"
                   bottom-slots
                 >
                   <template v-slot:append>
@@ -63,12 +63,19 @@
                 <q-input dense
                   color="teal"
                   filled
-                  type="password"
+                  :type="showPassword ? 'text' : 'password'"
                   v-model="form.passwordConfirmation"
                   label="Confirm password*"
                   lazy-rules
                   :rules="[val => val && val.length != '' || 'Please type something', val => val && val.length < 64 || 'Too many characters',val => val && val === form.password || 'Passwords doesnt match']"
-                />
+                >
+                  <template v-slot:append>
+                    <q-icon
+                      :name="showPassword ? 'visibility' : 'visibility_off'"
+                      class="cursor-pointer"
+                      @click="showPassword = !showPassword" />
+                  </template>
+                </q-input>
 
                 <q-toggle color="teal"
                   v-model="accept"
@@ -90,6 +97,7 @@ import { useQuasar } from 'quasar'
 import { ref,reactive, computed } from 'vue'
 import { useUserStore } from 'src/stores/userstore'
 import { useRouter,RouteLocationRaw } from 'vue-router'
+import { User } from 'src/contracts'
 
 export default {
     name: 'LoginPage',
@@ -118,7 +126,7 @@ export default {
           return { name: 'login' }
         })
 
-        function onSubmit() {
+        async function onSubmit() {
             if (accept.value !== true) {
                 $q.notify({
                     color: 'red-5',
@@ -126,19 +134,32 @@ export default {
                     icon: 'warning',
                     message: 'You need to accept the license and terms first'
                 })
+                return
             }
-            else {
-              userstore.register(form)
-                .then(()=> {
-                  //$userstore.makeRegistration(0, name.value, surname.value, nickname.value, email.value, password.value)
-                  $router.push(redirectTo.value)
-                })
+
+            const responce: string | User = await userstore.register(form)
+
+            if( typeof responce === 'string' && responce == 'err'){
+              $q.notify({
+                type: 'info',
+                message: 'Email or nickname is already taken.',
+                color: 'red-5',
+              });
+
+            } else {
+              $router.push(redirectTo.value)
             }
+
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        function isNumber(n: any) {
+          return !isNaN(parseFloat(n)) && !isNaN(n - 0) ;
         }
 
-        function validate_input(name: string): boolean {
-            for (let i = 0; i < name.length; i++) {
-                if ((name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z')) {
+        function validate_input(inputText: string): boolean {
+
+            for (let i = 0; i < inputText.length; i++) {
+                if ((inputText[i] >= 'A' && inputText[i] <= 'Z') || (inputText[i] >= 'a' && inputText[i] <= 'z') || isNumber(inputText[i])) {
                     continue
                 }
                 else {

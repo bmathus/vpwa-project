@@ -23,7 +23,6 @@
 <script setup lang="ts">
 
 import { useChannelStore } from '../stores/channelstore';
-import { useQuasar } from 'quasar';
 
 const props = defineProps<{
   button_title: string,
@@ -32,18 +31,11 @@ const props = defineProps<{
 }>()
 
 const store = useChannelStore();
-const $q = useQuasar();
+
 
 async function leaveChannel() {
   const result = await store.leaveChannel()
-
-  $q.notify({
-    type: 'info',
-    message: result,
-    color: 'teal',
-    timeout: 2500,
-  });
-
+  store.addNotification(result)
 }
 
 </script>

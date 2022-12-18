@@ -5,26 +5,26 @@ export default class extends BaseSchema {
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id').primary
+      table.increments('id').primary()
 
       table
-      .integer('kicked_user_id')
+      .integer('kicked_user')
       .unsigned()
       .references('users.id')
-      .onDelete('CASCADE') 
+      .onDelete('CASCADE')
 
       table
       .integer('kicked_by')
       .unsigned()
       .references('users.id')
-      .onDelete('CASCADE') 
+      .onDelete('CASCADE')
 
       table
       .integer('channel_id')
       .unsigned()
       .references('channels.id')
       .onDelete('CASCADE')
-      table.timestamp('created_at', { useTz: true })
+
     })
   }
 

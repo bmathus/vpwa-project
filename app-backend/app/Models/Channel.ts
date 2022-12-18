@@ -3,6 +3,7 @@ import { BaseModel, column,hasMany,HasMany,manyToMany,ManyToMany } from '@ioc:Ad
 import Message from './Message'
 import User from './User'
 import Invite from './Invite'
+import Kick from './Kick'
 
 
 export default class Channel extends BaseModel {
@@ -25,7 +26,12 @@ export default class Channel extends BaseModel {
   })
   public invites: HasMany<typeof Invite>;
 
- 
+  @hasMany(() => Kick, {
+    foreignKey: 'channel_id',
+  })
+  public kicks: HasMany<typeof Kick>;
+
+
   @manyToMany(() => User, {
     pivotTable: 'members',
     pivotForeignKey: 'channel_id',
@@ -34,13 +40,7 @@ export default class Channel extends BaseModel {
   })
   public users: ManyToMany<typeof User>;
 
-  @manyToMany(() => User, {
-    pivotTable: 'kicks',
-    pivotForeignKey: 'channel_id',
-    pivotRelatedForeignKey: 'kicked_by',
-    pivotColumns: ['kicked_user_id'],
-  })
-  public kicks: ManyToMany<typeof User>;
+
 
   @column.dateTime()
   public deletedAt: DateTime

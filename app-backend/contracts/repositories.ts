@@ -2,6 +2,7 @@
 // container binding. See providers/AppProvider.ts for how we are binding the implementation
 import User from '../app/Models/User'
 import Channel from '../app/Models/Channel'
+import Kick from 'App/Models/Kick'
 
 // @ts-ignore
 declare module '@ioc:Repositories/MessageRepository' {
@@ -35,6 +36,8 @@ declare module '@ioc:Repositories/ChannelRepository' {
   export interface ChannelRepositoryContract {
     getAll(user: User): Promise<Channel[]>;
     create(user: User,channel_name: string, type:'public'|'private' ): Promise<Channel|Error>;
+    join(user: User, channelToJoin: Channel): Promise<Channel|string>;
+    kick(KickedBy: number, kickedNickname: string, channelId: number): Promise<string | Kick>
   }
 
   const ChannelRepository: ChannelRepositoryContract;

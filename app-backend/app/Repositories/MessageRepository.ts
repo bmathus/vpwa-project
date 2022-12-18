@@ -8,16 +8,6 @@ import { DateTime } from 'luxon'
 export default class MessageRepository implements MessageRepositoryContract {
   public async getAll(channelId: number, page: number,fromMessageDateTime: string): Promise<SerializedMessage[]> {
 
-    // const channel = await Channel.query()
-    //   .where('name', channelName)
-    //   .preload('messages', (messagesQuery) => {
-    //     messagesQuery.preload('user',(userQuery) => {
-    //       userQuery.select('id','nickname','avatar_color')
-    //     })
-    //     .orderBy('send_at','desc')
-    //     .paginate(page,8)
-    //   })
-
     const messages = await Message
       .query()
       .where((query) => {

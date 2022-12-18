@@ -6,7 +6,6 @@ import {
   Member,
   SerializedMessage,
   RawMessage,
-  ErrorMessage,
 
 } from '../contracts';
 import { useQuasar } from 'quasar';
@@ -25,11 +24,10 @@ export const useChannelStore = defineStore('channelstore', {
     channels: [] as Channel[],
     channels_messages: {} as ChannelsMessages,
     active_channel: null as Channel | null,
-    loading: false as boolean,
-    error: null as Error | null,
 
-    inAppNotification: '' as string,
-    membersDialogOpen: false,
+    //interface states
+    inAppNotification: [] as string[],
+    membersDialogOpen: false, //used when /list
     infiniteScroll: {} as InfiniteScroll,
     q: useQuasar(),
   }),
@@ -75,14 +73,10 @@ export const useChannelStore = defineStore('channelstore', {
 
   actions: {
     addNotification(notification: string) {
-      this.inAppNotification = notification
-    },
-    LoadingStart() {
-      this.loading = true;
-      this.error = null;
+      this.inAppNotification.push(notification)
     },
 
-    AppendMessages(channelName: string, messages: SerializedMessage[]) {
+    appendMessages(channelName: string, messages: SerializedMessage[]) {
       if(channelName in this.channels_messages) {
         this.channels_messages[channelName].messages.splice(0,0,...messages)
         this.channels_messages[channelName].page++;
@@ -97,7 +91,6 @@ export const useChannelStore = defineStore('channelstore', {
     },
 
     LoadingSuccess(channelName: string) {
-      this.loading = false;
       this.channels_messages[channelName] = {
         messages:[],
         page:1,
@@ -106,16 +99,11 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    LoadingError(error : Error | null) {
-      this.loading = false;
-      this.error = error;
-    },
 
     SetActiveChannel(channel: Channel) {
       this.active_channel = channel;
       //this.scrollToBottom(false);
     },
-
 
     NewMessage({ channel, message }: { channel: string, message: SerializedMessage }) {
       this.channels_messages[channel].messages.push(message);
@@ -147,14 +135,12 @@ export const useChannelStore = defineStore('channelstore', {
       }
     },
 
-    //actions from tutorial part 3
+
     connectTo(channel: string) {
       try {
-        this.LoadingStart();
         channelService.startConnection(channel)
         this.LoadingSuccess(channel);
       } catch(err : any) {
-        this.LoadingError(err)
         throw err;
       }
     },
@@ -202,7 +188,7 @@ export const useChannelStore = defineStore('channelstore', {
 
         const messages = await channelService.in(this.active_channel.name)?.loadMessages(id,page,firstReceivedDateTime) as SerializedMessage[]
         if(messages.length !== 0) {
-          this.AppendMessages(this.active_channel.name,messages)
+          this.appendMessages(this.active_channel.name,messages)
           return 'load_more'
         } else {
           return 'no_messages'
@@ -227,17 +213,18 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
-
-
+    //join and /create
     async joinChannel(channelName: string,type: 'public' | 'private',creating: boolean):Promise<string> {
 
       const responce = await channelService.in('general')?.joinChannel(channelName,type,creating)
+      console.log(responce)
 
       if(typeof responce !== 'string' && responce !== undefined) { //kanal sa vytvoril alebo joinol uspesne
 
         this.NewChannel(responce)
 
         if((responce as Channel).members.length == 1) {//ak sa vytváral
+
           return 'Channel created succesfully.'
 
         } else {// ak sa joinoval
@@ -254,67 +241,55 @@ export const useChannelStore = defineStore('channelstore', {
 
     },
 
+    //cancel /quit
     async leaveChannel():Promise<string> {
 
-      if(this.active_channel != null ){
-
-        if(this.active_channel.name !== 'general') {
-          const result = await channelService.in(this.active_channel.name)?.leaveChannel(this.active_channel.id)
-
-          if(result == false )
-          {
-            await this.disconnectFrom(this.active_channel?.name,true)
-            return 'Channel left successfully';
-
-          }
-          else if(result == true )
-          {
-            await this.disconnectFrom(this.active_channel?.name,true)
-            return 'Channel destroyed successfully';
-          }
-          else {
-            return 'Fail'
-          }
-
-        } else {
-          return 'You cannot leave general.'
-        }
-
+      if(this.active_channel == null ){
+        return 'Error when leaving channel.'
       }
 
-      return 'Fail'
+      if(this.active_channel.name === 'general') {
+        return 'You cannot leave general.'
+      }
+
+      const result = await channelService.in(this.active_channel.name)?.leaveChannel(this.active_channel.id)
+
+      if(result == false )
+      {
+        await this.disconnectFrom(this.active_channel?.name,true)
+        return 'Channel left successfully';
+
+      }
+      else if(result == true )
+      {
+        await this.disconnectFrom(this.active_channel?.name,true)
+        return 'Channel destroyed successfully';
+      }
+      else if(typeof result === 'string' && result != undefined){
+        return result
+      }else {
+        return 'Error when leaving channel.'
+      }
 
     },
 
-
-    makeRevoke(nickname: string): number {
-      const len = this.active_channel?.members.length;
-
-      const new_members = this.active_channel?.members.filter(
-        (member) => member.nickname !== nickname
-      );
-
-      if (new_members != undefined) {
-        if (this.active_channel !== null) {
-          this.active_channel.members = new_members;
-        }
-
-        if (len == this.active_channel?.members.length) {
-          return 2;
-        }
+    // /revoke
+    async revokeUser(nickname: string): Promise<string>{
+      if(this.active_channel !== null) {
+        const result = await channelService.in(this.active_channel.name)?.revokeUser(nickname,this.active_channel.id)
+        if (result != undefined) return result
       }
-      return 1;
+      return 'Error when revoking user.'
+
     },
 
-
-    async addKick(nickname: string): Promise<number> {
-
-      if(this.active_channel != undefined){
-        const status = await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
-        if (status != undefined) return status
+    // /kick
+    async addKick(nickname: string): Promise<string> {
+      if(this.active_channel !== null){
+        const result = await channelService.in(this.active_channel.name)?.addKick(nickname, this.active_channel.id)
+        if (result != undefined) return result
       }
-
-      return 0
+      return 'Error when kicking user.'
     },
 
     //template controll actions

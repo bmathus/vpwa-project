@@ -35,11 +35,6 @@ export interface Invitation {
   }
 }
 
-export interface ErrorMessage {
-  message:string
-}
-
-
 export enum Status {
   online = 'online',
   DND = 'DND',

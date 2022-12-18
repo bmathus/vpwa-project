@@ -99,12 +99,12 @@ export default {
       }
       else {
         $router.push({ name: 'home' })
-          $q.notify({
-            color: 'teal',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Welcome back'
-          })
+        $q.notify({
+          color: 'teal',
+          textColor: 'white',
+          icon: 'cloud_done',
+          message: 'Welcome back'
+        })
       }
 
     }

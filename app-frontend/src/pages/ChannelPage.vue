@@ -105,20 +105,23 @@ export default {
     })
 
     watch(notification,(newNotification) => {
-      $q.notify({
-        type: 'info',
-        message: newNotification,
-        color: 'teal',
-        timeout: 2500,
-      });
-    })
+      if(newNotification.length != 0) {
+        $q.notify({
+          type: 'info',
+          message: newNotification.pop(),
+          color: 'teal',
+          timeout: 2500,
+        });
+        store.inAppNotification = []
+      }
+
+    },{deep: true})
 
     async function onLoad(index: number, done: (stop: boolean) => void) {
 
       if(store.getActiveChannel !== null) {
-          //console.log('az teraz',store.getActiveChannel !== null)
-          const result = await store.loadMessages();
 
+          const result = await store.loadMessages();
           if(result == 'load_more') {
             done(false);
           } else {

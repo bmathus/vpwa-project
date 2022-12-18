@@ -8,7 +8,7 @@ export const useUserStore = defineStore('userstore', {
   state: () => ({
     user: null as User | null,
     status: Status.online as Status,
-    notifyOnlyForMe: false,
+    notifyOnlyForMe: false, // notififications only for user or all
     auth_status: 'pending' as 'pending' | 'success' | 'error',
     errors: [] as { message: string; field?: string }[],
 
@@ -81,7 +81,7 @@ export const useUserStore = defineStore('userstore', {
         return user;
       } catch (err: any) {
         this.AuthError(err);
-        throw err;
+        return 'err'
       }
     },
     async login(credentials: LoginCredentials) {
@@ -118,7 +118,7 @@ export const useUserStore = defineStore('userstore', {
     async inviteUser(targetUserNickname: string): Promise<string>{
       const activeChannel = this.channelstore.getActiveChannel;
       if(activeChannel !== null) {
-        const responce = await channelService.in('general')?.inviteUser(targetUserNickname,activeChannel.id,activeChannel.name);
+        const responce = await channelService.in('general')?.inviteUser(targetUserNickname,activeChannel.id,activeChannel.name,activeChannel.admin);
         return responce !== undefined ? responce : 'Error when inviting user'
       }
       return 'Error when inviting user'
@@ -139,13 +139,23 @@ export const useUserStore = defineStore('userstore', {
 
       } else if (changed_status === Status.online) {
         channelstore.channels.forEach((channel) => {
+          const liveMessages = channelstore.channels_messages[channel.name].liveMessages
+          channelstore.channels_messages[channel.name] = {
+            messages:[],
+            page:1,
+            firstReceivedDateTime:'now',
+            liveMessages: liveMessages
+          }
           channelService.in(channel.name)?.subscribeMessages()
         })
+
+        channelstore.resumeMessagesLoading()
 
       }
       this.status = changed_status;
     },
 
+    //accept or decline invitation
     async resolveInvitation(invitation: Invitation, action: 'accept'|'decline') {
       const result = await channelService.in('general')?.resolveInvitation(invitation.id,invitation.channel.id,action)
       if(typeof result !== 'string' && result !== undefined) {
@@ -155,7 +165,6 @@ export const useUserStore = defineStore('userstore', {
         this.channelstore.addNotification(result)
       } else {
         this.channelstore.addNotification('Error when accepting invite.')
-        return
       }
 
       this.invitations = this.invitations.filter((obj) => {

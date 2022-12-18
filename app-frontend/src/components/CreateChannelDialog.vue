@@ -30,7 +30,6 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from 'vue'
 import { useChannelStore } from 'src/stores/channelstore';
-import { useQuasar } from 'quasar';
 
 export default defineComponent({
   name: 'CreateChannelDialog',
@@ -40,24 +39,14 @@ export default defineComponent({
     const name = ref('');
     const isPublic = ref(false);
 
-    const $q = useQuasar();
 
     const channelType = computed(()=> {
       return isPublic.value ? 'public' : 'private'
     })
 
-    function notify(msg: string) {
-      $q.notify({
-        type: 'info',
-        message: msg,
-        color: 'teal',
-        timeout: 2500,
-      });
-    }
-
     async function onSubmit() {
-      const responce = await store.joinChannel(name.value,channelType.value,true)
-      notify(responce)
+      const responce = await store.joinChannel(name.value.trim(),channelType.value,true)
+      store.addNotification(responce)
 
       ctx.emit('dialogVisibility');
       name.value = '';

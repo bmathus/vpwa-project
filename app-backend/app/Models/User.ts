@@ -4,6 +4,7 @@ import { column, beforeSave, BaseModel,hasMany,HasMany, manyToMany,ManyToMany } 
 import Message from './Message'
 import Channel from './Channel'
 import Invite from './Invite'
+import Kick from './Kick'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -53,15 +54,11 @@ export default class User extends BaseModel {
   })
   public channels: ManyToMany<typeof Channel>
 
-  @manyToMany(() => Channel, {
-    pivotTable: 'kicks',
-    localKey: 'id',
-    pivotForeignKey: 'kicked_by',
-    relatedKey: 'id',
-    pivotRelatedForeignKey: 'channel_id',
-    pivotColumns: ['kicked_user_id'],
+  @hasMany(() => Kick, {
+    foreignKey: 'kicked_user',
   })
-  public chkicks: ManyToMany<typeof Channel>
+  public kicks: HasMany<typeof Kick>;
+
 
   @column.dateTime({ autoCreate: true,serializeAs:null })
   public createdAt: DateTime
