@@ -66,7 +66,6 @@ class AuthManager {
   }
 
   public removeToken(): void {
-    console.log('removol som token')
     LocalStorage.remove(this.storageKey);
     this.notifyListeners();
   }

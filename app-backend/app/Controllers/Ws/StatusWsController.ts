@@ -7,7 +7,6 @@ export default class ActivityController {
   }
 
   public async onConnected({ socket, auth}: WsContextContract) {
-    console.log('conectnul som sa ')
 
     // all connections for the same authenticated user will be in the room
     const room = this.getUserRoom(auth.user!)
@@ -31,7 +30,6 @@ export default class ActivityController {
   public async onDisconnected({ socket, auth}: WsContextContract) {
     const room = this.getUserRoom(auth.user!)
     const userSockets = await socket.in(room).allSockets()
-    console.log('disconectnul som sa ')
 
     // user is disconnected
     if (userSockets.size === 0) {

@@ -21,7 +21,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
       delete channel.users
       return channel
     }) as Channel[];
-    console.log(channels)
     return channels
   }
 
