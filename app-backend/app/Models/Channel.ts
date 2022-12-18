@@ -41,8 +41,4 @@ export default class Channel extends BaseModel {
   public users: ManyToMany<typeof User>;
 
 
-
-  @column.dateTime()
-  public deletedAt: DateTime
-
 }

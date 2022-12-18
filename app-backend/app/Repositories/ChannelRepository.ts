@@ -16,7 +16,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
 
     const channels = user.channels.map((ch)=>{
       const channel = ch.serialize()
-      delete channel.deleted_at
       channel.admin = ch.$extras.pivot_admin
       channel.members = channel.users
       delete channel.users
@@ -79,7 +78,6 @@ export default class MessageRepository implements ChannelRepositoryContract {
       channelToJoin.related('users').attach([user.id])
 
       const serializedChannel = channelToJoin.serialize()
-      delete serializedChannel.deleted_at
       serializedChannel.admin = false
       serializedChannel.members = serializedChannel.users
       delete serializedChannel.users

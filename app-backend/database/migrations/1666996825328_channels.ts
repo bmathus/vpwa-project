@@ -13,7 +13,6 @@ export default class extends BaseSchema {
         existingType: false
       })
 
-      table.timestamp('deleted_at', { useTz: true }).defaultTo(null)
     })
   }
 

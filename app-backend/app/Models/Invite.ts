@@ -31,7 +31,4 @@ export default class Invite extends BaseModel {
   })
   public channel: BelongsTo<typeof Channel>;
 
-  @column.dateTime({ autoCreate: true,serializeAs:null })
-  public createdAt: DateTime
-
 }

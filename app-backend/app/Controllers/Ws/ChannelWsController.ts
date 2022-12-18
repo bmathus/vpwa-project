@@ -77,6 +77,7 @@ export default class ChannelControllerWs{
           await channel?.related('messages').query().delete()
           await channel?.related('users').query().delete()
           await channel?.related('invites').query().delete()
+          await channel.related('kicks').query().delete()
 
           await channel?.delete()
           return true

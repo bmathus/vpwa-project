@@ -14,6 +14,7 @@ export default class UsersController {
     const data = await request.validate(RegisterUserValidator)
     data.avatar_color = colorPallete[randomnumber]
 
+
     const user = await User.create(data)
     // join user to general channel
     const general = await Channel.findByOrFail('name', 'general')

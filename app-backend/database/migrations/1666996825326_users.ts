@@ -9,14 +9,14 @@ export default class extends BaseSchema {
       table.string('email', 255).notNullable().unique()
       table.string('password', 180).notNullable()
       table.string('remember_me_token').nullable()
-      table.string('name',20).notNullable()  
+      table.string('name',20).notNullable()
       table.string('surname',20).notNullable()
       table.string('nickname',20).notNullable().unique()
       table.enu('status',['online','offline','DND'],{
         useNative: true,
         enumName: 'status',
         existingType: false
-      })
+      }).defaultTo('offline')
       table.string('avatar_color',10).notNullable()
 
       /**

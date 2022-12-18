@@ -11,22 +11,21 @@ export default class extends BaseSchema {
       .integer('user_id')
       .unsigned()
       .references('users.id')
-      .onDelete('CASCADE') 
+      .onDelete('CASCADE')
 
       table
       .integer('sender_id')
       .unsigned()
       .references('users.id')
-      .onDelete('CASCADE') 
+      .onDelete('CASCADE')
 
       table
       .integer('channel_id')
       .unsigned()
       .references('channels.id')
-      .onDelete('CASCADE') 
+      .onDelete('CASCADE')
 
 
-      table.timestamp('created_at', { useTz: true })
     })
   }
 
