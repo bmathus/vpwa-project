@@ -43,20 +43,25 @@ App supports 2 possible types of channels: **private** or **public**.
   - Membership requires invitation from admin - `/invite nickName`
   - Admin can remove user from channel - `/revoke nickname`
 
-<div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin: 40px 0;">
-  <div style="text-align: center; flex: 1;">
-    <img src="docs-images/create-channel.png" width="300" style="margin-bottom: 10px;"/>
-    <p><em>Creating a new channel with public/private option</em></p>
-  </div>
-  <div style="text-align: center; flex: 1;">
-    <img src="docs-images/invite.png" width="300" style="margin-bottom: 10px;"/>
-    <p><em>Inviting new members using command interface</em></p>
-  </div>
-  <div style="text-align: center; flex: 1;">
-    <img src="docs-images/members.png" width="300" style="margin-bottom: 10px;"/>
-    <p><em>Channel members list with status indicators</em></p>
-  </div>
-</div>
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs-images/create-channel.png" width="300"/>
+      <br>
+      <em>Creating a new channel with public/private option</em>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs-images/invite.png" width="300"/>
+      <br>
+      <em>Inviting new members using command interface</em>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs-images/members.png" width="300"/>
+      <br>
+      <em>Channel members list with status indicators</em>
+    </td>
+  </tr>
+</table>
 
 **Channel leaving / removal**: Channel admin has right to **delete** channel with command `/quit`. User can leave channel with command `/cancel` (if admin does so its has the same effect as `/quit`).
 
